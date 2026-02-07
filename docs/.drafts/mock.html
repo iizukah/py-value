@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Py-Value | モック</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* UX-04 tokens + glass */
+    :root {
+      --color-bg-main: #0d1117;
+      --color-bg-secondary: #161b22;
+      --color-text: #e6edf3;
+      --color-text-muted: #8b949e;
+      --color-accent-emerald: #10b981;
+      --color-accent-blue: #3b82f6;
+      --color-border: #30363d;
+      --color-error-bg: #7f1d1d;
+      --color-error-border: #991b1b;
+      --color-error-text: #fecaca;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --tile-min-width: 280px;
+      --tile-min-height: 180px;
+      --center-block-max-width: 480px;
+      /* glass */
+      --glass-bg: rgba(22, 27, 34, 0.75);
+      --glass-border: rgba(48, 54, 61, 0.6);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Outfit', system-ui, sans-serif;
+      background: var(--color-bg-main);
+      color: var(--color-text);
+      min-height: 100vh;
+      font-size: 14px;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .typography-title { font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: 0.02em; font-size: 18px; }
+    .typography-heading { font-weight: 600; letter-spacing: 0.01em; }
+
+    /* CP-001 Layout: header + breadcrumb + main */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .app-header .logo { font-size: 18px; font-weight: 700; color: var(--color-accent-emerald); }
+    .app-header .nav { display: flex; gap: var(--space-4); align-items: center; }
+    .app-header .nav a {
+      color: var(--color-accent-emerald);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .app-header .nav a:hover { text-decoration: underline; }
+
+    .breadcrumb {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin: var(--space-2) var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .breadcrumb a { color: var(--color-accent-emerald); text-decoration: none; }
+    .main-content { max-width: 1200px; margin: 0 auto; padding: var(--space-4); min-height: 60vh; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Glass cards */
+    .card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+    .label { font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: var(--space-1); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-primary { background: var(--color-accent-emerald); color: #fff; }
+    .btn-secondary { background: var(--color-accent-blue); color: #fff; }
+    .btn-ghost { background: transparent; color: var(--color-text); border: 1px solid var(--color-border); }
+
+    /* SC-001: question tiles */
+    .question-tiles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+    .question-tile {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      min-width: var(--tile-min-width);
+      min-height: var(--tile-min-height);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+    }
+    .question-tile .tile-title { font-weight: 600; margin-bottom: var(--space-1); }
+    .question-tile .tile-excerpt { font-size: 13px; color: var(--color-text-muted); margin-bottom: var(--space-2); flex: 1; }
+    .question-tile .tile-meta { font-size: 12px; color: var(--color-text-muted); margin-bottom: var(--space-2); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background: var(--color-accent-emerald);
+      color: var(--color-bg-main);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge.muted { background: var(--color-border); color: var(--color-text-muted); }
+
+    /* SC-002: 3-pane workspace */
+    .three-pane {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr 1fr;
+      gap: var(--space-3);
+      min-height: 360px;
+    }
+    @media (max-width: 900px) { .three-pane { grid-template-columns: 1fr; } }
+    .pane {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      overflow: auto;
+    }
+    .cell-box {
+      border: 1px dashed var(--color-border);
+      padding: var(--space-3);
+      margin-bottom: var(--space-2);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      min-height: 60px;
+      background: rgba(13, 17, 23, 0.5);
+      border-radius: var(--radius-sm);
+    }
+
+    /* Center block SC-003, SC-004 */
+    .center-block {
+      max-width: var(--center-block-max-width);
+      margin: 0 auto;
+      text-align: center;
+      padding: var(--space-6) 0;
+    }
+    .center-block .card { text-align: left; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid var(--color-border); padding: var(--space-2); text-align: left; }
+    th { background: var(--glass-bg); font-weight: 600; }
+    tr.pass td:nth-child(2) { color: var(--color-accent-emerald); }
+    tr.fail td:nth-child(2) { color: var(--color-error-text); }
+
+    /* Form */
+    .form-group { margin-bottom: var(--space-3); }
+    .form-group label { display: block; margin-bottom: var(--space-1); font-size: 14px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      max-width: 400px;
+      padding: var(--space-2);
+      background: var(--color-bg-main);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+    }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+
+    /* Error block FR-P011 */
+    .error-block {
+      background: var(--color-error-bg);
+      border: 1px solid var(--color-error-border);
+      color: var(--color-error-text);
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-2);
+    }
+
+    /* Loading overlay (pyvalue5 style) */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-main);
+      opacity: 0.98;
+    }
+    .loading-overlay.hidden { display: none; }
+    .stats-loader {
+      width: 120px;
+      height: 60px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .stats-bar {
+      width: 8px;
+      background: linear-gradient(to top, var(--color-accent-blue), var(--color-accent-emerald));
+      animation: stats-grow 1.5s ease-in-out infinite;
+      border-radius: 2px 2px 0 0;
+    }
+    .stats-bar:nth-child(1) { height: 20%; animation-delay: 0.1s; }
+    .stats-bar:nth-child(2) { height: 50%; animation-delay: 0.2s; }
+    .stats-bar:nth-child(3) { height: 80%; animation-delay: 0.3s; }
+    .stats-bar:nth-child(4) { height: 100%; animation-delay: 0.4s; }
+    .stats-bar:nth-child(5) { height: 80%; animation-delay: 0.5s; }
+    .stats-bar:nth-child(6) { height: 50%; animation-delay: 0.6s; }
+    .stats-bar:nth-child(7) { height: 20%; animation-delay: 0.7s; }
+    @keyframes stats-grow {
+      0%, 100% { transform: scaleY(1); opacity: 0.5; }
+      50% { transform: scaleY(1.3); opacity: 1; }
+    }
+    .scanning-line {
+      width: 200px;
+      height: 2px;
+      background: rgba(16, 185, 129, 0.2);
+      position: relative;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .scanning-line::after {
+      content: "";
+      display: block;
+      position: absolute;
+      width: 40px;
+      height: 100%;
+      background: var(--color-accent-emerald);
+      box-shadow: 0 0 15px var(--color-accent-emerald);
+      animation: scan 2s linear infinite;
+    }
+    @keyframes scan { from { left: -40px; } to { left: 200px; } }
+    .loading-text { margin-top: var(--space-4); font-size: 10px; font-family: monospace; color: var(--color-accent-emerald); letter-spacing: 0.2em; }
+    .color-text-muted { color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="stats-loader">
+      <div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div>
+    </div>
+    <div class="scanning-line"></div>
+    <p class="loading-text" id="loading-message">LOADING...</p>
+  </div>
+
+  <header class="app-header" id="app-header">
+    <span class="logo typography-title" id="header-logo">Py-Value</span>
+    <nav class="nav" aria-label="メインナビゲーション">
+      <a href="#/" id="nav-list"><i data-lucide="list" width="16" height="16"></i> 問題一覧</a>
+      <a href="#/history" id="nav-history"><i data-lucide="history" width="16" height="16"></i> 履歴</a>
+      <a href="#/admin?key=admin" id="nav-admin"><i data-lucide="settings" width="16" height="16"></i> 管理</a>
+    </nav>
+  </header>
+  <div class="breadcrumb" id="breadcrumb"></div>
+  <main class="main-content" id="main-content">
+    <!-- SC-001 問題一覧 -->
+    <section id="panel-list" class="panel" data-sc="SC-001">
+      <div id="list-sort" class="card" style="margin-bottom: 16px;">
+        <span class="label">ソート</span>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+          <button type="button" class="btn btn-secondary" data-sort="order" aria-label="登録順でソート"><i data-lucide="arrow-down-up" width="16" height="16"></i> 登録順</button>
+          <button type="button" class="btn btn-ghost" data-sort="difficulty"><i data-lucide="bar-chart-2" width="16" height="16"></i> 難易度</button>
+          <button type="button" class="btn btn-ghost" data-sort="title"><i data-lucide="type" width="16" height="16"></i> タイトル</button>
+        </div>
+      </div>
+      <div id="list-zero" class="card" style="display: none;"><p class="label">0 件時メッセージ</p><p>問題がありません。</p></div>
+      <div class="question-tiles" id="question-tiles"></div>
+      <p style="margin-top: 16px;"><a href="#/history" class="btn btn-secondary"><i data-lucide="history" width="16" height="16"></i> 履歴へ</a></p>
+    </section>
+
+    <!-- SC-002 ワークスペース -->
+    <section id="panel-workspace" class="panel" data-sc="SC-002">
+      <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+        <button type="button" class="btn btn-ghost" id="btn-draft" aria-label="下書き保存"><i data-lucide="bookmark" width="16" height="16"></i> 下書き保存</button>
+        <button type="button" class="btn btn-primary" id="btn-submit" aria-label="解答送信"><i data-lucide="send" width="16" height="16"></i> 解答送信</button>
+        <button type="button" class="btn btn-ghost" id="btn-error-demo" aria-label="エラー表示例（FR-P011）"><i data-lucide="alert-circle" width="16" height="16"></i> エラー表示例</button>
+      </div>
+      <div class="card" id="workspace-judge-area" style="display: none;">
+        <span class="label">採点結果</span>
+        <div id="workspace-judge-content"><p id="workspace-judge-text"></p></div>
+      </div>
+      <div class="three-pane">
+        <div class="pane">
+          <span class="label">問題ペイン</span>
+          <div id="workspace-problem-body"></div>
+        </div>
+        <div class="pane">
+          <span class="label">エディタ・セル領域</span>
+          <div class="cell-box" id="workspace-cell1">import pandas as pd</div>
+          <div class="cell-box" id="workspace-cell2">ans = df['x'].mean()</div>
+          <p style="margin-top: 8px;"><span class="label">実行制御</span></p>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-ghost" aria-label="中断"><i data-lucide="square" width="14" height="14"></i> Interrupt</button>
+            <button type="button" class="btn btn-ghost" aria-label="カーネルリセット"><i data-lucide="refresh-cw" width="14" height="14"></i> リセット</button>
+          </div>
+        </div>
+        <div class="pane">
+          <span class="label">可視化・変数パネル</span>
+          <div class="card"><span class="label">変数</span><p id="workspace-vars" class="font-mono">ans: —<br>p_value: —</p></div>
+          <div class="card"><span class="label">プロット領域</span><p class="color-text-muted" style="font-size: 12px;">（Matplotlib 出力）</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SC-003 正解・バッジ -->
+    <section id="panel-result" class="panel" data-sc="SC-003">
+      <div class="center-block">
+        <div class="card">
+          <span class="label">採点結果（合格・バッジ）</span>
+          <p id="result-message" class="typography-heading">合格です。</p>
+          <p id="result-badges"></p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;">
+            <button type="button" class="btn btn-primary" id="btn-next"><i data-lucide="arrow-right" width="16" height="16"></i> 次の問題へ</button>
+            <button type="button" class="btn btn-secondary" id="btn-back-list"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+            <button type="button" class="btn btn-primary" id="btn-to-complete" style="display: none;"><i data-lucide="award" width="16" height="16"></i> 完了画面へ</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SC-004 完了画面 -->
+    <section id="panel-complete" class="panel" data-sc="SC-004">
+      <div class="center-block">
+        <div class="card">
+          <span class="label">完了</span>
+          <p class="typography-heading">おめでとうございます。全問正解です。</p>
+          <button type="button" class="btn btn-primary" id="btn-complete-back"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SC-005 履歴一覧 -->
+    <section id="panel-history" class="panel" data-sc="SC-005">
+      <div class="card">
+        <span class="label">履歴一覧</span>
+        <table>
+          <thead><tr><th>問題タイトル</th><th>結果</th><th>日時</th><th></th></tr></thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </div>
+      <button type="button" class="btn btn-secondary" id="btn-history-back"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+    </section>
+
+    <!-- SC-006 履歴詳細 -->
+    <section id="panel-history-detail" class="panel" data-sc="SC-006">
+      <div class="card" id="history-detail-card"></div>
+      <button type="button" class="btn btn-secondary" id="btn-history-detail-back"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+    </section>
+
+    <!-- SC-007 管理ダッシュボード (key required) -->
+    <section id="panel-admin" class="panel" data-sc="SC-007">
+      <div id="admin-key-required" class="card" style="display: none;">
+        <p class="typography-heading">管理画面にはキーが必要です。</p>
+        <p>URL に <code>?key=xxx</code> を付けてアクセスしてください。（例: #/admin?key=admin）</p>
+        <a href="#/" class="btn btn-secondary">問題一覧へ</a>
+      </div>
+      <div id="admin-dashboard" style="display: none;">
+        <div class="card" style="margin-bottom: 16px;">
+          <span class="label">管理ナビ</span>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="#/admin?key=admin" class="btn btn-ghost"><i data-lucide="list" width="16" height="16"></i> 問題一覧</a>
+            <a href="#/admin/import?key=admin" class="btn btn-ghost"><i data-lucide="upload" width="16" height="16"></i> インポート/エクスポート</a>
+            <a href="#/admin/dataset?key=admin" class="btn btn-ghost"><i data-lucide="database" width="16" height="16"></i> データセットアップロード</a>
+          </div>
+        </div>
+        <p><button type="button" class="btn btn-primary" id="btn-admin-new"><i data-lucide="plus" width="16" height="16"></i> 新規作成</button></p>
+        <div class="card" style="margin-top: 16px;">
+          <span class="label">問題一覧（下書き含む）</span>
+          <table>
+            <thead><tr><th>タイトル</th><th>ステータス</th><th>操作</th></tr></thead>
+            <tbody id="admin-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SC-008 問題登録エディタ -->
+    <section id="panel-admin-edit" class="panel" data-sc="SC-008">
+      <div class="card">
+        <span class="label">問題登録エディタ</span>
+        <div class="form-group"><label>タイトル</label><input type="text" id="edit-title" value="平均値の計算"></div>
+        <div class="form-group"><label>type</label><select id="edit-type"><option>python-analysis</option></select></div>
+        <div class="form-group"><label>難易度</label><input type="text" id="edit-difficulty" value="初級"></div>
+        <div class="form-group"><label>解説</label><textarea id="edit-explanation" rows="2">解説文...</textarea></div>
+        <div class="label">拡張フィールド（データ分析）</div>
+        <div class="form-group"><label>問題文</label><textarea id="edit-problem" rows="2"></textarea></div>
+        <div class="form-group"><label>watchVariables</label><input type="text" id="edit-watch" placeholder="ans, p_value"></div>
+        <p>ステータス: <button type="button" class="btn btn-secondary" id="edit-status-draft" aria-pressed="true"><i data-lucide="file-text" width="14" height="14"></i> 下書き</button> <button type="button" class="btn btn-ghost" id="edit-status-publish" aria-pressed="false"><i data-lucide="globe" width="14" height="14"></i> 公開</button></p>
+        <div style="display: flex; gap: 8px; margin-top: 16px;">
+          <button type="button" class="btn btn-primary" id="btn-edit-save"><i data-lucide="save" width="16" height="16"></i> 保存</button>
+          <button type="button" class="btn btn-secondary" id="btn-edit-cancel"><i data-lucide="x" width="16" height="16"></i> キャンセル</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SC-009 インポート/エクスポート -->
+    <section id="panel-admin-import" class="panel" data-sc="SC-009">
+      <div class="card">
+        <span class="label">インポート/エクスポート</span>
+        <div class="form-group"><label>インポート（JSON）</label><input type="file" id="import-file" accept=".json"></div>
+        <button type="button" class="btn btn-primary" id="btn-export"><i data-lucide="download" width="16" height="16"></i> エクスポート実行</button>
+        <div id="import-export-result" class="card" style="margin-top: 16px; display: none;"><p id="import-export-message"></p></div>
+      </div>
+    </section>
+
+    <!-- SC-010 データセットアップロード -->
+    <section id="panel-admin-dataset" class="panel" data-sc="SC-010">
+      <div class="card">
+        <span class="label">データセットアップロード</span>
+        <div class="form-group"><label>ファイル（CSV等）</label><input type="file" id="dataset-file" accept=".csv,.txt"></div>
+        <button type="button" class="btn btn-primary" id="btn-dataset-upload"><i data-lucide="upload" width="16" height="16"></i> アップロード</button>
+        <div id="dataset-result" class="card" style="margin-top: 16px; display: none;"><p id="dataset-message"></p></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const WORKBOOK_ID = 'py-value';
+      const VALID_ADMIN_KEY = 'admin';
+
+      const dummyQuestions = [
+        { id: 'q1', order: 1, title: '問題 1: 平均値の計算', excerpt: '問題文の冒頭。データが与えられたとき、平均値を求めて ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: '正解済' },
+        { id: 'q2', order: 2, title: '問題 2: t 検定', excerpt: '問題文の冒頭。2 群の平均の差について t 検定を行い、p_value を求めて...', difficulty: '中級', difficultyOrder: 2, badge: '未解答' },
+        { id: 'q3', order: 3, title: '問題 3: 回帰分析', excerpt: '問題文の冒頭。単回帰分析を行い、回帰係数を ans に代入してください...', difficulty: '上級', difficultyOrder: 3, badge: null },
+      ];
+      let questions = dummyQuestions.slice();
+      let sortBy = 'order';
+
+      const dummyHistories = [
+        { id: 'h1', questionId: 'q1', questionTitle: '平均値の計算', result: '合格', judgedAt: '2026-02-07T10:00:00Z' },
+        { id: 'h2', questionId: 'q2', questionTitle: 't 検定', result: '不合格', judgedAt: '2026-02-07T09:30:00Z' },
+      ];
+      const adminQuestions = [
+        { id: 'q1', title: '平均値の計算', status: '公開' },
+        { id: 'q2', title: 't 検定', status: '下書き' },
+      ];
+
+      function getHash() { return window.location.hash.slice(1) || '/'; }
+      function getHashPath() { return getHash().split('?')[0]; }
+      function getHashQuery() {
+        const q = getHash().indexOf('?');
+        if (q === -1) return {};
+        const params = {};
+        getHash().slice(q + 1).split('&').forEach(p => {
+          const [k, v] = p.split('=');
+          if (k && v) params[decodeURIComponent(k)] = decodeURIComponent(v);
+        });
+        return params;
+      }
+
+      function showLoading(message) {
+        document.getElementById('loading-message').textContent = message || 'LOADING...';
+        document.getElementById('loading-overlay').classList.remove('hidden');
+      }
+      function hideLoading() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+      }
+
+      function setBreadcrumb(items) {
+        const el = document.getElementById('breadcrumb');
+        el.innerHTML = items.map((x, i) => {
+          if (i > 0) return ['<span style="color: var(--color-text-muted);">&gt;</span>', x].join(' ');
+          return x;
+        }).join(' ');
+      }
+
+      function renderList() {
+        const tiles = document.getElementById('question-tiles');
+        const zero = document.getElementById('list-zero');
+        const list = [...questions].sort((a, b) => {
+          if (sortBy === 'order') return a.order - b.order;
+          if (sortBy === 'difficulty') return a.difficultyOrder - b.difficultyOrder;
+          return a.title.localeCompare(b.title);
+        });
+        if (list.length === 0) {
+          zero.style.display = 'block';
+          tiles.innerHTML = '';
+          return;
+        }
+        zero.style.display = 'none';
+        tiles.innerHTML = list.map(q => `
+          <div class="question-tile">
+            <div class="tile-title">${q.title}</div>
+            <div class="tile-excerpt">${q.excerpt}</div>
+            <div class="tile-meta">難易度: ${q.difficulty}</div>
+            <div class="tile-badge">${q.badge ? `<span class="badge">${q.badge}</span>` : '<span class="badge muted">—</span>'}</div>
+            <a href="#/questions/${q.id}" class="btn btn-primary"><i data-lucide="folder-open" width="16" height="16"></i> 開く</a>
+          </div>
+        `).join('');
+        lucide.createIcons();
+      }
+
+      function showPanel(id) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        const panel = document.getElementById(id);
+        if (panel) panel.classList.add('active');
+      }
+
+      function setSortButtons() {
+        document.querySelectorAll('#list-sort [data-sort]').forEach(b => {
+          b.className = b.getAttribute('data-sort') === sortBy ? 'btn btn-secondary' : 'btn btn-ghost';
+        });
+      }
+
+      function route() {
+        const path = getHashPath();
+        const query = getHashQuery();
+        const parts = path.split('/').filter(Boolean);
+
+        if (parts[0] === 'admin') {
+          const key = query.key;
+          if (!key || key !== VALID_ADMIN_KEY) {
+            showPanel('panel-admin');
+            document.getElementById('admin-key-required').style.display = 'block';
+            document.getElementById('admin-dashboard').style.display = 'none';
+            setBreadcrumb(['<a href="#/">ホーム</a>', '管理']);
+            return;
+          }
+          document.getElementById('admin-key-required').style.display = 'none';
+          document.getElementById('admin-dashboard').style.display = 'block';
+          if (parts[1] === 'import') {
+            showPanel('panel-admin-import');
+            setBreadcrumb(['<a href="#/">ホーム</a>', '<a href="#/admin?key=admin">管理</a>', 'インポート/エクスポート']);
+            return;
+          }
+          if (parts[1] === 'dataset') {
+            showPanel('panel-admin-dataset');
+            setBreadcrumb(['<a href="#/">ホーム</a>', '<a href="#/admin?key=admin">管理</a>', 'データセット']);
+            return;
+          }
+          if (parts[1] === 'edit' && parts[2]) {
+            showPanel('panel-admin-edit');
+            setBreadcrumb(['<a href="#/">ホーム</a>', '<a href="#/admin?key=admin">管理</a>', '問題編集']);
+            return;
+          }
+          showPanel('panel-admin');
+          const tbody = document.getElementById('admin-tbody');
+          tbody.innerHTML = adminQuestions.map(q => `
+            <tr>
+              <td>${q.title}</td>
+              <td>${q.status}</td>
+              <td>
+                <a href="#/admin/edit/${q.id}?key=admin" style="margin-right:8px;"><i data-lucide="pencil" width="14" height="14"></i> 編集</a>
+                <a href="#" data-delete-id="${q.id}" class="link-delete"><i data-lucide="trash-2" width="14" height="14"></i> 削除</a>
+              </td>
+            </tr>
+          `).join('');
+          lucide.createIcons();
+          setBreadcrumb(['<a href="#/">ホーム</a>', '管理']);
+          return;
+        }
+
+        if (parts[0] === 'history') {
+          if (parts[1]) {
+            const h = dummyHistories.find(x => x.id === parts[1]);
+            if (h) {
+              showPanel('panel-history-detail');
+              const card = document.getElementById('history-detail-card');
+              card.innerHTML = `
+                <span class="label">履歴詳細</span>
+                <p><strong>問題:</strong> ${h.questionTitle}</p>
+                <p><strong>userAnswer 要約:</strong> cells: 2 セル</p>
+                <p><strong>結果:</strong> ${h.result}</p>
+                <p><strong>judgedAt:</strong> ${h.judgedAt}</p>
+              `;
+              setBreadcrumb(['<a href="#/">ホーム</a>', '<a href="#/history">履歴</a>', '詳細']);
+            } else { showPanel('panel-history'); renderHistoryList(); setBreadcrumb(['<a href="#/">ホーム</a>', '履歴']); }
+            return;
+          }
+          showPanel('panel-history');
+          renderHistoryList();
+          setBreadcrumb(['<a href="#/">ホーム</a>', '履歴']);
+          return;
+        }
+
+        if (parts[0] === 'questions' && parts[1]) {
+          const qId = parts[1];
+          const q = questions.find(x => x.id === qId);
+          if (!q) { routeToList(); return; }
+          showPanel('panel-workspace');
+          document.getElementById('workspace-problem-body').innerHTML = `<p><strong>${q.title}</strong></p><p>${q.excerpt}</p>`;
+          document.getElementById('workspace-judge-area').style.display = 'none';
+          setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID, q.title]);
+          showLoading('問題を読み込み中...');
+          setTimeout(function() {
+            hideLoading();
+          }, 1500);
+          return;
+        }
+
+        if (parts[0] === 'result' && parts[1]) {
+          showPanel('panel-result');
+          const qId = parts[1];
+          const q = questions.find(x => x.id === qId);
+          const nextQ = questions.filter(x => x.order > (q ? q.order : 0)).sort((a,b) => a.order - b.order)[0];
+          const allCorrect = !nextQ;
+          document.getElementById('btn-next').style.display = allCorrect ? 'none' : 'inline-flex';
+          document.getElementById('btn-to-complete').style.display = allCorrect ? 'inline-flex' : 'none';
+          document.getElementById('result-badges').innerHTML = '獲得バッジ: <span class="badge">初回正解</span>';
+          setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID, '採点結果']);
+          return;
+        }
+
+        if (parts[0] === 'complete') {
+          showPanel('panel-complete');
+          setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID]);
+          return;
+        }
+
+        routeToList();
+      }
+
+      function routeToList() {
+        showPanel('panel-list');
+        setSortButtons();
+        renderList();
+        setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID]);
+      }
+
+      function renderHistoryList() {
+        const tbody = document.getElementById('history-tbody');
+        tbody.innerHTML = dummyHistories.map(h => `
+          <tr class="${h.result === '合格' ? 'pass' : 'fail'}">
+            <td>${h.questionTitle}</td>
+            <td>${h.result}</td>
+            <td>${new Date(h.judgedAt).toLocaleString('ja-JP')}</td>
+            <td><a href="#/history/${h.id}"><i data-lucide="eye" width="14" height="14"></i> 詳細</a></td>
+          </tr>
+        `).join('');
+        lucide.createIcons();
+      }
+
+      document.getElementById('list-sort').addEventListener('click', function(e) {
+        const btn = e.target.closest('[data-sort]');
+        if (!btn) return;
+        sortBy = btn.getAttribute('data-sort');
+        setSortButtons();
+        renderList();
+      });
+
+      document.getElementById('btn-submit').addEventListener('click', function() {
+        showLoading('採点中...');
+        setTimeout(function() {
+          hideLoading();
+          const judgeArea = document.getElementById('workspace-judge-area');
+          judgeArea.style.display = 'block';
+          document.getElementById('workspace-judge-content').innerHTML = '<p>合格です。</p>';
+          const hash = getHashPath();
+          const qId = (hash.match(/questions\/([^/]+)/) || [])[1];
+          if (qId) window.location.hash = '#/result/' + qId;
+        }, 1800);
+      });
+      document.getElementById('btn-draft').addEventListener('click', function() {
+        showLoading('下書き保存中...');
+        setTimeout(function() { hideLoading(); }, 800);
+      });
+      document.getElementById('btn-error-demo').addEventListener('click', function() {
+        const area = document.getElementById('workspace-judge-area');
+        const content = document.getElementById('workspace-judge-content');
+        area.style.display = 'block';
+        content.innerHTML = `
+          <p class="label">FR-P011 エラー表示例</p>
+          <div class="error-block"><strong>タイムアウト</strong><br>実行がタイムアウトしました（制限時間 60 秒）。</div>
+          <div class="error-block"><strong>実行エラー</strong><br>実行エラー: [Python のエラーメッセージ]</div>
+          <div class="error-block"><strong>採点エラー</strong><br>採点できませんでした。期待される形式で出力されているか確認してください。</div>
+          <div class="error-block"><strong>ロードエラー</strong><br>実行環境の読み込みに失敗しました。ページを再読み込みしてください。</div>
+        `;
+      });
+      document.getElementById('edit-status-draft').addEventListener('click', function() {
+        this.className = 'btn btn-secondary'; this.setAttribute('aria-pressed', 'true');
+        document.getElementById('edit-status-publish').className = 'btn btn-ghost'; document.getElementById('edit-status-publish').setAttribute('aria-pressed', 'false');
+      });
+      document.getElementById('edit-status-publish').addEventListener('click', function() {
+        this.className = 'btn btn-secondary'; this.setAttribute('aria-pressed', 'true');
+        document.getElementById('edit-status-draft').className = 'btn btn-ghost'; document.getElementById('edit-status-draft').setAttribute('aria-pressed', 'false');
+      });
+
+      document.getElementById('btn-next').addEventListener('click', function() {
+        const path = getHashPath();
+        const qId = (path.match(/result\/([^/]+)/) || [])[1];
+        const q = questions.find(x => x.id === qId);
+        const nextQ = q && questions.filter(x => x.order > q.order).sort((a,b) => a.order - b.order)[0];
+        if (nextQ) window.location.hash = '#/questions/' + nextQ.id;
+        else window.location.hash = '#/complete';
+      });
+      document.getElementById('btn-back-list').addEventListener('click', function() { window.location.hash = '#/'; });
+      document.getElementById('btn-to-complete').addEventListener('click', function() { window.location.hash = '#/complete'; });
+      document.getElementById('btn-complete-back').addEventListener('click', function() { window.location.hash = '#/'; });
+      document.getElementById('btn-history-back').addEventListener('click', function() { window.location.hash = '#/'; });
+      document.getElementById('btn-history-detail-back').addEventListener('click', function() { window.location.hash = '#/history'; });
+
+      document.getElementById('btn-admin-new').addEventListener('click', function() { window.location.hash = '#/admin/edit/new?key=admin'; });
+      document.getElementById('btn-edit-save').addEventListener('click', function() {
+        showLoading('保存中...');
+        setTimeout(function() { hideLoading(); window.location.hash = '#/admin?key=admin'; }, 1000);
+      });
+      document.getElementById('btn-edit-cancel').addEventListener('click', function() { window.location.hash = '#/admin?key=admin'; });
+
+      document.getElementById('btn-export').addEventListener('click', function() {
+        showLoading('エクスポート中...');
+        setTimeout(function() {
+          hideLoading();
+          const el = document.getElementById('import-export-result');
+          el.style.display = 'block';
+          document.getElementById('import-export-message').textContent = 'エクスポート完了（ダミー）';
+        }, 1200);
+      });
+      document.getElementById('import-file').addEventListener('change', function() {
+        if (!this.files.length) return;
+        showLoading('インポート中...');
+        setTimeout(function() {
+          hideLoading();
+          document.getElementById('import-export-result').style.display = 'block';
+          document.getElementById('import-export-message').textContent = 'インポート完了（ダミー）';
+        }, 1200);
+      });
+      document.getElementById('btn-dataset-upload').addEventListener('click', function() {
+        const file = document.getElementById('dataset-file').files[0];
+        showLoading('アップロード中...');
+        setTimeout(function() {
+          hideLoading();
+          document.getElementById('dataset-result').style.display = 'block';
+          document.getElementById('dataset-message').textContent = 'アップロード完了（ダミー）';
+        }, 1200);
+      });
+
+      document.getElementById('main-content').addEventListener('click', function(e) {
+        const del = e.target.closest('.link-delete');
+        if (del) { e.preventDefault(); }
+      });
+
+      window.addEventListener('hashchange', route);
+      route();
+      renderList();
+      setSortButtons();
+      lucide.createIcons();
+    })();
+  </script>
+</body>
+</html>
