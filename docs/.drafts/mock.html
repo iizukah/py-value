@@ -48,6 +48,18 @@
     .font-mono { font-family: 'JetBrains Mono', monospace; }
     .font-logo { font-family: 'Space Grotesk', sans-serif; }
     .logo-glow { filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5)); }
+    .text-gradient-emerald {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .text-gradient-blue {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
     .typography-title { font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: 0.02em; font-size: 18px; }
     .typography-heading { font-weight: 600; letter-spacing: 0.01em; }
 
@@ -379,6 +391,22 @@
       display: flex;
       justify-content: center;
       margin-bottom: var(--space-6);
+    }
+    .first-view-cta .btn-get-started {
+      padding: 14px 32px;
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .first-view-hero {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin: 0 0 var(--space-4);
+      position: relative;
+      z-index: 1;
     }
     .workbook-card-disabled {
       opacity: 0.6;
@@ -741,43 +769,60 @@
     .panel-result .result-medal-wrap {
       flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 200px;
     }
-    .panel-result .result-medal {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
+    .result-grading-loading {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: var(--space-4);
+    }
+    .result-grading-loading .result-grading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--color-border);
+      border-top-color: var(--color-accent-emerald);
+      border-radius: 50%;
+      animation: resultGradingSpin 0.8s linear infinite;
+    }
+    @keyframes resultGradingSpin {
+      to { transform: rotate(360deg); }
+    }
+    .result-grading-loading .result-grading-text {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.1em;
+    }
+    .result-badge-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .result-badge-block .result-status-badge {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .result-badge-block .result-status-badge i { width: 56px; height: 56px; flex-shrink: 0; }
+    .result-badge-block .result-status-label {
+      width: 112px;
+      text-align: center;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.75rem;
+      font-size: 1.25rem;
       font-weight: 700;
       letter-spacing: 0.05em;
-      color: #fff;
-      animation: resultStatusIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-    .panel-result .result-medal svg { flex-shrink: 0; }
-    .panel-result .result-medal.result-passed {
-      background: linear-gradient(135deg, #10b981 0%, #0d9488 50%, #0f766e 100%);
-      border: 2px solid rgba(255, 255, 255, 0.35);
-      box-shadow: 0 0 30px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    }
-    .panel-result .result-medal.result-failed {
-      background: linear-gradient(135deg, #f87171 0%, #dc2626 50%, #b91c1c 100%);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 0 24px rgba(248, 113, 113, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    }
-    @keyframes resultStatusIn {
-      0% { opacity: 0; transform: scale(0.5); }
-      100% { opacity: 1; transform: scale(1); }
+      color: var(--color-text);
     }
     .panel-result .result-tile {
-      animation: resultTileAppear 0.4s ease-out 0.8s forwards;
       opacity: 0;
       background: var(--glass-bg);
       backdrop-filter: blur(10px);
@@ -801,6 +846,9 @@
       min-width: 180px;
     }
     .panel-result .result-tile .tile-footer-actions-vertical .btn { justify-content: center; }
+    .panel-result .result-tile.result-tile-visible {
+      animation: resultTileAppear 0.4s ease-out forwards;
+    }
     @keyframes resultTileAppear {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
@@ -890,11 +938,14 @@
             <text x="42" y="32" fill="#e6edf3" class="font-logo" style="font-size: 30px; font-weight: 700; letter-spacing: 0.05em;">EXER</text>
           </svg>
         </div>
+        <h1 class="first-view-hero">
+          Exercise the <span class="text-gradient-emerald">Mind</span>,<br>
+          Master the <span class="text-gradient-blue">Skill</span>.
+        </h1>
         <p>コードで学ぶ、データ分析。ブラウザだけで問題に挑戦し、採点まで完結します。</p>
         <div class="first-view-cta">
-          <a href="#/py-value" class="btn btn-primary">GET STARTED</a>
+          <a href="#/py-value" class="btn btn-primary btn-get-started">GET STARTED</a>
         </div>
-        <span class="label">問題集を選ぶ</span>
         <div class="workbook-cards" id="workbook-cards">
           <a href="#/py-value" class="workbook-card" data-workbook-id="py-value">
             <span class="label">Pythonデータ分析</span>
@@ -995,7 +1046,14 @@
     <section id="panel-result" class="panel" data-sc="SC-003">
       <div class="result-layout">
         <div class="result-medal-wrap">
-          <div id="result-status" class="result-medal result-passed" aria-live="polite"><i data-lucide="award" width="28" height="28" aria-hidden="true"></i><span>Passed</span></div>
+          <div id="result-grading-loading" class="result-grading-loading" aria-live="polite">
+            <div class="result-grading-spinner" aria-hidden="true"></div>
+            <span class="result-grading-text">採点中</span>
+          </div>
+          <div id="result-badge-block" class="result-badge-block" style="display: none;" aria-live="polite">
+            <span id="result-status-badge" class="result-status-badge badge badge-pass" aria-label="合格"></span>
+            <span id="result-status-label" class="result-status-label">Passed</span>
+          </div>
         </div>
         <div id="result-tile" class="result-tile question-tile"></div>
       </div>
@@ -1525,25 +1583,41 @@
         setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook()]);
       }
 
+      var resultPanelTimeout = null;
       function renderResultPanel(q, passed, allCorrect) {
-        const statusEl = document.getElementById('result-status');
-        const icon = passed
-          ? '<i data-lucide="award" width="28" height="28" aria-hidden="true"></i>'
-          : '<i data-lucide="x-circle" width="28" height="28" aria-hidden="true"></i>';
-        const label = passed ? 'Passed' : 'Fail';
-        statusEl.innerHTML = icon + '<span>' + label + '</span>';
-        statusEl.className = 'result-medal ' + (passed ? 'result-passed' : 'result-failed');
-        statusEl.style.animation = 'none';
-        void statusEl.offsetHeight;
-        statusEl.style.animation = '';
+        const loadingEl = document.getElementById('result-grading-loading');
+        const blockEl = document.getElementById('result-badge-block');
+        const badgeEl = document.getElementById('result-status-badge');
+        const labelEl = document.getElementById('result-status-label');
+        const tileEl = document.getElementById('result-tile');
+
+        badgeEl.className = 'result-status-badge badge ' + (passed ? 'badge-pass' : 'badge-fail');
+        badgeEl.innerHTML = passed
+          ? '<i data-lucide="award" width="56" height="56" aria-hidden="true"></i>'
+          : '<i data-lucide="x-circle" width="56" height="56" aria-hidden="true"></i>';
+        badgeEl.setAttribute('aria-label', passed ? '合格' : '不合格');
+        labelEl.textContent = passed ? 'Passed' : 'Fail';
+
+        loadingEl.style.display = 'flex';
+        blockEl.style.display = 'none';
+        tileEl.classList.remove('result-tile-visible');
+
+        if (resultPanelTimeout) clearTimeout(resultPanelTimeout);
+        resultPanelTimeout = setTimeout(function() {
+          resultPanelTimeout = null;
+          loadingEl.style.display = 'none';
+          blockEl.style.display = 'flex';
+          tileEl.classList.add('result-tile-visible');
+          lucide.createIcons();
+        }, 2000);
+
         const sub = 'CHALLENGE ' + String(q.order).padStart(2, '0');
         const diffClass = q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced';
         const tagsHtml = (q.tags || []).map(t => '<span class="tile-tag">' + t + '</span>').join('');
         const badge = passed ? 'pass' : 'fail';
         const nextBtnHtml = allCorrect ? '' : '<button type="button" class="btn btn-primary" id="btn-next"><i data-lucide="arrow-right" width="16" height="16"></i> 次の問題へ</button>';
         const completeBtnHtml = allCorrect ? '<button type="button" class="btn btn-primary" id="btn-to-complete"><i data-lucide="award" width="16" height="16"></i> 完了画面へ</button>' : '';
-        const tile = document.getElementById('result-tile');
-        tile.innerHTML = `
+        tileEl.innerHTML = `
           <div class="tile-header">
             <div class="tile-subtitle">${sub}</div>
             <div class="tile-title-row">
