@@ -16,7 +16,10 @@
 
 ## 投入方法
 
-- **開発（Lowdb）**: `data/workbooks.json`, `data/questions.json` 等に JSON を配置するか、スクリプトで投入。
-- **本番（Firestore）**: Firebase Console または Admin SDK を用いたシードスクリプトで `workbooks`, `questions` に投入。
+- **開発（Lowdb）**: リポジトリの `data/workbooks.json`, `data/questions.json` をそのまま利用する。`LOWDB_PATH=./data` で参照される。
+- **本番（Firestore）**: Admin SDK を用いたシードスクリプト `scripts/seed-firestore.mjs` を実行する。
+  - 前提: Firebase プロジェクトを用意し、`GOOGLE_APPLICATION_CREDENTIALS` にサービスアカウント JSON のパスを設定するか、`firebase login` 済みで `firebase use` でプロジェクトを選択する。
+  - 実行: `node scripts/seed-firestore.mjs`
+  - 投入先: Firestore の `workbooks`, `questions` コレクション。
 
-具体的な JSON 例は実装時に `scripts/` または本ディレクトリに配置してよい。
+シードデータの実体はリポジトリの `data/workbooks.json`, `data/questions.json` に配置している。

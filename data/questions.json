@@ -1,0 +1,73 @@
+[
+  {
+    "id": "q1",
+    "workbookId": "py-value",
+    "title": "変数 ans に 1 を代入",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 1,
+    "problem_statement": "変数 `ans` に 1 を代入してください。",
+    "initial_code": "",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 1
+    }
+  },
+  {
+    "id": "q2",
+    "workbookId": "py-value",
+    "title": "変数 ans に 2+3 の結果",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 2,
+    "problem_statement": "変数 `ans` に 2+3 の結果を代入してください。",
+    "initial_code": "",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 5
+    }
+  },
+  {
+    "id": "q3",
+    "workbookId": "py-value",
+    "title": "リストの合計",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 3,
+    "problem_statement": "リスト [1,2,3,4,5] の合計を変数 `ans` に代入してください。",
+    "initial_code": "",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 15
+    }
+  },
+  {
+    "id": "q4",
+    "workbookId": "py-value",
+    "title": "円周率の近似",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 4,
+    "problem_statement": "変数 `ans` に 3.14 を代入してください。",
+    "initial_code": "",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 3.14,
+      "tolerance": { "atol": 0.01 }
+    }
+  },
+  {
+    "id": "q5",
+    "workbookId": "py-value",
+    "title": "平方根",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 5,
+    "problem_statement": "16 の平方根を変数 `ans` に代入してください。",
+    "initial_code": "import math",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 4
+    }
+  }
+]
