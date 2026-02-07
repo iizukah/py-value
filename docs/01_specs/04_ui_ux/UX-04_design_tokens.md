@@ -6,9 +6,9 @@
 |------|------|
 | **ID** | UX-04 |
 | **プロジェクト名** | EXER |
-| **関連ドキュメント** | REQ-02 §7、UX-02（テーマ・トークン推奨）、[wireframes/wireframes.html](wireframes/wireframes.html)、参考モック（docs/.drafts/mock.html） |
+| **関連ドキュメント** | REQ-02 §7、UX-02（テーマ・トークン推奨）、[wireframes/wireframes.html](wireframes/wireframes.html)、参考モック [reference/mock.html](reference/mock.html) |
 
-本ドキュメントは、実装時に一貫した見た目を確保するための**デザイントークン**（色・余白・角丸等）と**アイコン方針・一覧**を定義する。**プロジェクト名は EXER** とし、ロゴ・タイトルは「EXER」を用いる。パンくずリスト等でのワークブック表示名は仕様で定める（例: workbookId `py-value` の表示名は「Pythonデータ分析」。UX-01 を参照）。UX-02 の「テーマ・トークン（推奨）」を具体化し、ワイヤーフレームおよび参考モックのレイアウト・見た目と対応付ける。実装では CSS 変数（`var(--token-name)`）または Tailwind の theme に反映することを推奨する。
+本ドキュメントは、実装時に一貫した見た目を確保するための**デザイントークン**（色・余白・角丸等）と**アイコン方針・一覧**を定義する。**プロジェクト名は EXER** とし、ロゴ・タイトルは「EXER」を用いる。パンくずリスト等でのワークブック表示名は仕様で定める（例: workbookId `py-value` の表示名は「Pythonデータ分析」。UX-01 を参照）。UX-02 の「テーマ・トークン（推奨）」を具体化し、ワイヤーフレームおよび参考モック [reference/mock.html](reference/mock.html) のレイアウト・見た目と対応付ける。トークン（色・余白・角丸・グラス）は mock と矛盾しないよう必要に応じて値や注釈を追加する。実装では CSS 変数（`var(--token-name)`）または Tailwind の theme に反映することを推奨する。
 
 ---
 

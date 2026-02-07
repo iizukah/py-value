@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EXER | モック</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23161b22'/%3E%3Cpath d='M8 10h16M8 16h12M8 22h16' stroke='%2310b981' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='24' cy='16' r='2' fill='%2310b981'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400&display=swap">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* UX-04 tokens + glass */
+    :root {
+      --color-bg-main: #0d1117;
+      --color-bg-secondary: #161b22;
+      --color-text: #e6edf3;
+      --color-text-muted: #8b949e;
+      --color-accent-emerald: #10b981;
+      --color-accent-blue: #3b82f6;
+      --color-border: #30363d;
+      --color-error-bg: #7f1d1d;
+      --color-error-border: #991b1b;
+      --color-error-text: #fecaca;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --tile-min-width: 280px;
+      --tile-min-height: 180px;
+      --center-block-max-width: 480px;
+      /* glass */
+      --glass-bg: rgba(22, 27, 34, 0.75);
+      --glass-border: rgba(48, 54, 61, 0.6);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Outfit', system-ui, sans-serif;
+      background: var(--color-bg-main);
+      color: var(--color-text);
+      min-height: 100vh;
+      font-size: 14px;
+      padding-bottom: 48px;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-logo { font-family: 'Space Grotesk', sans-serif; }
+    .logo-glow { filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5)); }
+    .text-gradient-emerald {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .text-gradient-blue {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .typography-title { font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: 0.02em; font-size: 18px; }
+    .typography-heading { font-weight: 600; letter-spacing: 0.01em; }
+
+    /* CP-001 Layout: header + breadcrumb + main */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .app-header .logo-link { text-decoration: none; color: inherit; }
+    .app-header .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--color-accent-emerald);
+      text-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+    }
+    .app-header .nav { display: flex; gap: var(--space-2); align-items: center; }
+    .app-header .nav a {
+      color: var(--color-accent-emerald);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border-radius: 999px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .app-header .nav a:hover { background: rgba(16, 185, 129, 0.12); text-decoration: none; }
+
+    .breadcrumb {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin: var(--space-2) var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--color-accent-emerald); text-decoration: none; }
+    .breadcrumb .breadcrumb-sep { display: inline-flex; color: var(--color-text-muted); }
+    .breadcrumb .breadcrumb-workbook-link { display: inline-flex; align-items: center; gap: 6px; }
+    .main-content { max-width: 1200px; margin: 0 auto; padding: var(--space-4); min-height: 60vh; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Glass cards */
+    .card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+    .label { font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: var(--space-1); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 10px 20px;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-accent-emerald) 0%, #0d9488 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .btn-primary:hover { box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45); }
+    .btn-secondary {
+      background: var(--color-accent-blue);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+    .btn-secondary:hover { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.06); }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+    /* SC-001: question tiles（mock2 ベース・1行3パネル均等・同一サイズ） */
+    .question-tiles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+    }
+    .question-tile {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+      text-align: left;
+    }
+    .question-tile .tile-header {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(13, 148, 136, 0.14) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+    .question-tile .tile-subtitle {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--color-accent-emerald);
+      margin-bottom: var(--space-1);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .question-tile .tile-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .question-tile .tile-title-row .tile-difficulty { color: var(--color-text); }
+    .question-tile .tile-difficulty { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; flex-shrink: 0; }
+    .question-tile .tile-display-title { font-size: 1.1rem; font-weight: 700; flex: 1; min-width: 0; color: var(--color-text); }
+    .question-tile .tile-body {
+      display: flex;
+      align-items: stretch;
+      gap: var(--space-4);
+      flex: 1;
+      min-height: 0;
+      margin-bottom: var(--space-2);
+    }
+    .question-tile .tile-body-left {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .question-tile .tile-body-right {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .question-tile .tile-excerpt {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .question-tile .tile-body-right .badge {
+      width: 90px;
+      height: 90px;
+      min-width: 90px;
+      min-height: 90px;
+      border-radius: 50%;
+    }
+    .question-tile .tile-body-right .badge i { width: 58px; height: 58px; }
+    .question-tile .tile-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-top: auto;
+      gap: var(--space-2);
+    }
+    .question-tile .tile-footer .btn-favorite-block {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--color-text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .question-tile .tile-footer .btn-favorite-block:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f87171;
+      transform: translateY(-1px);
+    }
+    .question-tile .tile-footer .btn-favorite-block .tile-favorite-count { margin: 0; }
+    .difficulty-beginner { color: var(--color-text-muted); }
+    .difficulty-intermediate { color: var(--color-accent-blue); }
+    .difficulty-advanced { color: var(--color-accent-emerald); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      animation: badge-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .badge i { flex-shrink: 0; }
+    @keyframes badge-pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .badge-pass {
+      background: linear-gradient(135deg, #10b981 0%, #0d9488 50%, #0f766e 100%);
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    }
+    .badge-fail {
+      background: linear-gradient(135deg, #f87171 0%, #dc2626 50%, #b91c1c 100%);
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 16px rgba(248, 113, 113, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    }
+    .badge-none {
+      background: linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%);
+      color: #e2e8f0;
+      border: 2px solid var(--color-border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      filter: drop-shadow(0 0 6px rgba(100, 116, 139, 0.3));
+    }
+    .history-table .badge { width: 44px; height: 44px; }
+    .history-table .badge i { width: 22px; height: 22px; }
+
+    /* CP-000 ホーム背景レイヤー（画面全体・panel-home 時のみ表示） */
+    #home-bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      display: none;
+    }
+    body.home-bg-visible #home-bg-layer { display: block; }
+    #home-bg-layer {
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 48px, rgba(16, 185, 129, 0.04) 48px, rgba(16, 185, 129, 0.04) 49px),
+        repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(16, 185, 129, 0.04) 48px, rgba(16, 185, 129, 0.04) 49px);
+      background-size: 100% 100%;
+      animation: fvGridMove 20s linear infinite;
+    }
+    @keyframes fvGridMove {
+      0% { background-position: 0 0, 0 0; }
+      100% { background-position: 0 49px, 49px 0; }
+    }
+    #home-bg-layer::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(16, 185, 129, 0.15) 0%, transparent 50%);
+    }
+    #home-bg-layer .fv-shape {
+      position: absolute;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 50%;
+      animation: fvFloat 8s ease-in-out infinite;
+    }
+    #home-bg-layer .fv-shape-1 { width: 120px; height: 120px; left: 8%; top: 15%; animation-delay: 0s; }
+    #home-bg-layer .fv-shape-2 { width: 60px; height: 60px; right: 12%; top: 25%; border-radius: 4px; animation-delay: -2s; animation-duration: 10s; }
+    #home-bg-layer .fv-shape-3 { width: 80px; height: 80px; left: 20%; bottom: 20%; animation-delay: -4s; animation-duration: 12s; }
+    #home-bg-layer .fv-shape-4 { width: 40px; height: 40px; right: 25%; bottom: 30%; animation-delay: -1s; animation-duration: 6s; }
+    #home-bg-layer .fv-shape-5 { width: 100px; height: 100px; right: 8%; top: 50%; border-radius: 8px; animation-delay: -3s; animation-duration: 9s; }
+    #home-bg-layer .fv-shape-6 { width: 50px; height: 50px; left: 15%; top: 45%; animation-delay: -5s; animation-duration: 11s; }
+    @keyframes fvFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+      25% { transform: translate(6px, -8px) scale(1.02); opacity: 0.7; }
+      50% { transform: translate(-4px, 4px) scale(0.98); opacity: 0.5; }
+      75% { transform: translate(8px, 6px) scale(1.01); opacity: 0.6; }
+    }
+    #home-bg-layer .fv-light-sweep {
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(16, 185, 129, 0.08) 40%, rgba(16, 185, 129, 0.12) 50%, rgba(16, 185, 129, 0.08) 60%, transparent 100%);
+      animation: fvSweep 4s ease-in-out infinite;
+    }
+    @keyframes fvSweep {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(280%); }
+    }
+    /* ファーストビュー（コンテンツのみ） */
+    .first-view {
+      text-align: center;
+      padding: var(--space-6) var(--space-4);
+      position: relative;
+    }
+    .first-view-logo {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 var(--space-2);
+      animation: fvGlow 3s ease-in-out infinite;
+    }
+    .first-view-logo svg { display: inline-block; vertical-align: middle; }
+    @keyframes fvGlow {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.1); }
+    }
+    .first-view-cta {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-6);
+    }
+    .first-view-cta .btn-get-started {
+      padding: 14px 32px;
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .first-view-hero {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin: 0 0 var(--space-4);
+      position: relative;
+      z-index: 1;
+    }
+    .workbook-card-disabled {
+      opacity: 0.6;
+      color: var(--color-text-muted);
+      pointer-events: none;
+      cursor: default;
+    }
+    .workbook-card-disabled .label,
+    .workbook-card-disabled .typography-heading { color: var(--color-text-muted); }
+    .workbook-card-desc { font-size: 12px; color: var(--color-text-muted); margin: var(--space-1) 0 0; }
+    .first-view p {
+      position: relative;
+      z-index: 1;
+      color: var(--color-text-muted);
+      font-size: 1rem;
+      max-width: 480px;
+      margin: 0 auto var(--space-6);
+      line-height: 1.6;
+    }
+    .first-view .label,
+    .first-view .workbook-cards { position: relative; z-index: 1; }
+    .workbook-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      justify-content: center;
+      margin-top: var(--space-6);
+    }
+    .workbook-card {
+      display: block;
+      text-align: left;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      min-width: 260px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .workbook-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    .workbook-card .label { margin-bottom: var(--space-2); }
+    .workbook-card .typography-heading { margin: 0; font-size: 1.1rem; }
+
+    /* タグ・お気に入り（CP-016, CP-017） */
+    .tile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-2); }
+    .tile-tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--color-accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .tile-favorite-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .btn-favorite {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .btn-favorite:hover { color: #f87171; transform: scale(1.05); }
+    .btn-favorite.is-favorited { color: #f87171; }
+    .tile-favorite-count { font-size: 12px; color: var(--color-text-muted); }
+    .tag-filter-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+    .tag-filter-row .tag-pill {
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .tag-filter-row .tag-pill:hover, .tag-filter-row .tag-pill.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: var(--color-accent-emerald);
+      color: var(--color-accent-emerald);
+    }
+
+    /* SC-002: 3-pane workspace (pyvalue5 style) */
+    .three-pane {
+      display: grid;
+      grid-template-columns: 25% 1fr 30%;
+      gap: 0;
+      min-height: 400px;
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+    @media (max-width: 900px) { .three-pane { grid-template-columns: 1fr; } }
+    .pane {
+      background: var(--color-bg-main);
+      border-right: 1px solid var(--glass-border);
+      padding: var(--space-4);
+      overflow: auto;
+    }
+    .pane:last-child { border-right: none; }
+    .app-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg-main);
+      padding: var(--space-3) var(--space-4);
+      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--color-text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      letter-spacing: 0.15em;
+    }
+    .app-footer .footer-status { display: flex; gap: var(--space-4); }
+    .app-footer .footer-status .online { color: var(--color-accent-emerald); }
+    .pane .label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+    }
+    .workspace-problem-pane .problem-title { font-size: 1rem; font-weight: 700; margin-top: var(--space-2); margin-bottom: var(--space-2); }
+    .workspace-problem-tile { margin-bottom: var(--space-4); }
+    .workspace-problem-tile .tile-header { margin-bottom: var(--space-2); }
+    .workspace-problem-tile .tile-tags { margin-bottom: var(--space-3); }
+    .workspace-problem-readability {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--color-text);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+    }
+    .workspace-variable-watcher {
+      background: rgba(1, 4, 9, 0.9);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin-top: var(--space-4);
+    }
+    .workspace-variable-watcher .label { margin-bottom: var(--space-2); }
+    .workspace-variable-watcher .font-mono { font-size: 11px; }
+    .workspace-judge-success { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--color-accent-emerald); border-radius: var(--radius-md); padding: var(--space-3); margin-top: var(--space-2); }
+    .workspace-judge-fail { background: rgba(248, 113, 113, 0.1); border: 1px solid #f87171; border-radius: var(--radius-md); padding: var(--space-3); margin-top: var(--space-2); }
+    .cell-group-ws {
+      border-left: 4px solid transparent;
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-3);
+      transition: border-color 0.2s;
+    }
+    .cell-group-ws:hover { border-left-color: var(--color-accent-emerald); }
+    .cell-box {
+      border: 1px solid var(--color-border);
+      padding: var(--space-3);
+      margin-top: var(--space-2);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      min-height: 60px;
+      background: var(--color-bg-main);
+      border-radius: var(--radius-sm);
+    }
+    .workspace-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .workspace-toolbar-actions { display: flex; gap: var(--space-2); }
+    .cell-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+    }
+    .cell-actions-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .btn-cell-run { padding: 6px 12px; font-size: 13px; }
+    .btn-cell-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+    }
+    .btn-add-cell:hover { color: var(--color-accent-emerald); background: rgba(16, 185, 129, 0.12); }
+    .btn-delete-cell:hover { color: #f87171; background: rgba(248, 113, 113, 0.12); }
+    .workspace-plot-header {
+      padding: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      background: rgba(22, 27, 34, 0.5);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-muted);
+    }
+    .workspace-plot-body { padding: var(--space-4); min-height: 120px; }
+
+    /* Center block SC-003, SC-004 */
+    .center-block {
+      max-width: var(--center-block-max-width);
+      margin: 0 auto;
+      text-align: center;
+      padding: var(--space-6) 0;
+    }
+    .center-block .card { text-align: left; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; border-radius: var(--radius-md); overflow: hidden; }
+    th, td { border: 1px solid var(--color-border); padding: var(--space-3); text-align: left; }
+    th { background: var(--glass-bg); font-weight: 600; }
+    tbody tr { transition: background 0.15s; }
+    tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
+    .history-table th, .history-table td { border-color: var(--glass-border); }
+    .history-table thead th { padding: var(--space-3); }
+    .panel-history .card { max-width: 720px; margin-left: auto; margin-right: auto; text-align: center; }
+    .panel-history .history-table { margin-left: auto; margin-right: auto; }
+    .panel-history .history-table td,
+    .panel-history .history-table th { text-align: center; }
+    .panel-history .btn-history-back-wrap { text-align: center; margin-top: var(--space-4); }
+    .history-detail-tile { max-width: 640px; }
+    .history-detail-problem { font-size: 14px; line-height: 1.6; color: var(--color-text); margin-bottom: var(--space-4); white-space: pre-wrap; }
+    .history-detail-user-answer { margin-bottom: var(--space-4); }
+    .history-detail-user-answer .label { display: block; margin-bottom: var(--space-1); }
+    .history-detail-user-answer-body { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: var(--space-3); margin: 0; overflow-x: auto; white-space: pre-wrap; }
+    .history-detail-judged { font-size: 13px; color: var(--color-text-muted); margin-bottom: var(--space-2); }
+    .admin-actions { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+    .file-input-hidden { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+    .file-input-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4);
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .file-input-trigger:hover { border-color: var(--color-accent-emerald); background: rgba(16, 185, 129, 0.08); }
+
+    /* Form */
+    .form-group { margin-bottom: var(--space-3); }
+    .form-group label { display: block; margin-bottom: var(--space-1); font-size: 14px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      max-width: 400px;
+      padding: var(--space-2);
+      background: var(--color-bg-main);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+    }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+
+    /* Error block FR-P011 */
+    .error-block {
+      background: var(--color-error-bg);
+      border: 1px solid var(--color-error-border);
+      color: var(--color-error-text);
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-2);
+    }
+
+    /* Loading overlay (pyvalue5 style) */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-main);
+      opacity: 0.98;
+    }
+    .loading-overlay.hidden { display: none; }
+    .stats-loader {
+      width: 120px;
+      height: 60px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .stats-bar {
+      width: 8px;
+      background: linear-gradient(to top, var(--color-accent-blue), var(--color-accent-emerald));
+      animation: stats-grow 1.5s ease-in-out infinite;
+      border-radius: 2px 2px 0 0;
+    }
+    .stats-bar:nth-child(1) { height: 20%; animation-delay: 0.1s; }
+    .stats-bar:nth-child(2) { height: 50%; animation-delay: 0.2s; }
+    .stats-bar:nth-child(3) { height: 80%; animation-delay: 0.3s; }
+    .stats-bar:nth-child(4) { height: 100%; animation-delay: 0.4s; }
+    .stats-bar:nth-child(5) { height: 80%; animation-delay: 0.5s; }
+    .stats-bar:nth-child(6) { height: 50%; animation-delay: 0.6s; }
+    .stats-bar:nth-child(7) { height: 20%; animation-delay: 0.7s; }
+    @keyframes stats-grow {
+      0%, 100% { transform: scaleY(1); opacity: 0.5; }
+      50% { transform: scaleY(1.3); opacity: 1; }
+    }
+    .scanning-line {
+      width: 200px;
+      height: 2px;
+      background: rgba(16, 185, 129, 0.2);
+      position: relative;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .scanning-line::after {
+      content: "";
+      display: block;
+      position: absolute;
+      width: 40px;
+      height: 100%;
+      background: var(--color-accent-emerald);
+      box-shadow: 0 0 15px var(--color-accent-emerald);
+      animation: scan 2s linear infinite;
+    }
+    @keyframes scan { from { left: -40px; } to { left: 200px; } }
+    .loading-text { margin-top: var(--space-4); font-size: 10px; font-family: monospace; color: var(--color-accent-emerald); letter-spacing: 0.2em; }
+    .color-text-muted { color: var(--color-text-muted); }
+
+    /* SC-003 採点結果 */
+    .panel-result .result-layout { max-width: 560px; margin: 0 auto; padding: var(--space-6) 0; min-height: 420px; display: flex; flex-direction: column; align-items: center; }
+    .panel-result .result-medal-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+    }
+    .result-grading-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-4);
+    }
+    .result-grading-loading .result-grading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--color-border);
+      border-top-color: var(--color-accent-emerald);
+      border-radius: 50%;
+      animation: resultGradingSpin 0.8s linear infinite;
+    }
+    @keyframes resultGradingSpin {
+      to { transform: rotate(360deg); }
+    }
+    .result-grading-loading .result-grading-text {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.1em;
+    }
+    .result-badge-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .result-badge-block .result-status-badge {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .result-badge-block .result-status-badge i { width: 56px; height: 56px; flex-shrink: 0; }
+    .result-badge-block .result-status-label {
+      width: 112px;
+      text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--color-text);
+    }
+    .panel-result .result-tile {
+      opacity: 0;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      min-height: 140px;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+      text-align: left;
+      box-sizing: border-box;
+    }
+    .panel-result .result-tile .tile-body { margin-bottom: var(--space-2); }
+    .panel-result .result-tile .tile-body .tile-body-left { flex: none; }
+    .panel-result .result-tile .tile-footer {
+      justify-content: flex-end;
+      align-items: center;
+      width: 100%;
+    }
+    .panel-result .result-tile .tile-footer-actions-vertical {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+      justify-content: flex-end;
+      margin-left: auto;
+    }
+    .panel-result .result-tile .tile-footer-actions-vertical .btn { justify-content: center; }
+    .panel-result .result-tile.result-tile-visible {
+      animation: resultTileAppear 0.4s ease-out forwards;
+    }
+    @keyframes resultTileAppear {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ホーム以外の背景（参考ファイルと同じ hero-bg + grid-overlay） */
+    #non-home-bg-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      display: none;
+    }
+    body.non-home-bg-visible #non-home-bg-layer { display: block; }
+    #non-home-bg-layer .non-home-hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
+    }
+    #non-home-bg-layer .non-home-grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(var(--color-border) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+      background-size: 50px 50px;
+      mask-image: radial-gradient(ellipse at center, black, transparent 85%);
+      opacity: 0.15;
+      animation: moveGrid 20s infinite linear;
+    }
+    @keyframes moveGrid {
+      0% { transform: perspective(500px) rotateX(20deg) translateY(0); }
+      100% { transform: perspective(500px) rotateX(20deg) translateY(50px); }
+    }
+  </style>
+</head>
+<body>
+  <div id="home-bg-layer" class="home-bg-layer" aria-hidden="true">
+    <span class="fv-shape fv-shape-1"></span>
+    <span class="fv-shape fv-shape-2"></span>
+    <span class="fv-shape fv-shape-3"></span>
+    <span class="fv-shape fv-shape-4"></span>
+    <span class="fv-shape fv-shape-5"></span>
+    <span class="fv-shape fv-shape-6"></span>
+    <span class="fv-light-sweep"></span>
+  </div>
+  <div id="non-home-bg-layer" aria-hidden="true">
+    <div class="non-home-hero-bg"></div>
+    <div class="non-home-grid-overlay"></div>
+  </div>
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="stats-loader">
+      <div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div>
+    </div>
+    <div class="scanning-line"></div>
+    <p class="loading-text" id="loading-message">LOADING...</p>
+  </div>
+
+  <header class="app-header" id="app-header">
+    <a href="#/" class="logo-link" id="header-logo-link" aria-label="ホームへ">
+      <svg width="110" height="32" viewBox="0 0 130 40" class="logo-glow" aria-hidden="true">
+        <path d="M5 10H25M5 20H18M5 30H25" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="28" cy="20" r="3.5" fill="#10b981"/>
+        <text x="42" y="32" fill="#e6edf3" class="font-logo" style="font-size: 30px; font-weight: 700; letter-spacing: 0.05em;">EXER</text>
+      </svg>
+    </a>
+    <nav class="nav" aria-label="メインナビゲーション">
+      <a href="#/py-value" id="nav-list"><i data-lucide="list" width="16" height="16"></i> 問題一覧</a>
+      <a href="#/py-value/favorites" id="nav-favorites"><i data-lucide="heart" width="16" height="16"></i> お気に入り</a>
+      <a href="#/py-value/history" id="nav-history"><i data-lucide="history" width="16" height="16"></i> 履歴</a>
+      <a href="#/admin?key=admin" id="nav-admin"><i data-lucide="settings" width="16" height="16"></i> 管理</a>
+    </nav>
+  </header>
+  <div class="breadcrumb" id="breadcrumb"></div>
+  <main class="main-content" id="main-content">
+    <!-- SC-000 ホーム（ファーストビュー + 問題集選択） -->
+    <section id="panel-home" class="panel" data-sc="SC-000">
+      <div class="first-view">
+        <div id="first-view-title" class="first-view-logo" aria-hidden="true">
+          <svg width="140" height="44" viewBox="0 0 130 40" class="logo-glow">
+            <path d="M5 10H25M5 20H18M5 30H25" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="28" cy="20" r="3.5" fill="#10b981"/>
+            <text x="42" y="32" fill="#e6edf3" class="font-logo" style="font-size: 30px; font-weight: 700; letter-spacing: 0.05em;">EXER</text>
+          </svg>
+        </div>
+        <h1 class="first-view-hero">
+          Exercise the <span class="text-gradient-emerald">Mind</span>,<br>
+          Master the <span class="text-gradient-blue">Skill</span>.
+        </h1>
+        <p>コードで学ぶ、データ分析。ブラウザだけで問題に挑戦し、採点まで完結します。</p>
+        <div class="first-view-cta">
+          <a href="#/py-value" class="btn btn-primary btn-get-started">GET STARTED</a>
+        </div>
+        <div class="workbook-cards" id="workbook-cards">
+          <a href="#/py-value" class="workbook-card" data-workbook-id="py-value">
+            <span class="label">Pythonデータ分析</span>
+            <p class="typography-heading">統計・検定・データ分析の問題にコードで挑戦</p>
+          </a>
+          <div class="workbook-card workbook-card-disabled" aria-disabled="true">
+            <span class="label">SQL Expert</span>
+            <p class="typography-heading">Coming Soon</p>
+            <p class="workbook-card-desc">複雑なクエリ・最適化</p>
+          </div>
+          <div class="workbook-card workbook-card-disabled" aria-disabled="true">
+            <span class="label">Statistics</span>
+            <p class="typography-heading">基礎統計</p>
+            <p class="workbook-card-desc">統計の基礎</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SC-001 問題一覧 -->
+    <section id="panel-list" class="panel" data-sc="SC-001">
+      <div id="list-sort" class="card" style="margin-bottom: 16px;">
+        <span class="label">ソート</span>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+          <button type="button" class="btn btn-secondary" data-sort="order" aria-label="登録順でソート"><i data-lucide="arrow-down-up" width="16" height="16"></i> 登録順</button>
+          <button type="button" class="btn btn-ghost" data-sort="difficulty"><i data-lucide="signal" width="16" height="16"></i> 難易度</button>
+          <button type="button" class="btn btn-ghost" data-sort="title"><i data-lucide="type" width="16" height="16"></i> タイトル</button>
+          <button type="button" class="btn btn-ghost" data-sort="favorites"><i data-lucide="heart" width="16" height="16"></i> お気に入り数</button>
+        </div>
+        <span class="label" style="display: block; margin-top: 12px;">タグでフィルター</span>
+        <div class="tag-filter-row" id="tag-filter-row"></div>
+      </div>
+      <div id="list-zero" class="card" style="display: none;"><p class="label">0 件時メッセージ</p><p>問題がありません。</p></div>
+      <div class="question-tiles" id="question-tiles"></div>
+    </section>
+
+    <!-- SC-002 ワークスペース (pyvalue5 style) -->
+    <section id="panel-workspace" class="panel" data-sc="SC-002">
+      <div class="workspace-toolbar">
+        <div></div>
+        <div class="workspace-toolbar-actions">
+          <button type="button" class="btn btn-ghost" id="btn-draft" aria-label="下書き保存"><i data-lucide="bookmark" width="16" height="16"></i> 下書き保存</button>
+          <button type="button" class="btn btn-primary" id="btn-submit" aria-label="解答送信"><i data-lucide="send" width="16" height="16"></i> 解答送信</button>
+        </div>
+      </div>
+      <div class="three-pane">
+        <div class="pane workspace-problem-pane">
+          <div id="workspace-problem-body"></div>
+          <div class="workspace-judge-success" id="workspace-judge-area" style="display: none;">
+            <span class="label">採点結果</span>
+            <div id="workspace-judge-content"><p id="workspace-judge-text"></p></div>
+          </div>
+        </div>
+        <div class="pane">
+          <div class="cell-group-ws" data-cell-index="0">
+            <div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [1]</div>
+            <div class="cell-box" id="workspace-cell1">import pandas as pd</div>
+            <div class="cell-actions">
+              <div class="cell-actions-left">
+                <button type="button" class="btn-cell-icon btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button>
+                <button type="button" class="btn-cell-icon btn-delete-cell" data-action="delete-cell" aria-label="セルを削除"><i data-lucide="trash-2" width="18" height="18"></i></button>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm btn-cell-run" aria-label="このセルを実行"><i data-lucide="play" width="14" height="14"></i> Run</button>
+            </div>
+          </div>
+          <div class="cell-group-ws" data-cell-index="1">
+            <div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [2]</div>
+            <div class="cell-box" id="workspace-cell2">ans = df['x'].mean()</div>
+            <div class="cell-actions">
+              <div class="cell-actions-left">
+                <button type="button" class="btn-cell-icon btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button>
+                <button type="button" class="btn-cell-icon btn-delete-cell" data-action="delete-cell" aria-label="セルを削除"><i data-lucide="trash-2" width="18" height="18"></i></button>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm btn-cell-run" aria-label="このセルを実行"><i data-lucide="play" width="14" height="14"></i> Run</button>
+            </div>
+          </div>
+          <p style="margin-top: 12px;"><span class="label">実行制御</span></p>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-ghost" aria-label="中断"><i data-lucide="square" width="14" height="14"></i> Interrupt</button>
+            <button type="button" class="btn btn-ghost" aria-label="カーネルリセット"><i data-lucide="refresh-cw" width="14" height="14"></i> リセット</button>
+          </div>
+        </div>
+        <div class="pane" style="padding: var(--space-4); display: flex; flex-direction: column;">
+          <div class="workspace-variable-watcher">
+            <span class="label">Variable Watcher</span>
+            <p id="workspace-vars" class="font-mono">ans: —<br>p_value: —</p>
+          </div>
+          <div class="workspace-plot-header" style="margin-top: var(--space-4);">Result Plot</div>
+          <div class="workspace-plot-body">
+            <span class="label">プロット</span>
+            <p class="color-text-muted" style="font-size: 12px; margin-top: 4px;">（Matplotlib 出力）</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SC-003 採点結果 -->
+    <section id="panel-result" class="panel" data-sc="SC-003">
+      <div class="result-layout">
+        <div class="result-medal-wrap">
+          <div id="result-grading-loading" class="result-grading-loading" aria-live="polite">
+            <div class="result-grading-spinner" aria-hidden="true"></div>
+            <span class="result-grading-text">採点中</span>
+          </div>
+          <div id="result-badge-block" class="result-badge-block" style="display: none;" aria-live="polite">
+            <span id="result-status-badge" class="result-status-badge badge badge-pass" aria-label="合格"></span>
+            <span id="result-status-label" class="result-status-label">Passed</span>
+          </div>
+        </div>
+        <div id="result-tile" class="result-tile question-tile"></div>
+      </div>
+    </section>
+
+    <!-- SC-004 完了画面 -->
+    <section id="panel-complete" class="panel" data-sc="SC-004">
+      <div class="center-block">
+        <div class="card">
+          <span class="label">完了</span>
+          <p class="typography-heading">おめでとうございます。全問正解です。</p>
+          <button type="button" class="btn btn-primary" id="btn-complete-back"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SC-005 履歴一覧 -->
+    <section id="panel-history" class="panel" data-sc="SC-005">
+      <div class="card">
+        <span class="label">履歴一覧</span>
+        <table class="history-table">
+          <thead><tr><th><i data-lucide="file-text" width="14" height="14"></i> 問題</th><th><i data-lucide="check-circle" width="14" height="14"></i> 結果</th><th><i data-lucide="clock" width="14" height="14"></i> 日時</th><th></th></tr></thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </div>
+      <div class="btn-history-back-wrap">
+        <button type="button" class="btn btn-secondary" id="btn-history-back"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+      </div>
+    </section>
+
+    <!-- SC-006 履歴詳細 -->
+    <section id="panel-history-detail" class="panel" data-sc="SC-006">
+      <div id="history-detail-card"></div>
+      <button type="button" class="btn btn-secondary" id="btn-history-detail-back" style="margin-top: var(--space-4);"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+    </section>
+
+    <!-- SC-011 お気に入り一覧 -->
+    <section id="panel-favorites" class="panel" data-sc="SC-011">
+      <div class="card" style="margin-bottom: 16px;">
+        <span class="label">お気に入り</span>
+        <p id="favorites-zero" style="display: none; color: var(--color-text-muted);">お気に入りに追加した問題がここに表示されます。</p>
+        <div class="question-tiles" id="favorites-tiles"></div>
+      </div>
+      <button type="button" class="btn btn-secondary" id="btn-favorites-back"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+    </section>
+
+    <!-- SC-007 管理ダッシュボード (key required) -->
+    <section id="panel-admin" class="panel" data-sc="SC-007">
+      <div id="admin-key-required" class="card" style="display: none;">
+        <p class="typography-heading">管理画面にはキーが必要です。</p>
+        <p>URL に <code>?key=xxx</code> を付けてアクセスしてください。（例: #/admin?key=admin）</p>
+        <a href="#/" class="btn btn-secondary">問題一覧へ</a>
+      </div>
+      <div id="admin-dashboard" style="display: none;">
+        <div class="card" style="margin-bottom: 16px;">
+          <span class="label">管理ナビ</span>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="#/admin?key=admin" class="btn btn-ghost"><i data-lucide="list" width="16" height="16"></i> 問題一覧</a>
+            <a href="#/admin/import?key=admin" class="btn btn-ghost"><i data-lucide="upload" width="16" height="16"></i> インポート/エクスポート</a>
+            <a href="#/admin/dataset?key=admin" class="btn btn-ghost"><i data-lucide="database" width="16" height="16"></i> データセットアップロード</a>
+          </div>
+        </div>
+        <p><button type="button" class="btn btn-primary" id="btn-admin-new"><i data-lucide="plus" width="16" height="16"></i> 新規作成</button></p>
+        <div class="card" style="margin-top: 16px;">
+          <span class="label">問題一覧（下書き含む）</span>
+          <table class="history-table">
+            <thead><tr><th>タイトル</th><th>ステータス</th><th>操作</th></tr></thead>
+            <tbody id="admin-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SC-008 問題登録エディタ -->
+    <section id="panel-admin-edit" class="panel" data-sc="SC-008">
+      <div class="card">
+        <span class="label">問題登録エディタ</span>
+        <div class="form-group"><label>タイトル</label><input type="text" id="edit-title" value="平均値の計算"></div>
+        <div class="form-group"><label>type</label><select id="edit-type"><option>python-analysis</option></select></div>
+        <div class="form-group"><label>難易度</label><input type="text" id="edit-difficulty" value="初級"></div>
+        <div class="form-group"><label>解説</label><textarea id="edit-explanation" rows="2">解説文...</textarea></div>
+        <div class="label">拡張フィールド（データ分析）</div>
+        <div class="form-group"><label>問題文</label><textarea id="edit-problem" rows="2"></textarea></div>
+        <div class="form-group"><label>watchVariables</label><input type="text" id="edit-watch" placeholder="ans, p_value"></div>
+        <p>ステータス: <button type="button" class="btn btn-secondary" id="edit-status-draft" aria-pressed="true"><i data-lucide="file-text" width="14" height="14"></i> 下書き</button> <button type="button" class="btn btn-ghost" id="edit-status-publish" aria-pressed="false"><i data-lucide="globe" width="14" height="14"></i> 公開</button></p>
+        <div style="display: flex; gap: 8px; margin-top: 16px;">
+          <button type="button" class="btn btn-primary" id="btn-edit-save"><i data-lucide="save" width="16" height="16"></i> 保存</button>
+          <button type="button" class="btn btn-secondary" id="btn-edit-cancel"><i data-lucide="x" width="16" height="16"></i> キャンセル</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SC-009 インポート/エクスポート -->
+    <section id="panel-admin-import" class="panel" data-sc="SC-009">
+      <div class="card">
+        <span class="label">インポート/エクスポート</span>
+        <div class="form-group">
+          <label class="label">インポート（JSON）</label>
+          <input type="file" id="import-file" accept=".json" class="file-input-hidden">
+          <label for="import-file" class="file-input-trigger">
+            <i data-lucide="upload" width="20" height="20"></i>
+            <span>ファイルを選択</span>
+          </label>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-export"><i data-lucide="download" width="16" height="16"></i> エクスポート実行</button>
+        <div id="import-export-result" class="card" style="margin-top: 16px; display: none;"><p id="import-export-message"></p></div>
+      </div>
+    </section>
+
+    <!-- SC-010 データセットアップロード -->
+    <section id="panel-admin-dataset" class="panel" data-sc="SC-010">
+      <div class="card">
+        <span class="label">データセットアップロード</span>
+        <div class="form-group">
+          <label class="label">ファイル（CSV等）</label>
+          <input type="file" id="dataset-file" accept=".csv,.txt" class="file-input-hidden">
+          <label for="dataset-file" class="file-input-trigger">
+            <i data-lucide="upload" width="20" height="20"></i>
+            <span>ファイルを選択</span>
+          </label>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-dataset-upload"><i data-lucide="upload" width="16" height="16"></i> アップロード</button>
+        <div id="dataset-result" class="card" style="margin-top: 16px; display: none;"><p id="dataset-message"></p></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const WORKBOOK_ID = 'py-value';
+      const WORKBOOK_DISPLAY_NAME = 'Pythonデータ分析';
+      const VALID_ADMIN_KEY = 'admin';
+
+      const dummyQuestions = [
+        { id: 'q1', order: 1, displayTitle: '平均値の計算', excerpt: '問題文の冒頭。データが与えられたとき、平均値を求めて ans に代入してください。pandas の DataFrame が変数 df で与えられ、列 x の平均を計算するものとします。', fullProblem: 'データが与えられたとき、平均値を求めて ans に代入してください。\n\npandas の DataFrame が変数 df で与えられます。df には列 x が含まれており、その平均値を計算して変数 ans に代入してください。\n\n例: ans = df[\'x\'].mean()', difficulty: '初級', difficultyOrder: 1, badge: 'pass', tags: ['統計', '記述統計'], favoriteCount: 12 },
+        { id: 'q2', order: 2, displayTitle: 't 検定', excerpt: '問題文の冒頭。2 群の平均の差について t 検定を行い、p_value を求めてください。scipy.stats の ttest_ind 等を利用できます。', fullProblem: '2 群の平均の差について t 検定を行い、p_value を求めてください。\n\n2 群のデータはそれぞれ group_a と group_b という変数で与えられます。scipy.stats の ttest_ind 等を利用し、p 値を変数 p_value に代入してください。', difficulty: '中級', difficultyOrder: 2, badge: 'none', tags: ['統計', '検定'], favoriteCount: 8 },
+        { id: 'q3', order: 3, displayTitle: '回帰分析', excerpt: '問題文の冒頭。単回帰分析を行い、回帰係数を ans に代入してください。sklearn.linear_model の LinearRegression などを用いて構いません。', difficulty: '上級', difficultyOrder: 3, badge: 'none', tags: ['回帰', '検定'], favoriteCount: 5 },
+        { id: 'q4', order: 4, displayTitle: '中央値と四分位数', excerpt: 'データの中央値と第1・第3四分位数を求め、指定された変数に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'none', tags: ['統計', '記述統計'], favoriteCount: 6 },
+        { id: 'q5', order: 5, displayTitle: '分散と標準偏差', excerpt: '与えられたデータの不偏分散と標準偏差を計算し、ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'fail', tags: ['統計', '記述統計'], favoriteCount: 10 },
+        { id: 'q6', order: 6, displayTitle: 'カイ二乗検定', excerpt: '分割表に対してカイ二乗検定を行い、p_value を求めてください...', difficulty: '中級', difficultyOrder: 2, badge: 'none', tags: ['統計', '検定'], favoriteCount: 4 },
+        { id: 'q7', order: 7, displayTitle: '相関係数', excerpt: '2 変量のピアソンの相関係数を計算し、ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'none', tags: ['統計', '記述統計'], favoriteCount: 7 },
+      ];
+      let questions = dummyQuestions.slice();
+      let sortBy = 'order';
+      let selectedTags = [];
+      var myFavorites = {};
+
+      const dummyHistories = [
+        { id: 'h1', questionId: 'q1', questionTitle: '平均値の計算', result: '合格', judgedAt: '2026-02-07T10:00:00Z', userAnswer: 'import pandas as pd\nans = df[\'x\'].mean()' },
+        { id: 'h2', questionId: 'q2', questionTitle: 't 検定', result: '不合格', judgedAt: '2026-02-07T09:30:00Z', userAnswer: 'from scipy import stats\np_value = stats.ttest_ind(group_a, group_b).pvalue' },
+      ];
+      const adminQuestions = [
+        { id: 'q1', title: '平均値の計算', status: '公開' },
+        { id: 'q2', title: 't 検定', status: '下書き' },
+      ];
+
+      function getHash() { return window.location.hash.slice(1) || '/'; }
+      function getHashPath() { return getHash().split('?')[0]; }
+      function getHashQuery() {
+        const q = getHash().indexOf('?');
+        if (q === -1) return {};
+        const params = {};
+        getHash().slice(q + 1).split('&').forEach(p => {
+          const [k, v] = p.split('=');
+          if (k && v) params[decodeURIComponent(k)] = decodeURIComponent(v);
+        });
+        return params;
+      }
+
+      function showLoading(message) {
+        document.getElementById('loading-message').textContent = message || 'LOADING...';
+        document.getElementById('loading-overlay').classList.remove('hidden');
+      }
+      function hideLoading() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+      }
+
+      function setBreadcrumb(items) {
+        const el = document.getElementById('breadcrumb');
+        if (items.length === 1 && items[0] === 'ホーム') {
+          el.innerHTML = '';
+          el.style.display = 'none';
+          return;
+        }
+        el.style.display = '';
+        const parts = [];
+        items.forEach((x, i) => {
+          if (i > 0) parts.push('<span class="breadcrumb-sep"><i data-lucide="chevron-right" width="14" height="14"></i></span>');
+          if (i === 0) parts.push('<span class="breadcrumb-sep"><i data-lucide="home" width="14" height="14"></i></span>');
+          parts.push(x);
+        });
+        el.innerHTML = parts.join('');
+        lucide.createIcons();
+      }
+
+      function difficultyIcon(d) {
+        if (d === '初級') return '<i data-lucide="circle-dot" width="14" height="14" class="difficulty-beginner"></i>';
+        if (d === '中級') return '<i data-lucide="bar-chart-2" width="14" height="14" class="difficulty-intermediate"></i>';
+        return '<i data-lucide="zap" width="14" height="14" class="difficulty-advanced"></i>';
+      }
+      function badgeHtml(b) {
+        if (b === 'pass') return '<span class="badge badge-pass" aria-label="合格"><i data-lucide="award" width="28" height="28"></i></span>';
+        if (b === 'fail') return '<span class="badge badge-fail" aria-label="不合格"><i data-lucide="x-circle" width="28" height="28"></i></span>';
+        return '<span class="badge badge-none" aria-label="未挑戦"><i data-lucide="circle-dashed" width="28" height="28"></i></span>';
+      }
+      function renderList() {
+        const tiles = document.getElementById('question-tiles');
+        const zero = document.getElementById('list-zero');
+        let list = questions.filter(q => {
+          if (selectedTags.length === 0) return true;
+          const qt = q.tags || [];
+          return selectedTags.every(t => qt.includes(t));
+        });
+        list = [...list].sort((a, b) => {
+          if (sortBy === 'order') return a.order - b.order;
+          if (sortBy === 'difficulty') return a.difficultyOrder - b.difficultyOrder;
+          if (sortBy === 'favorites') return (b.favoriteCount || 0) - (a.favoriteCount || 0);
+          return (a.displayTitle || '').localeCompare(b.displayTitle || '');
+        });
+        if (list.length === 0) {
+          zero.style.display = 'block';
+          tiles.innerHTML = '';
+          return;
+        }
+        zero.style.display = 'none';
+        tiles.innerHTML = list.map(q => {
+          const sub = 'CHALLENGE ' + String(q.order).padStart(2, '0');
+          const diffClass = q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced';
+          const tagsHtml = (q.tags || []).map(t => '<span class="tile-tag">' + t + '</span>').join('');
+          const favCount = (q.favoriteCount || 0) + (myFavorites[q.id] || 0);
+          const isFav = (myFavorites[q.id] || 0) > 0;
+          return `
+          <div class="question-tile" data-question-id="${q.id}">
+            <div class="tile-header">
+              <div class="tile-subtitle">${sub}</div>
+              <div class="tile-title-row">
+                <span class="tile-difficulty difficulty-${diffClass}">${difficultyIcon(q.difficulty)} ${q.difficulty}</span>
+                <span class="tile-display-title">${q.displayTitle}</span>
+              </div>
+            </div>
+            <div class="tile-body">
+              <div class="tile-body-left">
+                ${tagsHtml ? '<div class="tile-tags">' + tagsHtml + '</div>' : ''}
+                <div class="tile-excerpt">${q.excerpt}</div>
+              </div>
+              <div class="tile-body-right">${badgeHtml(q.badge)}</div>
+            </div>
+            <div class="tile-footer">
+              <button type="button" class="btn-favorite-block" data-question-id="${q.id}" aria-label="お気に入り">
+                ${isFav ? '<i data-lucide="heart" width="16" height="16" fill="currentColor"></i>' : '<i data-lucide="heart" width="16" height="16"></i>'}
+                <span class="tile-favorite-count">${favCount}</span>
+              </button>
+              <a href="#/py-value/questions/${q.id}" class="btn btn-primary"><i data-lucide="play" width="16" height="16"></i> Try</a>
+            </div>
+          </div>
+        `;
+        }).join('');
+        lucide.createIcons();
+        document.querySelectorAll('.btn-favorite-block').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const qId = this.getAttribute('data-question-id');
+            myFavorites[qId] = (myFavorites[qId] || 0) + 1;
+            renderList();
+            renderTagFilter();
+          });
+        });
+      }
+
+      function renderTagFilter() {
+        const allTags = [];
+        questions.forEach(q => { (q.tags || []).forEach(t => { if (!allTags.includes(t)) allTags.push(t); }); });
+        const row = document.getElementById('tag-filter-row');
+        row.innerHTML = allTags.map(t => {
+          const active = selectedTags.includes(t);
+          return '<button type="button" class="tag-pill ' + (active ? 'active' : '') + '" data-tag="' + t + '">' + t + '</button>';
+        }).join('');
+        row.querySelectorAll('.tag-pill').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const t = this.getAttribute('data-tag');
+            if (selectedTags.includes(t)) selectedTags = selectedTags.filter(x => x !== t);
+            else selectedTags = selectedTags.concat(t);
+            renderList();
+            renderTagFilter();
+          });
+        });
+      }
+
+      function renderFavorites() {
+        const favList = questions.filter(q => (myFavorites[q.id] || 0) > 0);
+        const container = document.getElementById('favorites-tiles');
+        const zeroEl = document.getElementById('favorites-zero');
+        if (favList.length === 0) {
+          zeroEl.style.display = 'block';
+          container.innerHTML = '';
+          return;
+        }
+        zeroEl.style.display = 'none';
+        container.innerHTML = favList.map(q => {
+          const sub = 'CHALLENGE ' + String(q.order).padStart(2, '0');
+          const diffClass = q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced';
+          const tagsHtml = (q.tags || []).map(t => '<span class="tile-tag">' + t + '</span>').join('');
+          return `
+          <div class="question-tile" data-question-id="${q.id}">
+            <div class="tile-header">
+              <div class="tile-subtitle">${sub}</div>
+              <div class="tile-title-row">
+                <span class="tile-difficulty difficulty-${diffClass}">${difficultyIcon(q.difficulty)} ${q.difficulty}</span>
+                <span class="tile-display-title">${q.displayTitle}</span>
+              </div>
+            </div>
+            <div class="tile-body">
+              <div class="tile-body-left">
+                ${tagsHtml ? '<div class="tile-tags">' + tagsHtml + '</div>' : ''}
+                <div class="tile-excerpt">${q.excerpt}</div>
+              </div>
+              <div class="tile-body-right">${badgeHtml(q.badge)}</div>
+            </div>
+            <div class="tile-footer">
+              <button type="button" class="btn btn-ghost btn-unfavorite" data-question-id="${q.id}"><i data-lucide="heart-off" width="16" height="16"></i> 解除</button>
+              <a href="#/py-value/questions/${q.id}" class="btn btn-primary"><i data-lucide="play" width="16" height="16"></i> Try</a>
+            </div>
+          </div>
+        `;
+        }).join('');
+        lucide.createIcons();
+        container.querySelectorAll('.btn-unfavorite').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const qId = this.getAttribute('data-question-id');
+            if (myFavorites[qId]) { myFavorites[qId]--; if (myFavorites[qId] <= 0) delete myFavorites[qId]; }
+            renderFavorites();
+            renderList();
+            renderTagFilter();
+          });
+        });
+      }
+
+      function showPanel(id) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        const panel = document.getElementById(id);
+        if (panel) panel.classList.add('active');
+        if (id === 'panel-home') {
+          document.body.classList.add('home-bg-visible');
+          document.body.classList.remove('non-home-bg-visible');
+        } else {
+          document.body.classList.remove('home-bg-visible');
+          document.body.classList.add('non-home-bg-visible');
+        }
+      }
+
+      function setSortButtons() {
+        document.querySelectorAll('#list-sort [data-sort]').forEach(b => {
+          b.className = b.getAttribute('data-sort') === sortBy ? 'btn btn-secondary' : 'btn btn-ghost';
+        });
+      }
+
+      function breadcrumbWorkbook() { return '<a href="#/py-value" class="breadcrumb-workbook-link"><i data-lucide="book-open" width="14" height="14"></i> ' + WORKBOOK_DISPLAY_NAME + '</a>'; }
+
+      function route() {
+        const path = getHashPath();
+        const query = getHashQuery();
+        const parts = path.split('/').filter(Boolean);
+
+        if (parts[0] === 'admin') {
+          const key = query.key;
+          if (!key || key !== VALID_ADMIN_KEY) {
+            showPanel('panel-admin');
+            document.getElementById('admin-key-required').style.display = 'block';
+            document.getElementById('admin-dashboard').style.display = 'none';
+            setBreadcrumb(['<a href="#/">ホーム</a>', '管理']);
+            return;
+          }
+          document.getElementById('admin-key-required').style.display = 'none';
+          document.getElementById('admin-dashboard').style.display = 'block';
+          if (parts[1] === 'import') {
+            showPanel('panel-admin-import');
+            setBreadcrumb(['<a href="#/">ホーム</a>', '<a href="#/admin?key=admin">管理</a>', 'インポート/エクスポート']);
+            return;
+          }
+          if (parts[1] === 'dataset') {
+            showPanel('panel-admin-dataset');
+            setBreadcrumb(['<a href="#/">ホーム</a>', '<a href="#/admin?key=admin">管理</a>', 'データセット']);
+            return;
+          }
+          if (parts[1] === 'edit' && parts[2]) {
+            showPanel('panel-admin-edit');
+            setBreadcrumb(['<a href="#/">ホーム</a>', '<a href="#/admin?key=admin">管理</a>', '問題編集']);
+            return;
+          }
+          showPanel('panel-admin');
+          const tbody = document.getElementById('admin-tbody');
+          tbody.innerHTML = adminQuestions.map(q => `
+            <tr>
+              <td>${q.title}</td>
+              <td>${q.status}</td>
+              <td><span class="admin-actions"><a href="#/admin/edit/${q.id}?key=admin" class="btn btn-ghost btn-sm"><i data-lucide="pencil" width="14" height="14"></i> 編集</a><a href="#" data-delete-id="${q.id}" class="btn btn-ghost btn-sm link-delete"><i data-lucide="trash-2" width="14" height="14"></i> 削除</a></span></td>
+            </tr>
+          `).join('');
+          lucide.createIcons();
+          setBreadcrumb(['<a href="#/">ホーム</a>', '管理']);
+          return;
+        }
+
+        if (parts[0] === 'history') {
+          window.location.hash = '#/py-value/history' + (parts[1] ? '/' + parts[1] : '');
+          return;
+        }
+
+        if (parts[0] === 'py-value') {
+          if (parts[1] === 'favorites') {
+            showPanel('panel-favorites');
+            renderFavorites();
+            setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), 'お気に入り']);
+            return;
+          }
+          if (parts[1] === 'history') {
+            if (parts[2]) {
+              const h = dummyHistories.find(x => x.id === parts[2]);
+              if (h) {
+                showPanel('panel-history-detail');
+                const q = questions.find(x => x.id === h.questionId);
+                const card = document.getElementById('history-detail-card');
+                const resultBadge = h.result === '合格' ? 'pass' : 'fail';
+                const sub = q ? 'CHALLENGE ' + String(q.order).padStart(2, '0') : '';
+                const diffClass = q && q.difficulty === '初級' ? 'beginner' : q && q.difficulty === '中級' ? 'intermediate' : 'advanced';
+                const difficulty = q ? q.difficulty : '—';
+                const tagsHtml = (q && q.tags) ? q.tags.map(t => '<span class="tile-tag">' + t + '</span>').join('') : '';
+                function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+                const fullText = (q && (q.fullProblem || q.excerpt)) ? esc(q.fullProblem || q.excerpt).replace(/\n/g, '<br>') : '';
+                const judgedAtJST = new Date(h.judgedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+                card.innerHTML = `
+                  <div class="question-tile history-detail-tile">
+                    <div class="tile-header">
+                      <div class="tile-subtitle">${sub}</div>
+                      <div class="tile-title-row">
+                        <span class="tile-difficulty difficulty-${diffClass}">${q ? difficultyIcon(q.difficulty) : ''} ${difficulty}</span>
+                        <span class="tile-display-title">${h.questionTitle}</span>
+                      </div>
+                    </div>
+                    ${tagsHtml ? '<div class="tile-tags">' + tagsHtml + '</div>' : ''}
+                    <div class="history-detail-problem workspace-problem-readability">${fullText}</div>
+                    <div class="history-detail-user-answer">
+                      <span class="label">userAnswer</span>
+                      <pre class="history-detail-user-answer-body">${esc(h.userAnswer || '')}</pre>
+                    </div>
+                    <p class="history-detail-judged"><span class="label">JudgedAt</span> ${judgedAtJST}</p>
+                    <div class="tile-footer" style="justify-content: flex-end;">
+                      <a href="#/py-value/questions/${h.questionId}" class="btn btn-primary"><i data-lucide="rotate-ccw" width="16" height="16"></i> ReTry</a>
+                    </div>
+                  </div>
+                `;
+                lucide.createIcons();
+                setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), '<a href="#/py-value/history">履歴</a>', '詳細']);
+              } else { showPanel('panel-history'); renderHistoryList(); setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), '履歴']); }
+              return;
+            }
+            showPanel('panel-history');
+            renderHistoryList();
+            setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), '履歴']);
+            return;
+          }
+          if (parts[1] === 'questions' && parts[2]) {
+            const qId = parts[2];
+            const q = questions.find(x => x.id === qId);
+            if (!q) { routeToList(); return; }
+            showPanel('panel-workspace');
+            const fullText = (q.fullProblem || q.excerpt || '').replace(/\n/g, '<br>');
+            const tagsHtml = (q.tags || []).map(t => '<span class="tile-tag">' + t + '</span>').join('');
+            const sub = 'CHALLENGE ' + String(q.order).padStart(2, '0');
+            const diffClass = q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced';
+            document.getElementById('workspace-problem-body').innerHTML = `
+              <div class="workspace-problem-tile">
+                <div class="tile-header">
+                  <div class="tile-subtitle">${sub}</div>
+                  <div class="tile-title-row">
+                    <span class="tile-difficulty difficulty-${diffClass}">${difficultyIcon(q.difficulty)} ${q.difficulty}</span>
+                    <span class="tile-display-title">${q.displayTitle}</span>
+                  </div>
+                </div>
+                ${tagsHtml ? '<div class="tile-tags">' + tagsHtml + '</div>' : ''}
+                <div class="workspace-problem-readability">${fullText}</div>
+              </div>
+            `;
+            lucide.createIcons();
+            document.getElementById('workspace-judge-area').style.display = 'none';
+            setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), q.displayTitle]);
+            showLoading('問題を読み込み中...');
+            setTimeout(function() { hideLoading(); }, 1500);
+            return;
+          }
+          if (parts[1] === 'result' && parts[2]) {
+            showPanel('panel-result');
+            const qId = parts[2];
+            const q = questions.find(x => x.id === qId);
+            const nextQ = questions.filter(x => x.order > (q ? q.order : 0)).sort((a,b) => a.order - b.order)[0];
+            const allCorrect = !nextQ;
+            const passed = true;
+            renderResultPanel(q || { displayTitle: '', excerpt: '', difficulty: '初級', order: 0, tags: [], badge: 'pass' }, passed, allCorrect);
+            setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), '採点結果']);
+            return;
+          }
+          if (parts[1] === 'complete') {
+            showPanel('panel-complete');
+            setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook()]);
+            return;
+          }
+          routeToList();
+          return;
+        }
+
+        if (parts.length === 0 || (parts[0] === '')) {
+          showPanel('panel-home');
+          setBreadcrumb(['ホーム']);
+          return;
+        }
+
+        routeToList();
+      }
+
+      function routeToList() {
+        if (getHashPath() !== '/py-value') { window.location.hash = '#/py-value'; return; }
+        showPanel('panel-list');
+        setSortButtons();
+        renderList();
+        renderTagFilter();
+        setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook()]);
+      }
+
+      var resultPanelTimeout = null;
+      function renderResultPanel(q, passed, allCorrect) {
+        const loadingEl = document.getElementById('result-grading-loading');
+        const blockEl = document.getElementById('result-badge-block');
+        const badgeEl = document.getElementById('result-status-badge');
+        const labelEl = document.getElementById('result-status-label');
+        const tileEl = document.getElementById('result-tile');
+
+        badgeEl.className = 'result-status-badge badge ' + (passed ? 'badge-pass' : 'badge-fail');
+        badgeEl.innerHTML = passed
+          ? '<i data-lucide="award" width="56" height="56" aria-hidden="true"></i>'
+          : '<i data-lucide="x-circle" width="56" height="56" aria-hidden="true"></i>';
+        badgeEl.setAttribute('aria-label', passed ? '合格' : '不合格');
+        labelEl.textContent = passed ? 'Passed' : 'Fail';
+
+        loadingEl.style.display = 'flex';
+        blockEl.style.display = 'none';
+        tileEl.classList.remove('result-tile-visible');
+
+        if (resultPanelTimeout) clearTimeout(resultPanelTimeout);
+        resultPanelTimeout = setTimeout(function() {
+          resultPanelTimeout = null;
+          loadingEl.style.display = 'none';
+          blockEl.style.display = 'flex';
+          tileEl.classList.add('result-tile-visible');
+          lucide.createIcons();
+        }, 2000);
+
+        const sub = 'CHALLENGE ' + String(q.order).padStart(2, '0');
+        const diffClass = q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced';
+        const tagsHtml = (q.tags || []).map(t => '<span class="tile-tag">' + t + '</span>').join('');
+        const nextBtnHtml = allCorrect ? '' : '<button type="button" class="btn btn-primary" id="btn-next"><i data-lucide="rotate-ccw" width="16" height="16"></i> Retry</button>';
+        const completeBtnHtml = allCorrect ? '<button type="button" class="btn btn-primary" id="btn-to-complete"><i data-lucide="award" width="16" height="16"></i> 完了画面へ</button>' : '';
+        tileEl.innerHTML = `
+          <div class="tile-header">
+            <div class="tile-subtitle">${sub}</div>
+            <div class="tile-title-row">
+              <span class="tile-difficulty difficulty-${diffClass}">${difficultyIcon(q.difficulty)} ${q.difficulty}</span>
+              <span class="tile-display-title">${q.displayTitle}</span>
+            </div>
+          </div>
+          <div class="tile-body">
+            <div class="tile-body-left">
+              ${tagsHtml ? '<div class="tile-tags">' + tagsHtml + '</div>' : ''}
+              <div class="tile-excerpt">${q.excerpt}</div>
+            </div>
+          </div>
+          <div class="tile-footer">
+            <div class="tile-footer-actions-vertical">
+              <button type="button" class="btn btn-secondary" id="btn-back-list"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+              ${completeBtnHtml}
+              ${nextBtnHtml}
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+
+      function renderHistoryList() {
+        const tbody = document.getElementById('history-tbody');
+        tbody.innerHTML = dummyHistories.map(h => {
+          const badge = h.result === '合格' ? 'pass' : 'fail';
+          return `
+          <tr>
+            <td>${h.questionTitle}</td>
+            <td>${badgeHtml(badge)}</td>
+            <td>${new Date(h.judgedAt).toLocaleString('ja-JP')}</td>
+            <td><a href="#/py-value/history/${h.id}" class="btn btn-ghost btn-sm"><i data-lucide="eye" width="14" height="14"></i> 詳細</a></td>
+          </tr>
+        `;
+        }).join('');
+        lucide.createIcons();
+      }
+
+      document.getElementById('list-sort').addEventListener('click', function(e) {
+        const btn = e.target.closest('[data-sort]');
+        if (!btn) return;
+        sortBy = btn.getAttribute('data-sort');
+        setSortButtons();
+        renderList();
+      });
+
+      document.getElementById('btn-submit').addEventListener('click', function() {
+        showLoading('採点中...');
+        setTimeout(function() {
+          hideLoading();
+          const judgeArea = document.getElementById('workspace-judge-area');
+          judgeArea.style.display = 'block';
+          judgeArea.classList.remove('workspace-judge-fail');
+          judgeArea.classList.add('workspace-judge-success');
+          document.getElementById('workspace-judge-content').innerHTML = '<p>合格です。</p>';
+          const hash = getHashPath();
+          const qId = (hash.match(/questions\/([^/]+)/) || [])[1];
+          if (qId) window.location.hash = '#/py-value/result/' + qId;
+        }, 1800);
+      });
+      document.getElementById('btn-draft').addEventListener('click', function() {
+        showLoading('下書き保存中...');
+        setTimeout(function() { hideLoading(); }, 800);
+      });
+      document.getElementById('edit-status-draft').addEventListener('click', function() {
+        this.className = 'btn btn-secondary'; this.setAttribute('aria-pressed', 'true');
+        document.getElementById('edit-status-publish').className = 'btn btn-ghost'; document.getElementById('edit-status-publish').setAttribute('aria-pressed', 'false');
+      });
+      document.getElementById('edit-status-publish').addEventListener('click', function() {
+        this.className = 'btn btn-secondary'; this.setAttribute('aria-pressed', 'true');
+        document.getElementById('edit-status-draft').className = 'btn btn-ghost'; document.getElementById('edit-status-draft').setAttribute('aria-pressed', 'false');
+      });
+
+      document.getElementById('btn-complete-back').addEventListener('click', function() { window.location.hash = '#/py-value'; });
+      document.getElementById('btn-history-back').addEventListener('click', function() { window.location.hash = '#/py-value'; });
+      document.getElementById('btn-history-detail-back').addEventListener('click', function() { window.location.hash = '#/py-value/history'; });
+      document.getElementById('btn-favorites-back').addEventListener('click', function() { window.location.hash = '#/py-value'; });
+
+      document.getElementById('btn-admin-new').addEventListener('click', function() { window.location.hash = '#/admin/edit/new?key=admin'; });
+      document.getElementById('btn-edit-save').addEventListener('click', function() {
+        showLoading('保存中...');
+        setTimeout(function() { hideLoading(); window.location.hash = '#/admin?key=admin'; }, 1000);
+      });
+      document.getElementById('btn-edit-cancel').addEventListener('click', function() { window.location.hash = '#/admin?key=admin'; });
+
+      document.getElementById('btn-export').addEventListener('click', function() {
+        showLoading('エクスポート中...');
+        setTimeout(function() {
+          hideLoading();
+          const el = document.getElementById('import-export-result');
+          el.style.display = 'block';
+          document.getElementById('import-export-message').textContent = 'エクスポート完了（ダミー）';
+        }, 1200);
+      });
+      document.getElementById('import-file').addEventListener('change', function() {
+        if (!this.files.length) return;
+        showLoading('インポート中...');
+        setTimeout(function() {
+          hideLoading();
+          document.getElementById('import-export-result').style.display = 'block';
+          document.getElementById('import-export-message').textContent = 'インポート完了（ダミー）';
+        }, 1200);
+      });
+      document.getElementById('btn-dataset-upload').addEventListener('click', function() {
+        const file = document.getElementById('dataset-file').files[0];
+        showLoading('アップロード中...');
+        setTimeout(function() {
+          hideLoading();
+          document.getElementById('dataset-result').style.display = 'block';
+          document.getElementById('dataset-message').textContent = 'アップロード完了（ダミー）';
+        }, 1200);
+      });
+
+      document.getElementById('main-content').addEventListener('click', function(e) {
+        const del = e.target.closest('.link-delete');
+        if (del) { e.preventDefault(); }
+        if (e.target.closest('#btn-next')) {
+          const path = getHashPath();
+          const qId = (path.match(/result\/([^/]+)/) || [])[1];
+          const q = questions.find(x => x.id === qId);
+          const nextQ = q && questions.filter(x => x.order > q.order).sort((a,b) => a.order - b.order)[0];
+          if (nextQ) window.location.hash = '#/py-value/questions/' + nextQ.id;
+          else window.location.hash = '#/py-value/complete';
+          return;
+        }
+        if (e.target.closest('#btn-back-list')) { window.location.hash = '#/py-value'; return; }
+        if (e.target.closest('#btn-to-complete')) { window.location.hash = '#/py-value/complete'; return; }
+        const addBtn = e.target.closest('.btn-add-cell[data-action="add-cell"]');
+        if (addBtn) {
+          const group = addBtn.closest('.cell-group-ws');
+          if (!group) return;
+          const editorPane = group.parentElement;
+          const groups = editorPane.querySelectorAll('.cell-group-ws');
+          const nextIndex = groups.length;
+          const newGroup = document.createElement('div');
+          newGroup.className = 'cell-group-ws';
+          newGroup.setAttribute('data-cell-index', String(nextIndex));
+          newGroup.innerHTML = '<div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [' + (nextIndex + 1) + ']</div><div class="cell-box"># 新しいセル</div><div class="cell-actions"><div class="cell-actions-left"><button type="button" class="btn-cell-icon btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button><button type="button" class="btn-cell-icon btn-delete-cell" data-action="delete-cell" aria-label="セルを削除"><i data-lucide="trash-2" width="18" height="18"></i></button></div><button type="button" class="btn btn-primary btn-sm btn-cell-run" aria-label="このセルを実行"><i data-lucide="play" width="14" height="14"></i> Run</button></div>';
+          group.after(newGroup);
+          lucide.createIcons();
+        }
+        const delBtn = e.target.closest('.btn-delete-cell[data-action="delete-cell"]');
+        if (delBtn) {
+          const group = delBtn.closest('.cell-group-ws');
+          if (!group) return;
+          const editorPane = group.parentElement;
+          if (editorPane.querySelectorAll('.cell-group-ws').length <= 1) return;
+          group.remove();
+        }
+      });
+
+      window.addEventListener('hashchange', route);
+      if (!window.location.hash || window.location.hash === '#') window.location.hash = '#/';
+      route();
+      renderList();
+      renderTagFilter();
+      setSortButtons();
+      lucide.createIcons();
+    })();
+  </script>
+  <footer class="app-footer" role="contentinfo">
+    <div class="footer-status">
+      <span class="online">● SYSTEM ONLINE</span>
+      <span>NODE_ENV: DEVELOPMENT</span>
+    </div>
+    <div>EXER FRAMEWORK © 2026</div>
+  </footer>
+</body>
+</html>
