@@ -1,0 +1,16 @@
+---
+description: 仕様書はMermaidを積極利用。UI/UXはApple HIG・Material Design・WCAGを信頼できるソースとして参照する。
+alwaysApply: true
+---
+
+# 仕様書の図示とUI/UXの信頼できるソース
+
+## 仕様書とMermaid
+- 仕様書・設計書では、フロー・構造・関係は**Mermaid図**で表現する（ユースケース図、画面遷移、データフロー、シーケンス等）。人間に分かりやすくする。
+
+## UI/UXの信頼できるソース
+- **Apple Human Interface Guidelines**（HIG）
+- **Google Material Design**
+- **WCAG**（Web Content Accessibility Guidelines）
+
+上記を信頼できる一次ソースとして参照する。UI/UX・アクセシビリティの判断はこれらのガイドラインに沿う。矛盾時はWCAGを優先することを推奨。

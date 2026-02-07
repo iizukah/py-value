@@ -1,5 +1,5 @@
 ---
-description: 変更は必ずコミット。Conventional Commitsを採用し、99_historyに仕様変更を連番で記録する。
+description: 変更は必ずコミット。Conventional Commitsを採用し、99_historyに仕様変更を連番で記録する。WindowsではUTF-8でコミットメッセージを保存する。
 alwaysApply: true
 ---
 
@@ -9,12 +9,19 @@ alwaysApply: true
 - 意味のある変更単位で**必ずコミット**する。
 - **Conventional Commits**を採用: `feat:`, `fix:`, `docs:`, `refactor:` 等。本文にドキュメントIDや理由を記載し、Cursorが後から参照しやすいようにする。
 
-### コミットメッセージの文字化け防止（Windows/自動実行時）
-- 日本語など非ASCIIを含むメッセージは、**UTF-8**でエンコードしてコミットすること。シェル（PowerShell等）の `-m "..."` で渡すと環境によって文字化けすることがある。
-- **推奨**: メッセージを **UTF-8 のテキストファイル**に書き、`git commit -F <ファイルパス>` でコミットする。ファイルはコミット後に削除するか、.gitignore に追加する（例: `.git_commit_msg.txt`）。
-- 自動実行時は `git commit -m "..."` の代わりに上記 `-F` を必ず使うこと。
+### コミットメッセージの文字化け防止（Windows／自動実行時）
+- 日本語など非ASCIIを含むメッセージを **`git commit -m "..."` で直接渡すと、PowerShell のコードページ等により文字化けし、フォーマットも崩れる**。そのため **`-m` は使わず、必ずファイル経由でコミットする**。
+- **手順（必須）**:
+  1. コミットメッセージを **UTF-8（BOM なし推奨）** のテキストファイルに書き、保存する。例: `.cursor/commit_msg_utf8.txt` または `.git_commit_msg.txt`。
+  2. `git commit -F .cursor/commit_msg_utf8.txt` のように **`-F <ファイルパス>`** でコミットする。
+  3. 一時ファイルを使った場合はコミット後に削除するか、`.gitignore` に追加する。本リポジトリでは `.git_commit_msg.txt` が .gitignore 済みのため、そのファイルに書き `git commit -F .git_commit_msg.txt` してもコミット対象にならない。
+- **リポジトリ推奨の Git 設定（一度だけ実行）**: 文字化けとログ表示を防ぐため、リポジトリで以下を設定する。
+  - `git config core.quotepath false`
+  - `git config i18n.commitEncoding utf-8`
+  - `git config i18n.logOutputEncoding utf-8`
+- 自動実行（エージェント・スクリプト）では、**日本語メッセージの場合は必ず `-F` を使う**。`-m` は英語のみの短いメッセージに限る。
 
-例:
+例（ファイルに書く内容）:
 ```
 feat(UC-02): コード実行をShift+Enterでトリガー
 docs(SC-001): API仕様を01_specsに追加

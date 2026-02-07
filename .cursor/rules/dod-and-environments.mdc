@@ -1,0 +1,13 @@
+---
+description: 各SKILLはDefinition of Doneを持つ。開発環境と本番環境を区別し、環境変数・シークレットの管理方法を明記する。
+alwaysApply: true
+---
+
+# DoDと環境の区別
+
+## Definition of Done
+- 各役割（SKILL）は**Definition of Done（DoD）**を持つ。エージェントはそのSKILLのDoDを満たした時点で「完了」とみなす。DoDの詳細は各SKILLに記載。
+
+## 開発環境と本番環境
+- **開発環境**と**本番環境**を常に区別する。設定・シークレット・接続先・機能フラグは環境ごとに分離し、本番向けの破壊的変更や誤操作を防ぐ。
+- 環境変数・シークレットの管理方法（.env.exampleの扱い、本番はFirebase Console等での設定）は、インフラSKILLのreference.mdまたは本ルールで明記する。
