@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>EXER | モック</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23161b22'/%3E%3Cpath d='M8 10h16M8 16h12M8 22h16' stroke='%2310b981' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='24' cy='16' r='2' fill='%2310b981'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400&display=swap">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -42,8 +43,11 @@
       color: var(--color-text);
       min-height: 100vh;
       font-size: 14px;
+      padding-bottom: 48px;
     }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-logo { font-family: 'Space Grotesk', sans-serif; }
+    .logo-glow { filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5)); }
     .typography-title { font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: 0.02em; font-size: 18px; }
     .typography-heading { font-weight: 600; letter-spacing: 0.01em; }
 
@@ -360,22 +364,31 @@
       padding: var(--space-6) var(--space-4);
       position: relative;
     }
-    .first-view h1 {
+    .first-view-logo {
       position: relative;
       z-index: 1;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      color: var(--color-accent-emerald);
-      text-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
       margin: 0 0 var(--space-2);
       animation: fvGlow 3s ease-in-out infinite;
     }
+    .first-view-logo svg { display: inline-block; vertical-align: middle; }
     @keyframes fvGlow {
       0%, 100% { filter: brightness(1); }
       50% { filter: brightness(1.1); }
     }
+    .first-view-cta {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-6);
+    }
+    .workbook-card-disabled {
+      opacity: 0.6;
+      color: var(--color-text-muted);
+      pointer-events: none;
+      cursor: default;
+    }
+    .workbook-card-disabled .label,
+    .workbook-card-disabled .typography-heading { color: var(--color-text-muted); }
+    .workbook-card-desc { font-size: 12px; color: var(--color-text-muted); margin: var(--space-1) 0 0; }
     .first-view p {
       position: relative;
       z-index: 1;
@@ -480,6 +493,25 @@
       overflow: auto;
     }
     .pane:last-child { border-right: none; }
+    .app-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg-main);
+      padding: var(--space-3) var(--space-4);
+      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--color-text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      letter-spacing: 0.15em;
+    }
+    .app-footer .footer-status { display: flex; gap: var(--space-4); }
+    .app-footer .footer-status .online { color: var(--color-accent-emerald); }
     .pane .label {
       font-size: 10px;
       font-weight: 700;
@@ -718,15 +750,18 @@
       height: 120px;
       border-radius: 50%;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 4px;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1rem;
+      font-size: 0.75rem;
       font-weight: 700;
       letter-spacing: 0.05em;
       color: #fff;
       animation: resultStatusIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
+    .panel-result .result-medal svg { flex-shrink: 0; }
     .panel-result .result-medal.result-passed {
       background: linear-gradient(135deg, #10b981 0%, #0d9488 50%, #0f766e 100%);
       border: 2px solid rgba(255, 255, 255, 0.35);
@@ -770,6 +805,40 @@
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* ホーム以外の背景（参考ファイルと同じ hero-bg + grid-overlay） */
+    #non-home-bg-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      display: none;
+    }
+    body.non-home-bg-visible #non-home-bg-layer { display: block; }
+    #non-home-bg-layer .non-home-hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
+    }
+    #non-home-bg-layer .non-home-grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(var(--color-border) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+      background-size: 50px 50px;
+      mask-image: radial-gradient(ellipse at center, black, transparent 85%);
+      opacity: 0.15;
+      animation: moveGrid 20s infinite linear;
+    }
+    @keyframes moveGrid {
+      0% { transform: perspective(500px) rotateX(20deg) translateY(0); }
+      100% { transform: perspective(500px) rotateX(20deg) translateY(50px); }
+    }
   </style>
 </head>
 <body>
@@ -782,6 +851,10 @@
     <span class="fv-shape fv-shape-6"></span>
     <span class="fv-light-sweep"></span>
   </div>
+  <div id="non-home-bg-layer" aria-hidden="true">
+    <div class="non-home-hero-bg"></div>
+    <div class="non-home-grid-overlay"></div>
+  </div>
   <div id="loading-overlay" class="loading-overlay hidden">
     <div class="stats-loader">
       <div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div><div class="stats-bar"></div>
@@ -791,7 +864,13 @@
   </div>
 
   <header class="app-header" id="app-header">
-    <a href="#/" class="logo-link" id="header-logo-link" aria-label="ホームへ"><span class="logo typography-title" id="header-logo">EXER</span></a>
+    <a href="#/" class="logo-link" id="header-logo-link" aria-label="ホームへ">
+      <svg width="110" height="32" viewBox="0 0 130 40" class="logo-glow" aria-hidden="true">
+        <path d="M5 10H25M5 20H18M5 30H25" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="28" cy="20" r="3.5" fill="#10b981"/>
+        <text x="42" y="32" fill="#e6edf3" class="font-logo" style="font-size: 30px; font-weight: 700; letter-spacing: 0.05em;">EXER</text>
+      </svg>
+    </a>
     <nav class="nav" aria-label="メインナビゲーション">
       <a href="#/py-value" id="nav-list"><i data-lucide="list" width="16" height="16"></i> 問題一覧</a>
       <a href="#/py-value/favorites" id="nav-favorites"><i data-lucide="heart" width="16" height="16"></i> お気に入り</a>
@@ -804,14 +883,33 @@
     <!-- SC-000 ホーム（ファーストビュー + 問題集選択） -->
     <section id="panel-home" class="panel" data-sc="SC-000">
       <div class="first-view">
-        <h1 id="first-view-title">EXER</h1>
+        <div id="first-view-title" class="first-view-logo" aria-hidden="true">
+          <svg width="140" height="44" viewBox="0 0 130 40" class="logo-glow">
+            <path d="M5 10H25M5 20H18M5 30H25" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="28" cy="20" r="3.5" fill="#10b981"/>
+            <text x="42" y="32" fill="#e6edf3" class="font-logo" style="font-size: 30px; font-weight: 700; letter-spacing: 0.05em;">EXER</text>
+          </svg>
+        </div>
         <p>コードで学ぶ、データ分析。ブラウザだけで問題に挑戦し、採点まで完結します。</p>
+        <div class="first-view-cta">
+          <a href="#/py-value" class="btn btn-primary">GET STARTED</a>
+        </div>
         <span class="label">問題集を選ぶ</span>
         <div class="workbook-cards" id="workbook-cards">
           <a href="#/py-value" class="workbook-card" data-workbook-id="py-value">
             <span class="label">Pythonデータ分析</span>
             <p class="typography-heading">統計・検定・データ分析の問題にコードで挑戦</p>
           </a>
+          <div class="workbook-card workbook-card-disabled" aria-disabled="true">
+            <span class="label">SQL Expert</span>
+            <p class="typography-heading">Coming Soon</p>
+            <p class="workbook-card-desc">複雑なクエリ・最適化</p>
+          </div>
+          <div class="workbook-card workbook-card-disabled" aria-disabled="true">
+            <span class="label">Statistics</span>
+            <p class="typography-heading">基礎統計</p>
+            <p class="workbook-card-desc">統計の基礎</p>
+          </div>
         </div>
       </div>
     </section>
@@ -831,10 +929,6 @@
       </div>
       <div id="list-zero" class="card" style="display: none;"><p class="label">0 件時メッセージ</p><p>問題がありません。</p></div>
       <div class="question-tiles" id="question-tiles"></div>
-      <p style="margin-top: 16px;">
-        <a href="#/py-value/favorites" class="btn btn-secondary"><i data-lucide="heart" width="16" height="16"></i> お気に入り</a>
-        <a href="#/py-value/history" class="btn btn-secondary"><i data-lucide="history" width="16" height="16"></i> 履歴へ</a>
-      </p>
     </section>
 
     <!-- SC-002 ワークスペース (pyvalue5 style) -->
@@ -901,7 +995,7 @@
     <section id="panel-result" class="panel" data-sc="SC-003">
       <div class="result-layout">
         <div class="result-medal-wrap">
-          <div id="result-status" class="result-medal result-passed" aria-live="polite">Passed</div>
+          <div id="result-status" class="result-medal result-passed" aria-live="polite"><i data-lucide="award" width="28" height="28" aria-hidden="true"></i><span>Passed</span></div>
         </div>
         <div id="result-tile" class="result-tile question-tile"></div>
       </div>
@@ -1244,8 +1338,13 @@
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         const panel = document.getElementById(id);
         if (panel) panel.classList.add('active');
-        if (id === 'panel-home') document.body.classList.add('home-bg-visible');
-        else document.body.classList.remove('home-bg-visible');
+        if (id === 'panel-home') {
+          document.body.classList.add('home-bg-visible');
+          document.body.classList.remove('non-home-bg-visible');
+        } else {
+          document.body.classList.remove('home-bg-visible');
+          document.body.classList.add('non-home-bg-visible');
+        }
       }
 
       function setSortButtons() {
@@ -1428,8 +1527,15 @@
 
       function renderResultPanel(q, passed, allCorrect) {
         const statusEl = document.getElementById('result-status');
-        statusEl.textContent = passed ? 'Passed' : 'Fail';
+        const icon = passed
+          ? '<i data-lucide="award" width="28" height="28" aria-hidden="true"></i>'
+          : '<i data-lucide="x-circle" width="28" height="28" aria-hidden="true"></i>';
+        const label = passed ? 'Passed' : 'Fail';
+        statusEl.innerHTML = icon + '<span>' + label + '</span>';
         statusEl.className = 'result-medal ' + (passed ? 'result-passed' : 'result-failed');
+        statusEl.style.animation = 'none';
+        void statusEl.offsetHeight;
+        statusEl.style.animation = '';
         const sub = 'CHALLENGE ' + String(q.order).padStart(2, '0');
         const diffClass = q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced';
         const tagsHtml = (q.tags || []).map(t => '<span class="tile-tag">' + t + '</span>').join('');
@@ -1601,5 +1707,12 @@
       lucide.createIcons();
     })();
   </script>
+  <footer class="app-footer" role="contentinfo">
+    <div class="footer-status">
+      <span class="online">● SYSTEM ONLINE</span>
+      <span>NODE_ENV: DEVELOPMENT</span>
+    </div>
+    <div>EXER FRAMEWORK © 2026</div>
+  </footer>
 </body>
 </html>
