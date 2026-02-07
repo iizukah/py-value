@@ -195,35 +195,42 @@
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 10px 20px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 700;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
       animation: badge-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
+    .badge i { flex-shrink: 0; }
     @keyframes badge-pop {
       0% { transform: scale(0.5); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
     .badge-pass {
-      background: linear-gradient(135deg, #10b981, #0d9488);
+      background: linear-gradient(135deg, #10b981 0%, #0d9488 50%, #0f766e 100%);
       color: #fff;
-      border: 1px solid rgba(16, 185, 129, 0.5);
-      filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.5));
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
     }
     .badge-fail {
-      background: linear-gradient(135deg, #f87171, #dc2626);
+      background: linear-gradient(135deg, #f87171 0%, #dc2626 50%, #b91c1c 100%);
       color: #fff;
-      border: 1px solid rgba(248, 113, 113, 0.5);
-      filter: drop-shadow(0 0 12px rgba(248, 113, 113, 0.5));
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 16px rgba(248, 113, 113, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
     }
     .badge-none {
-      background: linear-gradient(135deg, #64748b, #475569);
+      background: linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%);
       color: #e2e8f0;
-      border: 1px solid var(--color-border);
+      border: 2px solid var(--color-border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
       filter: drop-shadow(0 0 6px rgba(100, 116, 139, 0.3));
     }
+    .tile-badge .badge { width: 48px; height: 48px; }
+    .tile-badge .badge i { width: 24px; height: 24px; }
+    .history-table .badge { width: 44px; height: 44px; }
+    .history-table .badge i { width: 22px; height: 22px; }
 
     /* CP-000 ファーストビュー（SC-000）画像なし・CSS/JS のみ */
     .first-view {
@@ -231,6 +238,14 @@
       padding: var(--space-6) var(--space-4);
       position: relative;
       overflow: hidden;
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 48px, rgba(16, 185, 129, 0.04) 48px, rgba(16, 185, 129, 0.04) 49px),
+        repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(16, 185, 129, 0.04) 48px, rgba(16, 185, 129, 0.04) 49px);
+      background-size: 100% 100%;
+      animation: fvGridMove 20s linear infinite;
+    }
+    @keyframes fvGridMove {
+      0% { background-position: 0 0, 0 0; }
+      100% { background-position: 0 49px, 49px 0; }
     }
     .first-view::before {
       content: "";
@@ -238,8 +253,48 @@
       inset: 0;
       background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(16, 185, 129, 0.15) 0%, transparent 50%);
       pointer-events: none;
+      z-index: 1;
+    }
+    .first-view-bg-shapes {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .fv-shape {
+      position: absolute;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 50%;
+      animation: fvFloat 8s ease-in-out infinite;
+    }
+    .fv-shape-1 { width: 120px; height: 120px; left: 8%; top: 15%; animation-delay: 0s; }
+    .fv-shape-2 { width: 60px; height: 60px; right: 12%; top: 25%; border-radius: 4px; animation-delay: -2s; animation-duration: 10s; }
+    .fv-shape-3 { width: 80px; height: 80px; left: 20%; bottom: 20%; animation-delay: -4s; animation-duration: 12s; }
+    .fv-shape-4 { width: 40px; height: 40px; right: 25%; bottom: 30%; animation-delay: -1s; animation-duration: 6s; }
+    .fv-shape-5 { width: 100px; height: 100px; right: 8%; top: 50%; border-radius: 8px; animation-delay: -3s; animation-duration: 9s; }
+    .fv-shape-6 { width: 50px; height: 50px; left: 15%; top: 45%; animation-delay: -5s; animation-duration: 11s; }
+    @keyframes fvFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+      25% { transform: translate(6px, -8px) scale(1.02); opacity: 0.7; }
+      50% { transform: translate(-4px, 4px) scale(0.98); opacity: 0.5; }
+      75% { transform: translate(8px, 6px) scale(1.01); opacity: 0.6; }
+    }
+    .fv-light-sweep {
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(16, 185, 129, 0.08) 40%, rgba(16, 185, 129, 0.12) 50%, rgba(16, 185, 129, 0.08) 60%, transparent 100%);
+      animation: fvSweep 4s ease-in-out infinite;
+    }
+    @keyframes fvSweep {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(280%); }
     }
     .first-view h1 {
+      position: relative;
+      z-index: 2;
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 700;
@@ -254,12 +309,16 @@
       50% { filter: brightness(1.1); }
     }
     .first-view p {
+      position: relative;
+      z-index: 2;
       color: var(--color-text-muted);
       font-size: 1rem;
       max-width: 480px;
       margin: 0 auto var(--space-6);
       line-height: 1.6;
     }
+    .first-view .label,
+    .first-view .workbook-cards { position: relative; z-index: 2; }
     .workbook-cards {
       display: flex;
       flex-wrap: wrap;
@@ -388,6 +447,29 @@
       background: var(--color-bg-main);
       border-radius: var(--radius-sm);
     }
+    .cell-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+    }
+    .btn-cell-run { padding: 6px 12px; font-size: 13px; }
+    .btn-add-cell {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+    }
+    .btn-add-cell:hover { color: var(--color-accent-emerald); background: rgba(16, 185, 129, 0.12); }
     .workspace-plot-header {
       padding: var(--space-3);
       border-bottom: 1px solid var(--color-border);
@@ -564,6 +646,15 @@
     <!-- SC-000 ホーム（ファーストビュー + 問題集選択） -->
     <section id="panel-home" class="panel" data-sc="SC-000">
       <div class="first-view">
+        <div class="first-view-bg-shapes" aria-hidden="true">
+          <span class="fv-shape fv-shape-1"></span>
+          <span class="fv-shape fv-shape-2"></span>
+          <span class="fv-shape fv-shape-3"></span>
+          <span class="fv-shape fv-shape-4"></span>
+          <span class="fv-shape fv-shape-5"></span>
+          <span class="fv-shape fv-shape-6"></span>
+          <span class="fv-light-sweep"></span>
+        </div>
         <h1 id="first-view-title">EXER</h1>
         <p>コードで学ぶ、データ分析。ブラウザだけで問題に挑戦し、採点まで完結します。</p>
         <span class="label">問題集を選ぶ</span>
@@ -608,10 +699,6 @@
         <div class="pane workspace-problem-pane">
           <span class="label">問題</span>
           <div id="workspace-problem-body"></div>
-          <div class="workspace-variable-watcher">
-            <span class="label">Variable Watcher</span>
-            <p id="workspace-vars" class="font-mono">ans: —<br>p_value: —</p>
-          </div>
           <div class="workspace-judge-success" id="workspace-judge-area" style="display: none;">
             <span class="label">採点結果</span>
             <div id="workspace-judge-content"><p id="workspace-judge-text"></p></div>
@@ -619,13 +706,21 @@
         </div>
         <div class="pane">
           <span class="label">エディタ・セル</span>
-          <div class="cell-group-ws">
+          <div class="cell-group-ws" data-cell-index="0">
             <div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [1]</div>
             <div class="cell-box" id="workspace-cell1">import pandas as pd</div>
+            <div class="cell-actions">
+              <button type="button" class="btn btn-primary btn-sm btn-cell-run" aria-label="このセルを実行"><i data-lucide="play" width="14" height="14"></i> Run</button>
+              <button type="button" class="btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button>
+            </div>
           </div>
-          <div class="cell-group-ws">
+          <div class="cell-group-ws" data-cell-index="1">
             <div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [2]</div>
             <div class="cell-box" id="workspace-cell2">ans = df['x'].mean()</div>
+            <div class="cell-actions">
+              <button type="button" class="btn btn-primary btn-sm btn-cell-run" aria-label="このセルを実行"><i data-lucide="play" width="14" height="14"></i> Run</button>
+              <button type="button" class="btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button>
+            </div>
           </div>
           <p style="margin-top: 12px;"><span class="label">実行制御</span></p>
           <div style="display: flex; gap: 8px;">
@@ -633,12 +728,14 @@
             <button type="button" class="btn btn-ghost" aria-label="カーネルリセット"><i data-lucide="refresh-cw" width="14" height="14"></i> リセット</button>
           </div>
         </div>
-        <div class="pane" style="padding: 0; display: flex; flex-direction: column;">
-          <div class="workspace-plot-header">Result Plot</div>
+        <div class="pane" style="padding: var(--space-4); display: flex; flex-direction: column;">
+          <div class="workspace-variable-watcher">
+            <span class="label">Variable Watcher</span>
+            <p id="workspace-vars" class="font-mono">ans: —<br>p_value: —</p>
+          </div>
+          <div class="workspace-plot-header" style="margin-top: var(--space-4);">Result Plot</div>
           <div class="workspace-plot-body">
-            <span class="label">変数</span>
-            <p id="workspace-vars-right" class="font-mono" style="font-size: 11px;">ans: —<br>p_value: —</p>
-            <span class="label" style="margin-top: 12px;">プロット</span>
+            <span class="label">プロット</span>
             <p class="color-text-muted" style="font-size: 12px; margin-top: 4px;">（Matplotlib 出力）</p>
           </div>
         </div>
@@ -845,9 +942,9 @@
         return '<i data-lucide="zap" width="14" height="14" class="difficulty-advanced"></i>';
       }
       function badgeHtml(b) {
-        if (b === 'pass') return '<span class="badge badge-pass">合格</span>';
-        if (b === 'fail') return '<span class="badge badge-fail">不合格</span>';
-        return '<span class="badge badge-none">未挑戦</span>';
+        if (b === 'pass') return '<span class="badge badge-pass" aria-label="合格"><i data-lucide="award" width="28" height="28"></i></span>';
+        if (b === 'fail') return '<span class="badge badge-fail" aria-label="不合格"><i data-lucide="x-circle" width="28" height="28"></i></span>';
+        return '<span class="badge badge-none" aria-label="未挑戦"><i data-lucide="circle-dashed" width="28" height="28"></i></span>';
       }
       function renderList() {
         const tiles = document.getElementById('question-tiles');
@@ -1080,7 +1177,8 @@
             const allCorrect = !nextQ;
             document.getElementById('btn-next').style.display = allCorrect ? 'none' : 'inline-flex';
             document.getElementById('btn-to-complete').style.display = allCorrect ? 'inline-flex' : 'none';
-            document.getElementById('result-badges').innerHTML = '獲得バッジ: <span class="badge badge-pass">合格</span>';
+            document.getElementById('result-badges').innerHTML = '獲得バッジ: ' + badgeHtml('pass');
+            lucide.createIcons();
             setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), '採点結果']);
             return;
           }
@@ -1229,6 +1327,19 @@
       document.getElementById('main-content').addEventListener('click', function(e) {
         const del = e.target.closest('.link-delete');
         if (del) { e.preventDefault(); }
+        const addBtn = e.target.closest('.btn-add-cell[data-action="add-cell"]');
+        if (addBtn) {
+          const group = addBtn.closest('.cell-group-ws');
+          if (!group) return;
+          const editorPane = group.parentElement;
+          const nextIndex = 1 + Array.from(editorPane.querySelectorAll('.cell-group-ws')).indexOf(group);
+          const newGroup = document.createElement('div');
+          newGroup.className = 'cell-group-ws';
+          newGroup.setAttribute('data-cell-index', String(nextIndex));
+          newGroup.innerHTML = '<div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [' + (nextIndex + 1) + ']</div><div class="cell-box"># 新しいセル</div><div class="cell-actions"><button type="button" class="btn btn-primary btn-sm btn-cell-run" aria-label="このセルを実行"><i data-lucide="play" width="14" height="14"></i> Run</button><button type="button" class="btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button></div>';
+          group.after(newGroup);
+          lucide.createIcons();
+        }
       });
 
       window.addEventListener('hashchange', route);
