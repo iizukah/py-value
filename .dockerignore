@@ -1,0 +1,41 @@
+# Dependencies and build output (rebuilt in image)
+node_modules
+.next
+out
+
+# Git and IDE
+.git
+.gitignore
+.cursor
+.vscode
+*.md
+!README.md
+
+# Tests and tooling (not needed in production image)
+src/tests
+playwright.config.ts
+vitest.config.ts
+test-results
+playwright-report
+coverage
+*.test.ts
+*.spec.ts
+
+# Docs and scripts (not needed at runtime)
+docs
+scripts
+# data: ビルド時に Repository が参照するためコピーする（本番は DATA_SOURCE=firestore）
+
+# Firebase config (Hosting uses its own; Run does not need these in image)
+firebase.json
+.firebaserc
+firestore.rules
+
+# Env (set at Cloud Run, not baked in)
+.env
+.env.*
+
+# Misc
+*.log
+.dockerignore
+Dockerfile
