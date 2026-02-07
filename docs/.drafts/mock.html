@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Py-Value | モック</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400&display=swap">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     /* UX-04 tokens + glass */
@@ -61,16 +61,27 @@
       top: 0;
       z-index: 100;
     }
-    .app-header .logo { font-size: 18px; font-weight: 700; color: var(--color-accent-emerald); }
-    .app-header .nav { display: flex; gap: var(--space-4); align-items: center; }
+    .app-header .logo-link { text-decoration: none; color: inherit; }
+    .app-header .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--color-accent-emerald);
+      text-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+    }
+    .app-header .nav { display: flex; gap: var(--space-2); align-items: center; }
     .app-header .nav a {
       color: var(--color-accent-emerald);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: var(--space-1);
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border-radius: 999px;
+      transition: background 0.2s, color 0.2s;
     }
-    .app-header .nav a:hover { text-decoration: underline; }
+    .app-header .nav a:hover { background: rgba(16, 185, 129, 0.12); text-decoration: none; }
 
     .breadcrumb {
       font-size: 14px;
@@ -78,9 +89,11 @@
       margin: var(--space-2) var(--space-4);
       display: flex;
       align-items: center;
-      gap: var(--space-1);
+      gap: var(--space-2);
+      flex-wrap: wrap;
     }
     .breadcrumb a { color: var(--color-accent-emerald); text-decoration: none; }
+    .breadcrumb .breadcrumb-sep { display: inline-flex; color: var(--color-text-muted); }
     .main-content { max-width: 1200px; margin: 0 auto; padding: var(--space-4); min-height: 60vh; }
     .panel { display: none; }
     .panel.active { display: block; }
@@ -102,19 +115,34 @@
       display: inline-flex;
       align-items: center;
       gap: var(--space-2);
-      padding: var(--space-2) var(--space-4);
+      padding: 10px 20px;
       border: none;
-      border-radius: var(--radius-md);
+      border-radius: 999px;
       cursor: pointer;
       font-family: inherit;
       font-size: 14px;
       font-weight: 600;
-      transition: opacity 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    .btn:hover { opacity: 0.9; }
-    .btn-primary { background: var(--color-accent-emerald); color: #fff; }
-    .btn-secondary { background: var(--color-accent-blue); color: #fff; }
-    .btn-ghost { background: transparent; color: var(--color-text); border: 1px solid var(--color-border); }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-accent-emerald) 0%, #0d9488 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .btn-primary:hover { box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45); }
+    .btn-secondary {
+      background: var(--color-accent-blue);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+    .btn-secondary:hover { box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.06); }
 
     /* SC-001: question tiles */
     .question-tiles {
@@ -137,21 +165,31 @@
       justify-content: space-between;
       text-align: center;
     }
-    .question-tile .tile-title { font-weight: 600; margin-bottom: var(--space-1); }
+    .question-tile .tile-subtitle {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-1);
+      text-transform: uppercase;
+    }
+    .question-tile .tile-display-title { font-size: 1.1rem; font-weight: 700; margin-bottom: var(--space-1); }
     .question-tile .tile-excerpt { font-size: 13px; color: var(--color-text-muted); margin-bottom: var(--space-2); flex: 1; }
-    .question-tile .tile-meta { font-size: 12px; color: var(--color-text-muted); margin-bottom: var(--space-2); }
+    .question-tile .tile-meta { font-size: 12px; margin-bottom: var(--space-2); display: inline-flex; align-items: center; gap: 6px; }
+    .difficulty-beginner { color: var(--color-text-muted); }
+    .difficulty-intermediate { color: var(--color-accent-blue); }
+    .difficulty-advanced { color: var(--color-accent-emerald); }
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 2px 8px;
-      background: var(--color-accent-emerald);
-      color: var(--color-bg-main);
-      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
     }
-    .badge.muted { background: var(--color-border); color: var(--color-text-muted); }
+    .badge-pass { background: rgba(16, 185, 129, 0.2); color: var(--color-accent-emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-fail { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-none { background: rgba(139, 148, 158, 0.15); color: var(--color-text-muted); border: 1px solid var(--color-border); }
 
     /* SC-002: 3-pane workspace */
     .three-pane {
@@ -191,11 +229,26 @@
     .center-block .card { text-align: left; }
 
     /* Tables */
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid var(--color-border); padding: var(--space-2); text-align: left; }
+    table { width: 100%; border-collapse: collapse; border-radius: var(--radius-md); overflow: hidden; }
+    th, td { border: 1px solid var(--color-border); padding: var(--space-3); text-align: left; }
     th { background: var(--glass-bg); font-weight: 600; }
-    tr.pass td:nth-child(2) { color: var(--color-accent-emerald); }
-    tr.fail td:nth-child(2) { color: var(--color-error-text); }
+    tbody tr { transition: background 0.15s; }
+    tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
+    .history-table th, .history-table td { border-color: var(--glass-border); }
+    .history-table thead th { padding: var(--space-3); }
+    .file-input-hidden { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+    .file-input-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4);
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .file-input-trigger:hover { border-color: var(--color-accent-emerald); background: rgba(16, 185, 129, 0.08); }
 
     /* Form */
     .form-group { margin-bottom: var(--space-3); }
@@ -292,7 +345,7 @@
   </div>
 
   <header class="app-header" id="app-header">
-    <span class="logo typography-title" id="header-logo">Py-Value</span>
+    <a href="#/" class="logo-link" id="header-logo-link" aria-label="ホームへ"><span class="logo typography-title" id="header-logo">Py-Value</span></a>
     <nav class="nav" aria-label="メインナビゲーション">
       <a href="#/" id="nav-list"><i data-lucide="list" width="16" height="16"></i> 問題一覧</a>
       <a href="#/history" id="nav-history"><i data-lucide="history" width="16" height="16"></i> 履歴</a>
@@ -307,7 +360,7 @@
         <span class="label">ソート</span>
         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
           <button type="button" class="btn btn-secondary" data-sort="order" aria-label="登録順でソート"><i data-lucide="arrow-down-up" width="16" height="16"></i> 登録順</button>
-          <button type="button" class="btn btn-ghost" data-sort="difficulty"><i data-lucide="bar-chart-2" width="16" height="16"></i> 難易度</button>
+          <button type="button" class="btn btn-ghost" data-sort="difficulty"><i data-lucide="signal" width="16" height="16"></i> 難易度</button>
           <button type="button" class="btn btn-ghost" data-sort="title"><i data-lucide="type" width="16" height="16"></i> タイトル</button>
         </div>
       </div>
@@ -381,8 +434,8 @@
     <section id="panel-history" class="panel" data-sc="SC-005">
       <div class="card">
         <span class="label">履歴一覧</span>
-        <table>
-          <thead><tr><th>問題タイトル</th><th>結果</th><th>日時</th><th></th></tr></thead>
+        <table class="history-table">
+          <thead><tr><th><i data-lucide="file-text" width="14" height="14"></i> 問題</th><th><i data-lucide="check-circle" width="14" height="14"></i> 結果</th><th><i data-lucide="clock" width="14" height="14"></i> 日時</th><th></th></tr></thead>
           <tbody id="history-tbody"></tbody>
         </table>
       </div>
@@ -445,7 +498,14 @@
     <section id="panel-admin-import" class="panel" data-sc="SC-009">
       <div class="card">
         <span class="label">インポート/エクスポート</span>
-        <div class="form-group"><label>インポート（JSON）</label><input type="file" id="import-file" accept=".json"></div>
+        <div class="form-group">
+          <label class="label">インポート（JSON）</label>
+          <input type="file" id="import-file" accept=".json" class="file-input-hidden">
+          <label for="import-file" class="file-input-trigger">
+            <i data-lucide="upload" width="20" height="20"></i>
+            <span>ファイルを選択</span>
+          </label>
+        </div>
         <button type="button" class="btn btn-primary" id="btn-export"><i data-lucide="download" width="16" height="16"></i> エクスポート実行</button>
         <div id="import-export-result" class="card" style="margin-top: 16px; display: none;"><p id="import-export-message"></p></div>
       </div>
@@ -468,9 +528,9 @@
       const VALID_ADMIN_KEY = 'admin';
 
       const dummyQuestions = [
-        { id: 'q1', order: 1, title: '問題 1: 平均値の計算', excerpt: '問題文の冒頭。データが与えられたとき、平均値を求めて ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: '正解済' },
-        { id: 'q2', order: 2, title: '問題 2: t 検定', excerpt: '問題文の冒頭。2 群の平均の差について t 検定を行い、p_value を求めて...', difficulty: '中級', difficultyOrder: 2, badge: '未解答' },
-        { id: 'q3', order: 3, title: '問題 3: 回帰分析', excerpt: '問題文の冒頭。単回帰分析を行い、回帰係数を ans に代入してください...', difficulty: '上級', difficultyOrder: 3, badge: null },
+        { id: 'q1', order: 1, displayTitle: '平均値の計算', excerpt: '問題文の冒頭。データが与えられたとき、平均値を求めて ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'pass' },
+        { id: 'q2', order: 2, displayTitle: 't 検定', excerpt: '問題文の冒頭。2 群の平均の差について t 検定を行い、p_value を求めて...', difficulty: '中級', difficultyOrder: 2, badge: 'none' },
+        { id: 'q3', order: 3, displayTitle: '回帰分析', excerpt: '問題文の冒頭。単回帰分析を行い、回帰係数を ans に代入してください...', difficulty: '上級', difficultyOrder: 3, badge: 'none' },
       ];
       let questions = dummyQuestions.slice();
       let sortBy = 'order';
@@ -507,19 +567,33 @@
 
       function setBreadcrumb(items) {
         const el = document.getElementById('breadcrumb');
-        el.innerHTML = items.map((x, i) => {
-          if (i > 0) return ['<span style="color: var(--color-text-muted);">&gt;</span>', x].join(' ');
-          return x;
-        }).join(' ');
+        const parts = [];
+        items.forEach((x, i) => {
+          if (i > 0) parts.push('<span class="breadcrumb-sep"><i data-lucide="chevron-right" width="14" height="14"></i></span>');
+          if (i === 0) parts.push('<span class="breadcrumb-sep"><i data-lucide="home" width="14" height="14"></i></span>');
+          parts.push(x);
+        });
+        el.innerHTML = parts.join('');
+        lucide.createIcons();
       }
 
+      function difficultyIcon(d) {
+        if (d === '初級') return '<i data-lucide="circle-dot" width="14" height="14" class="difficulty-beginner"></i>';
+        if (d === '中級') return '<i data-lucide="bar-chart-2" width="14" height="14" class="difficulty-intermediate"></i>';
+        return '<i data-lucide="zap" width="14" height="14" class="difficulty-advanced"></i>';
+      }
+      function badgeHtml(b) {
+        if (b === 'pass') return '<span class="badge badge-pass">合格</span>';
+        if (b === 'fail') return '<span class="badge badge-fail">不合格</span>';
+        return '<span class="badge badge-none">未挑戦</span>';
+      }
       function renderList() {
         const tiles = document.getElementById('question-tiles');
         const zero = document.getElementById('list-zero');
         const list = [...questions].sort((a, b) => {
           if (sortBy === 'order') return a.order - b.order;
           if (sortBy === 'difficulty') return a.difficultyOrder - b.difficultyOrder;
-          return a.title.localeCompare(b.title);
+          return (a.displayTitle || '').localeCompare(b.displayTitle || '');
         });
         if (list.length === 0) {
           zero.style.display = 'block';
@@ -527,15 +601,19 @@
           return;
         }
         zero.style.display = 'none';
-        tiles.innerHTML = list.map(q => `
+        tiles.innerHTML = list.map(q => {
+          const sub = 'CHALLENGE ' + String(q.order).padStart(2, '0');
+          return `
           <div class="question-tile">
-            <div class="tile-title">${q.title}</div>
+            <div class="tile-subtitle">${sub}</div>
+            <div class="tile-display-title">${q.displayTitle}</div>
             <div class="tile-excerpt">${q.excerpt}</div>
-            <div class="tile-meta">難易度: ${q.difficulty}</div>
-            <div class="tile-badge">${q.badge ? `<span class="badge">${q.badge}</span>` : '<span class="badge muted">—</span>'}</div>
-            <a href="#/questions/${q.id}" class="btn btn-primary"><i data-lucide="folder-open" width="16" height="16"></i> 開く</a>
+            <div class="tile-meta difficulty-${q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced'}">${difficultyIcon(q.difficulty)} ${q.difficulty}</div>
+            <div class="tile-badge">${badgeHtml(q.badge)}</div>
+            <a href="#/questions/${q.id}" class="btn btn-primary"><i data-lucide="play" width="16" height="16"></i> Try</a>
           </div>
-        `).join('');
+        `;
+        }).join('');
         lucide.createIcons();
       }
 
@@ -605,11 +683,12 @@
             if (h) {
               showPanel('panel-history-detail');
               const card = document.getElementById('history-detail-card');
+              const resultBadge = h.result === '合格' ? 'pass' : 'fail';
               card.innerHTML = `
                 <span class="label">履歴詳細</span>
                 <p><strong>問題:</strong> ${h.questionTitle}</p>
                 <p><strong>userAnswer 要約:</strong> cells: 2 セル</p>
-                <p><strong>結果:</strong> ${h.result}</p>
+                <p><strong>結果:</strong> ${badgeHtml(resultBadge)}</p>
                 <p><strong>judgedAt:</strong> ${h.judgedAt}</p>
               `;
               setBreadcrumb(['<a href="#/">ホーム</a>', '<a href="#/history">履歴</a>', '詳細']);
@@ -627,9 +706,9 @@
           const q = questions.find(x => x.id === qId);
           if (!q) { routeToList(); return; }
           showPanel('panel-workspace');
-          document.getElementById('workspace-problem-body').innerHTML = `<p><strong>${q.title}</strong></p><p>${q.excerpt}</p>`;
+          document.getElementById('workspace-problem-body').innerHTML = `<p><strong>${q.displayTitle}</strong></p><p>${q.excerpt}</p>`;
           document.getElementById('workspace-judge-area').style.display = 'none';
-          setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID, q.title]);
+          setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID, q.displayTitle]);
           showLoading('問題を読み込み中...');
           setTimeout(function() {
             hideLoading();
@@ -645,7 +724,7 @@
           const allCorrect = !nextQ;
           document.getElementById('btn-next').style.display = allCorrect ? 'none' : 'inline-flex';
           document.getElementById('btn-to-complete').style.display = allCorrect ? 'inline-flex' : 'none';
-          document.getElementById('result-badges').innerHTML = '獲得バッジ: <span class="badge">初回正解</span>';
+          document.getElementById('result-badges').innerHTML = '獲得バッジ: <span class="badge badge-pass">合格</span>';
           setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID, '採点結果']);
           return;
         }
@@ -668,14 +747,17 @@
 
       function renderHistoryList() {
         const tbody = document.getElementById('history-tbody');
-        tbody.innerHTML = dummyHistories.map(h => `
-          <tr class="${h.result === '合格' ? 'pass' : 'fail'}">
+        tbody.innerHTML = dummyHistories.map(h => {
+          const badge = h.result === '合格' ? 'pass' : 'fail';
+          return `
+          <tr>
             <td>${h.questionTitle}</td>
-            <td>${h.result}</td>
+            <td>${badgeHtml(badge)}</td>
             <td>${new Date(h.judgedAt).toLocaleString('ja-JP')}</td>
             <td><a href="#/history/${h.id}"><i data-lucide="eye" width="14" height="14"></i> 詳細</a></td>
           </tr>
-        `).join('');
+        `;
+        }).join('');
         lucide.createIcons();
       }
 
