@@ -145,10 +145,10 @@
     .btn-ghost:hover { background: rgba(255, 255, 255, 0.06); }
     .btn-sm { padding: 6px 12px; font-size: 13px; }
 
-    /* SC-001: question tiles */
+    /* SC-001: question tiles（mock2 ベース・1行3パネル均等・同一サイズ） */
     .question-tiles {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: var(--space-4);
     }
     .question-tile {
@@ -158,37 +158,82 @@
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-lg);
       padding: var(--space-4);
-      min-width: var(--tile-min-width);
-      min-height: var(--tile-min-height);
+      min-height: 300px;
       display: flex;
       flex-direction: column;
       align-items: stretch;
       justify-content: space-between;
       text-align: left;
     }
+    .question-tile .tile-header {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(13, 148, 136, 0.14) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      margin-bottom: var(--space-2);
+    }
     .question-tile .tile-subtitle {
       font-size: 11px;
       letter-spacing: 0.08em;
-      color: var(--color-text-muted);
+      color: var(--color-accent-emerald);
       margin-bottom: var(--space-1);
       text-transform: uppercase;
+      font-weight: 600;
     }
     .question-tile .tile-title-row {
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+    .question-tile .tile-title-row .tile-difficulty { color: var(--color-text); }
+    .question-tile .tile-difficulty { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; flex-shrink: 0; }
+    .question-tile .tile-display-title { font-size: 1.1rem; font-weight: 700; flex: 1; min-width: 0; color: var(--color-text); }
+    .question-tile .tile-excerpt { font-size: 13px; color: var(--color-text-muted); margin-bottom: var(--space-2); flex: 1; }
+    .question-tile .tile-badge-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: var(--space-3) 0;
       margin-bottom: var(--space-2);
     }
-    .question-tile .tile-difficulty { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; flex-shrink: 0; }
-    .question-tile .tile-display-title { font-size: 1.1rem; font-weight: 700; flex: 1; min-width: 0; }
-    .question-tile .tile-excerpt { font-size: 13px; color: var(--color-text-muted); margin-bottom: var(--space-2); flex: 1; }
+    .question-tile .tile-badge-row .badge {
+      width: 90px;
+      height: 90px;
+      min-width: 90px;
+      min-height: 90px;
+      border-radius: 50%;
+    }
+    .question-tile .tile-badge-row .badge i { width: 58px; height: 58px; }
     .question-tile .tile-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
       margin-top: auto;
+      gap: var(--space-2);
     }
+    .question-tile .tile-footer .btn-favorite-block {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--color-text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .question-tile .tile-footer .btn-favorite-block:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f87171;
+      transform: translateY(-1px);
+    }
+    .question-tile .tile-footer .btn-favorite-block .tile-favorite-count { margin: 0; }
     .difficulty-beginner { color: var(--color-text-muted); }
     .difficulty-intermediate { color: var(--color-accent-blue); }
     .difficulty-advanced { color: var(--color-accent-emerald); }
@@ -227,8 +272,6 @@
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
       filter: drop-shadow(0 0 6px rgba(100, 116, 139, 0.3));
     }
-    .tile-badge .badge { width: 48px; height: 48px; }
-    .tile-badge .badge i { width: 24px; height: 24px; }
     .history-table .badge { width: 44px; height: 44px; }
     .history-table .badge i { width: 22px; height: 22px; }
 
@@ -447,15 +490,28 @@
       background: var(--color-bg-main);
       border-radius: var(--radius-sm);
     }
+    .workspace-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .workspace-toolbar-actions { display: flex; gap: var(--space-2); }
     .cell-actions {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
       gap: var(--space-2);
       margin-top: var(--space-2);
     }
+    .cell-actions-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
     .btn-cell-run { padding: 6px 12px; font-size: 13px; }
-    .btn-add-cell {
+    .btn-cell-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -470,6 +526,7 @@
       transition: color 0.2s, background 0.2s;
     }
     .btn-add-cell:hover { color: var(--color-accent-emerald); background: rgba(16, 185, 129, 0.12); }
+    .btn-delete-cell:hover { color: #f87171; background: rgba(248, 113, 113, 0.12); }
     .workspace-plot-header {
       padding: var(--space-3);
       border-bottom: 1px solid var(--color-border);
@@ -690,10 +747,12 @@
 
     <!-- SC-002 ワークスペース (pyvalue5 style) -->
     <section id="panel-workspace" class="panel" data-sc="SC-002">
-      <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
-        <button type="button" class="btn btn-ghost" id="btn-draft" aria-label="下書き保存"><i data-lucide="bookmark" width="16" height="16"></i> 下書き保存</button>
-        <button type="button" class="btn btn-primary" id="btn-submit" aria-label="解答送信"><i data-lucide="send" width="16" height="16"></i> 解答送信</button>
-        <button type="button" class="btn btn-ghost" id="btn-error-demo" aria-label="エラー表示例（FR-P011）"><i data-lucide="alert-circle" width="16" height="16"></i> エラー表示例</button>
+      <div class="workspace-toolbar">
+        <div></div>
+        <div class="workspace-toolbar-actions">
+          <button type="button" class="btn btn-ghost" id="btn-draft" aria-label="下書き保存"><i data-lucide="bookmark" width="16" height="16"></i> 下書き保存</button>
+          <button type="button" class="btn btn-primary" id="btn-submit" aria-label="解答送信"><i data-lucide="send" width="16" height="16"></i> 解答送信</button>
+        </div>
       </div>
       <div class="three-pane">
         <div class="pane workspace-problem-pane">
@@ -710,16 +769,22 @@
             <div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [1]</div>
             <div class="cell-box" id="workspace-cell1">import pandas as pd</div>
             <div class="cell-actions">
+              <div class="cell-actions-left">
+                <button type="button" class="btn-cell-icon btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button>
+                <button type="button" class="btn-cell-icon btn-delete-cell" data-action="delete-cell" aria-label="セルを削除"><i data-lucide="trash-2" width="18" height="18"></i></button>
+              </div>
               <button type="button" class="btn btn-primary btn-sm btn-cell-run" aria-label="このセルを実行"><i data-lucide="play" width="14" height="14"></i> Run</button>
-              <button type="button" class="btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button>
             </div>
           </div>
           <div class="cell-group-ws" data-cell-index="1">
             <div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [2]</div>
             <div class="cell-box" id="workspace-cell2">ans = df['x'].mean()</div>
             <div class="cell-actions">
+              <div class="cell-actions-left">
+                <button type="button" class="btn-cell-icon btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button>
+                <button type="button" class="btn-cell-icon btn-delete-cell" data-action="delete-cell" aria-label="セルを削除"><i data-lucide="trash-2" width="18" height="18"></i></button>
+              </div>
               <button type="button" class="btn btn-primary btn-sm btn-cell-run" aria-label="このセルを実行"><i data-lucide="play" width="14" height="14"></i> Run</button>
-              <button type="button" class="btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button>
             </div>
           </div>
           <p style="margin-top: 12px;"><span class="label">実行制御</span></p>
@@ -888,6 +953,10 @@
         { id: 'q1', order: 1, displayTitle: '平均値の計算', excerpt: '問題文の冒頭。データが与えられたとき、平均値を求めて ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'pass', tags: ['統計', '記述統計'], favoriteCount: 12 },
         { id: 'q2', order: 2, displayTitle: 't 検定', excerpt: '問題文の冒頭。2 群の平均の差について t 検定を行い、p_value を求めて...', difficulty: '中級', difficultyOrder: 2, badge: 'none', tags: ['統計', '検定'], favoriteCount: 8 },
         { id: 'q3', order: 3, displayTitle: '回帰分析', excerpt: '問題文の冒頭。単回帰分析を行い、回帰係数を ans に代入してください...', difficulty: '上級', difficultyOrder: 3, badge: 'none', tags: ['回帰', '検定'], favoriteCount: 5 },
+        { id: 'q4', order: 4, displayTitle: '中央値と四分位数', excerpt: 'データの中央値と第1・第3四分位数を求め、指定された変数に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'none', tags: ['統計', '記述統計'], favoriteCount: 6 },
+        { id: 'q5', order: 5, displayTitle: '分散と標準偏差', excerpt: '与えられたデータの不偏分散と標準偏差を計算し、ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'fail', tags: ['統計', '記述統計'], favoriteCount: 10 },
+        { id: 'q6', order: 6, displayTitle: 'カイ二乗検定', excerpt: '分割表に対してカイ二乗検定を行い、p_value を求めてください...', difficulty: '中級', difficultyOrder: 2, badge: 'none', tags: ['統計', '検定'], favoriteCount: 4 },
+        { id: 'q7', order: 7, displayTitle: '相関係数', excerpt: '2 変量のピアソンの相関係数を計算し、ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'none', tags: ['統計', '記述統計'], favoriteCount: 7 },
       ];
       let questions = dummyQuestions.slice();
       let sortBy = 'order';
@@ -926,6 +995,12 @@
 
       function setBreadcrumb(items) {
         const el = document.getElementById('breadcrumb');
+        if (items.length === 1 && items[0] === 'ホーム') {
+          el.innerHTML = '';
+          el.style.display = 'none';
+          return;
+        }
+        el.style.display = '';
         const parts = [];
         items.forEach((x, i) => {
           if (i > 0) parts.push('<span class="breadcrumb-sep"><i data-lucide="chevron-right" width="14" height="14"></i></span>');
@@ -974,28 +1049,28 @@
           const isFav = (myFavorites[q.id] || 0) > 0;
           return `
           <div class="question-tile" data-question-id="${q.id}">
-            <div class="tile-subtitle">${sub}</div>
-            <div class="tile-title-row">
-              <span class="tile-difficulty difficulty-${diffClass}">${difficultyIcon(q.difficulty)} ${q.difficulty}</span>
-              <span class="tile-display-title">${q.displayTitle}</span>
+            <div class="tile-header">
+              <div class="tile-subtitle">${sub}</div>
+              <div class="tile-title-row">
+                <span class="tile-difficulty difficulty-${diffClass}">${difficultyIcon(q.difficulty)} ${q.difficulty}</span>
+                <span class="tile-display-title">${q.displayTitle}</span>
+              </div>
             </div>
             ${tagsHtml ? '<div class="tile-tags">' + tagsHtml + '</div>' : ''}
             <div class="tile-excerpt">${q.excerpt}</div>
+            <div class="tile-badge-row">${badgeHtml(q.badge)}</div>
             <div class="tile-footer">
-              <div>
-                <div class="tile-badge">${badgeHtml(q.badge)}</div>
-                <div class="tile-favorite-row">
-                  <button type="button" class="btn-favorite ${isFav ? 'is-favorited' : ''}" data-question-id="${q.id}" aria-label="お気に入り">${isFav ? '<i data-lucide="heart" width="18" height="18" fill="currentColor"></i>' : '<i data-lucide="heart" width="18" height="18"></i>'}</button>
-                  <span class="tile-favorite-count"><i data-lucide="heart" width="12" height="12"></i> ${favCount}</span>
-                </div>
-              </div>
+              <button type="button" class="btn-favorite-block" data-question-id="${q.id}" aria-label="お気に入り">
+                ${isFav ? '<i data-lucide="heart" width="16" height="16" fill="currentColor"></i>' : '<i data-lucide="heart" width="16" height="16"></i>'}
+                <span class="tile-favorite-count">${favCount}</span>
+              </button>
               <a href="#/py-value/questions/${q.id}" class="btn btn-primary"><i data-lucide="play" width="16" height="16"></i> Try</a>
             </div>
           </div>
         `;
         }).join('');
         lucide.createIcons();
-        document.querySelectorAll('.btn-favorite').forEach(btn => {
+        document.querySelectorAll('.btn-favorite-block').forEach(btn => {
           btn.addEventListener('click', function(e) {
             e.preventDefault();
             const qId = this.getAttribute('data-question-id');
@@ -1251,20 +1326,6 @@
         showLoading('下書き保存中...');
         setTimeout(function() { hideLoading(); }, 800);
       });
-      document.getElementById('btn-error-demo').addEventListener('click', function() {
-        const area = document.getElementById('workspace-judge-area');
-        const content = document.getElementById('workspace-judge-content');
-        area.style.display = 'block';
-        area.classList.remove('workspace-judge-success');
-        area.classList.add('workspace-judge-fail');
-        content.innerHTML = `
-          <p class="label">FR-P011 エラー表示例</p>
-          <div class="error-block"><strong>タイムアウト</strong><br>実行がタイムアウトしました（制限時間 60 秒）。</div>
-          <div class="error-block"><strong>実行エラー</strong><br>実行エラー: [Python のエラーメッセージ]</div>
-          <div class="error-block"><strong>採点エラー</strong><br>採点できませんでした。期待される形式で出力されているか確認してください。</div>
-          <div class="error-block"><strong>ロードエラー</strong><br>実行環境の読み込みに失敗しました。ページを再読み込みしてください。</div>
-        `;
-      });
       document.getElementById('edit-status-draft').addEventListener('click', function() {
         this.className = 'btn btn-secondary'; this.setAttribute('aria-pressed', 'true');
         document.getElementById('edit-status-publish').className = 'btn btn-ghost'; document.getElementById('edit-status-publish').setAttribute('aria-pressed', 'false');
@@ -1332,13 +1393,22 @@
           const group = addBtn.closest('.cell-group-ws');
           if (!group) return;
           const editorPane = group.parentElement;
-          const nextIndex = 1 + Array.from(editorPane.querySelectorAll('.cell-group-ws')).indexOf(group);
+          const groups = editorPane.querySelectorAll('.cell-group-ws');
+          const nextIndex = groups.length;
           const newGroup = document.createElement('div');
           newGroup.className = 'cell-group-ws';
           newGroup.setAttribute('data-cell-index', String(nextIndex));
-          newGroup.innerHTML = '<div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [' + (nextIndex + 1) + ']</div><div class="cell-box"># 新しいセル</div><div class="cell-actions"><button type="button" class="btn btn-primary btn-sm btn-cell-run" aria-label="このセルを実行"><i data-lucide="play" width="14" height="14"></i> Run</button><button type="button" class="btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button></div>';
+          newGroup.innerHTML = '<div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [' + (nextIndex + 1) + ']</div><div class="cell-box"># 新しいセル</div><div class="cell-actions"><div class="cell-actions-left"><button type="button" class="btn-cell-icon btn-add-cell" data-action="add-cell" aria-label="セルを追加"><i data-lucide="plus" width="18" height="18"></i></button><button type="button" class="btn-cell-icon btn-delete-cell" data-action="delete-cell" aria-label="セルを削除"><i data-lucide="trash-2" width="18" height="18"></i></button></div><button type="button" class="btn btn-primary btn-sm btn-cell-run" aria-label="このセルを実行"><i data-lucide="play" width="14" height="14"></i> Run</button></div>';
           group.after(newGroup);
           lucide.createIcons();
+        }
+        const delBtn = e.target.closest('.btn-delete-cell[data-action="delete-cell"]');
+        if (delBtn) {
+          const group = delBtn.closest('.cell-group-ws');
+          if (!group) return;
+          const editorPane = group.parentElement;
+          if (editorPane.querySelectorAll('.cell-group-ws').length <= 1) return;
+          group.remove();
         }
       });
 
