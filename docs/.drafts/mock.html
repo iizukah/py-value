@@ -94,6 +94,7 @@
     }
     .breadcrumb a { color: var(--color-accent-emerald); text-decoration: none; }
     .breadcrumb .breadcrumb-sep { display: inline-flex; color: var(--color-text-muted); }
+    .breadcrumb .breadcrumb-workbook-link { display: inline-flex; align-items: center; gap: 6px; }
     .main-content { max-width: 1200px; margin: 0 auto; padding: var(--space-4); min-height: 60vh; }
     .panel { display: none; }
     .panel.active { display: block; }
@@ -188,22 +189,44 @@
     .question-tile .tile-title-row .tile-difficulty { color: var(--color-text); }
     .question-tile .tile-difficulty { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; flex-shrink: 0; }
     .question-tile .tile-display-title { font-size: 1.1rem; font-weight: 700; flex: 1; min-width: 0; color: var(--color-text); }
-    .question-tile .tile-excerpt { font-size: 13px; color: var(--color-text-muted); margin-bottom: var(--space-2); flex: 1; }
-    .question-tile .tile-badge-row {
+    .question-tile .tile-body {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: var(--space-3) 0;
+      align-items: stretch;
+      gap: var(--space-4);
+      flex: 1;
+      min-height: 0;
       margin-bottom: var(--space-2);
     }
-    .question-tile .tile-badge-row .badge {
+    .question-tile .tile-body-left {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .question-tile .tile-body-right {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .question-tile .tile-excerpt {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .question-tile .tile-body-right .badge {
       width: 90px;
       height: 90px;
       min-width: 90px;
       min-height: 90px;
       border-radius: 50%;
     }
-    .question-tile .tile-badge-row .badge i { width: 58px; height: 58px; }
+    .question-tile .tile-body-right .badge i { width: 58px; height: 58px; }
     .question-tile .tile-footer {
       display: flex;
       justify-content: space-between;
@@ -655,29 +678,46 @@
     .loading-text { margin-top: var(--space-4); font-size: 10px; font-family: monospace; color: var(--color-accent-emerald); letter-spacing: 0.2em; }
     .color-text-muted { color: var(--color-text-muted); }
 
-    /* SC-003 採点結果アニメーション */
-    .panel-result .center-block .card {
-      animation: resultCardIn 0.5s ease-out forwards;
+    /* SC-003 採点結果 */
+    .panel-result .result-layout { max-width: 560px; margin: 0 auto; padding: var(--space-6) 0; }
+    .panel-result .result-status {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-align: center;
+      margin-bottom: var(--space-6);
+      animation: resultStatusIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
-    @keyframes resultCardIn {
-      0% { opacity: 0; transform: scale(0.95); }
-      100% { opacity: 1; transform: scale(1); }
+    .panel-result .result-status.result-passed { color: var(--color-accent-emerald); text-shadow: 0 0 30px rgba(16, 185, 129, 0.4); }
+    .panel-result .result-status.result-failed { color: #f87171; text-shadow: 0 0 30px rgba(248, 113, 113, 0.4); }
+    @keyframes resultStatusIn {
+      0% { opacity: 0; transform: scale(0.8) translateY(-20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
     }
-    .panel-result #result-message {
-      animation: resultTextPulse 1s ease-in-out 0.2s both;
+    .panel-result .result-tile {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+      text-align: left;
     }
-    @keyframes resultTextPulse {
-      0% { opacity: 0; transform: scale(0.9); }
-      50% { opacity: 1; transform: scale(1.02); text-shadow: 0 0 24px rgba(16, 185, 129, 0.5); }
-      100% { opacity: 1; transform: scale(1); text-shadow: 0 0 16px rgba(16, 185, 129, 0.3); }
+    .panel-result .result-tile .tile-body { margin-bottom: var(--space-2); }
+    .panel-result .result-tile .tile-footer { justify-content: flex-end; }
+    .panel-result .result-tile .tile-footer-actions-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      align-items: stretch;
+      min-width: 180px;
     }
-    .panel-result #result-badges .badge {
-      animation: badgePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;
-    }
-    @keyframes badgePop {
-      0% { transform: scale(0.5); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+    .panel-result .result-tile .tile-footer-actions-vertical .btn { justify-content: center; }
   </style>
 </head>
 <body>
@@ -807,19 +847,11 @@
       </div>
     </section>
 
-    <!-- SC-003 正解・バッジ -->
+    <!-- SC-003 採点結果 -->
     <section id="panel-result" class="panel" data-sc="SC-003">
-      <div class="center-block">
-        <div class="card">
-          <span class="label">採点結果（合格・バッジ）</span>
-          <p id="result-message" class="typography-heading">合格です。</p>
-          <p id="result-badges"></p>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;">
-            <button type="button" class="btn btn-primary" id="btn-next"><i data-lucide="arrow-right" width="16" height="16"></i> 次の問題へ</button>
-            <button type="button" class="btn btn-secondary" id="btn-back-list"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
-            <button type="button" class="btn btn-primary" id="btn-to-complete" style="display: none;"><i data-lucide="award" width="16" height="16"></i> 完了画面へ</button>
-          </div>
-        </div>
+      <div class="result-layout">
+        <p id="result-status" class="result-status result-passed" aria-live="polite">Passed</p>
+        <div id="result-tile" class="result-tile question-tile"></div>
       </div>
     </section>
 
@@ -950,9 +982,9 @@
       const VALID_ADMIN_KEY = 'admin';
 
       const dummyQuestions = [
-        { id: 'q1', order: 1, displayTitle: '平均値の計算', excerpt: '問題文の冒頭。データが与えられたとき、平均値を求めて ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'pass', tags: ['統計', '記述統計'], favoriteCount: 12 },
-        { id: 'q2', order: 2, displayTitle: 't 検定', excerpt: '問題文の冒頭。2 群の平均の差について t 検定を行い、p_value を求めて...', difficulty: '中級', difficultyOrder: 2, badge: 'none', tags: ['統計', '検定'], favoriteCount: 8 },
-        { id: 'q3', order: 3, displayTitle: '回帰分析', excerpt: '問題文の冒頭。単回帰分析を行い、回帰係数を ans に代入してください...', difficulty: '上級', difficultyOrder: 3, badge: 'none', tags: ['回帰', '検定'], favoriteCount: 5 },
+        { id: 'q1', order: 1, displayTitle: '平均値の計算', excerpt: '問題文の冒頭。データが与えられたとき、平均値を求めて ans に代入してください。pandas の DataFrame が変数 df で与えられ、列 x の平均を計算するものとします。', difficulty: '初級', difficultyOrder: 1, badge: 'pass', tags: ['統計', '記述統計'], favoriteCount: 12 },
+        { id: 'q2', order: 2, displayTitle: 't 検定', excerpt: '問題文の冒頭。2 群の平均の差について t 検定を行い、p_value を求めてください。scipy.stats の ttest_ind 等を利用できます。', difficulty: '中級', difficultyOrder: 2, badge: 'none', tags: ['統計', '検定'], favoriteCount: 8 },
+        { id: 'q3', order: 3, displayTitle: '回帰分析', excerpt: '問題文の冒頭。単回帰分析を行い、回帰係数を ans に代入してください。sklearn.linear_model の LinearRegression などを用いて構いません。', difficulty: '上級', difficultyOrder: 3, badge: 'none', tags: ['回帰', '検定'], favoriteCount: 5 },
         { id: 'q4', order: 4, displayTitle: '中央値と四分位数', excerpt: 'データの中央値と第1・第3四分位数を求め、指定された変数に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'none', tags: ['統計', '記述統計'], favoriteCount: 6 },
         { id: 'q5', order: 5, displayTitle: '分散と標準偏差', excerpt: '与えられたデータの不偏分散と標準偏差を計算し、ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'fail', tags: ['統計', '記述統計'], favoriteCount: 10 },
         { id: 'q6', order: 6, displayTitle: 'カイ二乗検定', excerpt: '分割表に対してカイ二乗検定を行い、p_value を求めてください...', difficulty: '中級', difficultyOrder: 2, badge: 'none', tags: ['統計', '検定'], favoriteCount: 4 },
@@ -1056,9 +1088,13 @@
                 <span class="tile-display-title">${q.displayTitle}</span>
               </div>
             </div>
-            ${tagsHtml ? '<div class="tile-tags">' + tagsHtml + '</div>' : ''}
-            <div class="tile-excerpt">${q.excerpt}</div>
-            <div class="tile-badge-row">${badgeHtml(q.badge)}</div>
+            <div class="tile-body">
+              <div class="tile-body-left">
+                ${tagsHtml ? '<div class="tile-tags">' + tagsHtml + '</div>' : ''}
+                <div class="tile-excerpt">${q.excerpt}</div>
+              </div>
+              <div class="tile-body-right">${badgeHtml(q.badge)}</div>
+            </div>
             <div class="tile-footer">
               <button type="button" class="btn-favorite-block" data-question-id="${q.id}" aria-label="お気に入り">
                 ${isFav ? '<i data-lucide="heart" width="16" height="16" fill="currentColor"></i>' : '<i data-lucide="heart" width="16" height="16"></i>'}
@@ -1150,7 +1186,7 @@
         });
       }
 
-      function breadcrumbWorkbook() { return '<a href="#/py-value">' + WORKBOOK_DISPLAY_NAME + '</a>'; }
+      function breadcrumbWorkbook() { return '<a href="#/py-value" class="breadcrumb-workbook-link"><i data-lucide="book-open" width="14" height="14"></i> ' + WORKBOOK_DISPLAY_NAME + '</a>'; }
 
       function route() {
         const path = getHashPath();
@@ -1250,10 +1286,8 @@
             const q = questions.find(x => x.id === qId);
             const nextQ = questions.filter(x => x.order > (q ? q.order : 0)).sort((a,b) => a.order - b.order)[0];
             const allCorrect = !nextQ;
-            document.getElementById('btn-next').style.display = allCorrect ? 'none' : 'inline-flex';
-            document.getElementById('btn-to-complete').style.display = allCorrect ? 'inline-flex' : 'none';
-            document.getElementById('result-badges').innerHTML = '獲得バッジ: ' + badgeHtml('pass');
-            lucide.createIcons();
+            const passed = true;
+            renderResultPanel(q || { displayTitle: '', excerpt: '', difficulty: '初級', order: 0, tags: [], badge: 'pass' }, passed, allCorrect);
             setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), '採点結果']);
             return;
           }
@@ -1282,6 +1316,43 @@
         renderList();
         renderTagFilter();
         setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook()]);
+      }
+
+      function renderResultPanel(q, passed, allCorrect) {
+        const statusEl = document.getElementById('result-status');
+        statusEl.textContent = passed ? 'Passed' : 'Fail';
+        statusEl.className = 'result-status ' + (passed ? 'result-passed' : 'result-failed');
+        const sub = 'CHALLENGE ' + String(q.order).padStart(2, '0');
+        const diffClass = q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced';
+        const tagsHtml = (q.tags || []).map(t => '<span class="tile-tag">' + t + '</span>').join('');
+        const badge = passed ? 'pass' : 'fail';
+        const nextBtnHtml = allCorrect ? '' : '<button type="button" class="btn btn-primary" id="btn-next"><i data-lucide="arrow-right" width="16" height="16"></i> 次の問題へ</button>';
+        const completeBtnHtml = allCorrect ? '<button type="button" class="btn btn-primary" id="btn-to-complete"><i data-lucide="award" width="16" height="16"></i> 完了画面へ</button>' : '';
+        const tile = document.getElementById('result-tile');
+        tile.innerHTML = `
+          <div class="tile-header">
+            <div class="tile-subtitle">${sub}</div>
+            <div class="tile-title-row">
+              <span class="tile-difficulty difficulty-${diffClass}">${difficultyIcon(q.difficulty)} ${q.difficulty}</span>
+              <span class="tile-display-title">${q.displayTitle}</span>
+            </div>
+          </div>
+          <div class="tile-body">
+            <div class="tile-body-left">
+              ${tagsHtml ? '<div class="tile-tags">' + tagsHtml + '</div>' : ''}
+              <div class="tile-excerpt">${q.excerpt}</div>
+            </div>
+            <div class="tile-body-right">${badgeHtml(badge)}</div>
+          </div>
+          <div class="tile-footer">
+            <div class="tile-footer-actions-vertical">
+              ${nextBtnHtml}
+              ${completeBtnHtml}
+              <button type="button" class="btn btn-secondary" id="btn-back-list"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
       }
 
       function renderHistoryList() {
@@ -1335,16 +1406,6 @@
         document.getElementById('edit-status-draft').className = 'btn btn-ghost'; document.getElementById('edit-status-draft').setAttribute('aria-pressed', 'false');
       });
 
-      document.getElementById('btn-next').addEventListener('click', function() {
-        const path = getHashPath();
-        const qId = (path.match(/result\/([^/]+)/) || [])[1];
-        const q = questions.find(x => x.id === qId);
-        const nextQ = q && questions.filter(x => x.order > q.order).sort((a,b) => a.order - b.order)[0];
-        if (nextQ) window.location.hash = '#/py-value/questions/' + nextQ.id;
-        else window.location.hash = '#/py-value/complete';
-      });
-      document.getElementById('btn-back-list').addEventListener('click', function() { window.location.hash = '#/py-value'; });
-      document.getElementById('btn-to-complete').addEventListener('click', function() { window.location.hash = '#/py-value/complete'; });
       document.getElementById('btn-complete-back').addEventListener('click', function() { window.location.hash = '#/py-value'; });
       document.getElementById('btn-history-back').addEventListener('click', function() { window.location.hash = '#/py-value'; });
       document.getElementById('btn-history-detail-back').addEventListener('click', function() { window.location.hash = '#/py-value/history'; });
@@ -1388,6 +1449,17 @@
       document.getElementById('main-content').addEventListener('click', function(e) {
         const del = e.target.closest('.link-delete');
         if (del) { e.preventDefault(); }
+        if (e.target.closest('#btn-next')) {
+          const path = getHashPath();
+          const qId = (path.match(/result\/([^/]+)/) || [])[1];
+          const q = questions.find(x => x.id === qId);
+          const nextQ = q && questions.filter(x => x.order > q.order).sort((a,b) => a.order - b.order)[0];
+          if (nextQ) window.location.hash = '#/py-value/questions/' + nextQ.id;
+          else window.location.hash = '#/py-value/complete';
+          return;
+        }
+        if (e.target.closest('#btn-back-list')) { window.location.hash = '#/py-value'; return; }
+        if (e.target.closest('#btn-to-complete')) { window.location.hash = '#/py-value/complete'; return; }
         const addBtn = e.target.closest('.btn-add-cell[data-action="add-cell"]');
         if (addBtn) {
           const group = addBtn.closest('.cell-group-ws');
