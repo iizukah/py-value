@@ -13,7 +13,9 @@
 |--------------|------|
 | **01_requirements/** | 上流：要件定義（REQ-01 枠組み、REQ-02 プラグイン等） |
 | **02_architecture/** | 中流：全体構成・アーキテクチャ（ARC-01 等） |
-| **03_contracts/** | 下流：データ・API 契約（DATA-01、API-01 等） |
+| **02_architecture/plugins/** | プラグイン別アーキテクチャ（ARC-02 等） |
+| **03_contracts/** | 下流：データ・API 契約（DATA-01、API-01、openapi.yaml 等） |
+| **03_contracts/plugins/** | プラグイン別契約（DATA-02、API-02 等） |
 | **04_ui_ux/** | 下流：画面・コンポーネント（UX-01、UX-02 等） |
 | **05_test/** | 下流：検証・テスト計画（TEST-01 等） |
 | **06_operations/** | 下流：運用・デプロイ（INFRA-01 等） |
@@ -34,10 +36,10 @@
 - **機能要件**: FR-F001…（枠組み）、FR-P001…（プラグイン）。1 件ごとに必ず付与する。
 - **非機能要件**: NFR-F001…（枠組み）、NFR-P001…（プラグイン）。1 件ごとに必ず付与する。
 - **ユースケース**: UC-Fxx（枠組み / Framework）、UC-Pxx（プラグイン / Plugin）
-- **アーキテクチャ**: ARC-01, …
-- **API**: API-001, API-002, …
+- **アーキテクチャ**: ARC-01, …（枠組み）。ARC-02 等は 02_architecture/plugins/ に配置。
+- **API**: API-001, API-002, …（枠組みは API-01、openapi.yaml が正本）。API-02 は 03_contracts/plugins/（将来用）。
 - **画面**: SC-001, …（UX-01 で定義）
 - **コンポーネント**: CP-001, …（UX-02 で定義）
-- **データ・型**: DATA-01, …
+- **データ・型**: DATA-01, …（共有）。DATA-02 等は 03_contracts/plugins/ に配置。
 - **テストケース**: TC-001, …
 - **運用**: INFRA-01, …

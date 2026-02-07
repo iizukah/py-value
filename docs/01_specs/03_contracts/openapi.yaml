@@ -1,0 +1,604 @@
+openapi: 3.0.3
+info:
+  title: Py-Value 枠組み API（API-01）
+  description: |
+    問題集サイト枠組みの REST 契約。匿名識別子は **X-Client-Id** ヘッダで送る。
+    管理系 API はクエリ key を検証する。
+  version: 0.1.0
+
+servers:
+  - url: /api
+    description: 相対パス（Next.js ベース URL に結合）
+
+tags:
+  - name: workbooks
+    description: ワークブック
+  - name: questions
+    description: 問題（学習者向け・公開済み）
+  - name: histories
+    description: 解答履歴
+  - name: drafts
+    description: 下書き
+  - name: admin
+    description: 管理（key 検証必須）
+
+components:
+  securitySchemes:
+    clientId:
+      type: apiKey
+      in: header
+      name: X-Client-Id
+      description: 匿名識別子（履歴・下書きの紐づけに使用）
+    adminKey:
+      type: apiKey
+      in: query
+      name: key
+      description: 管理用簡易キー
+
+  parameters:
+    WorkbookId:
+      name: workbookId
+      in: path
+      required: true
+      schema: { type: string }
+    QuestionId:
+      name: questionId
+      in: path
+      required: true
+      schema: { type: string }
+    HistoryId:
+      name: historyId
+      in: path
+      required: true
+      schema: { type: string }
+    SortQuestions:
+      name: sort
+      in: query
+      schema:
+        type: string
+        enum: [order, difficulty, title]
+        default: order
+    AdminKey:
+      name: key
+      in: query
+      required: true
+      description: 管理用簡易キー（検証必須）
+      schema: { type: string }
+
+  schemas:
+    Workbook:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        historyLimit: { type: integer, default: 10 }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Question:
+      type: object
+      description: 共通基底 + type 別拡張（DATA-01, DATA-02 参照）
+      properties:
+        id: { type: string }
+        workbookId: { type: string }
+        title: { type: string }
+        type: { type: string }
+        category: { type: string }
+        difficulty: { type: string }
+        explanation: { type: string }
+        tags: { type: array, items: { type: string } }
+        status: { type: string, enum: [draft, published] }
+        order: { type: number }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    History:
+      type: object
+      properties:
+        id: { type: string }
+        workbookId: { type: string }
+        questionId: { type: string }
+        clientId: { type: string }
+        status: { type: string, enum: [draft, submitted] }
+        userAnswer: { type: object }
+        isCorrect: { type: boolean }
+        judgedAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Draft:
+      type: object
+      properties:
+        id: { type: string }
+        workbookId: { type: string }
+        questionId: { type: string }
+        clientId: { type: string }
+        userAnswer: { type: object }
+        updatedAt: { type: string, format: date-time }
+    JudgeResult:
+      type: object
+      description: プラグイン判定結果（DATA-02 参照）
+      properties:
+        isCorrect: { type: boolean }
+        message: { type: string }
+        details: { type: object }
+    Error:
+      type: object
+      properties:
+        code: { type: string }
+        message: { type: string }
+
+paths:
+  /workbooks:
+    get:
+      tags: [workbooks]
+      summary: API-001 ワークブック一覧取得
+      operationId: listWorkbooks
+      responses:
+        '200':
+          description: ワークブック一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Workbook' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /workbooks/{workbookId}:
+    get:
+      tags: [workbooks]
+      summary: API-002 ワークブック取得
+      operationId: getWorkbook
+      parameters: [{ $ref: '#/components/parameters/WorkbookId' }]
+      responses:
+        '200':
+          description: ワークブック
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Workbook' }
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /workbooks/{workbookId}/questions:
+    get:
+      tags: [questions]
+      summary: API-003 問題一覧取得（公開済みのみ）
+      operationId: listQuestions
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/SortQuestions'
+      responses:
+        '200':
+          description: 問題一覧（status=published のみ）
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Question' }
+        '404':
+          description: ワークブックが存在しない
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /workbooks/{workbookId}/questions/{questionId}:
+    get:
+      tags: [questions]
+      summary: API-004 問題 1 件取得
+      operationId: getQuestion
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/QuestionId'
+      responses:
+        '200':
+          description: 問題（公開済みのみ返却）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Question' }
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /workbooks/{workbookId}/histories:
+    get:
+      tags: [histories]
+      summary: API-005 履歴一覧取得
+      description: 匿名識別子は X-Client-Id ヘッダで送る。
+      operationId: listHistories
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+      security: [{ clientId: [] }]
+      responses:
+        '200':
+          description: 履歴一覧（該当 clientId、直近 N 件まで）
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/History' }
+        '400':
+          description: X-Client-Id 未指定
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /workbooks/{workbookId}/histories/{historyId}:
+    get:
+      tags: [histories]
+      summary: API-006 履歴詳細取得
+      description: 匿名識別子は X-Client-Id ヘッダで送る。自分の履歴のみ取得可能。
+      operationId: getHistory
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/HistoryId'
+      security: [{ clientId: [] }]
+      responses:
+        '200':
+          description: 履歴詳細（X-Client-Id で自分の履歴のみ取得可能）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/History' }
+        '403':
+          description: 他クライアントの履歴
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /workbooks/{workbookId}/questions/{questionId}/draft:
+    get:
+      tags: [drafts]
+      summary: API-007 下書き取得
+      description: 匿名識別子は X-Client-Id ヘッダで送る。
+      operationId: getDraft
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/QuestionId'
+      security: [{ clientId: [] }]
+      responses:
+        '200':
+          description: 下書き（存在しない場合は 204 または 404）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Draft' }
+        '404':
+          description: 下書きなし
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+    put:
+      tags: [drafts]
+      summary: API-008 下書き保存
+      description: 匿名識別子は X-Client-Id ヘッダで送る。1 問題 1 件で上書き保存。
+      operationId: saveDraft
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/QuestionId'
+      security: [{ clientId: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Draft' }
+      responses:
+        '200':
+          description: 保存成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Draft' }
+        '400':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /workbooks/{workbookId}/questions/{questionId}/submit:
+    post:
+      tags: [questions]
+      summary: API-009 解答送信
+      description: |
+        匿名識別子は X-Client-Id ヘッダで送る。
+        枠組みがプラグインの判定アダプタを呼び出し、結果を履歴に保存して返す。
+      operationId: submitAnswer
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/QuestionId'
+      security: [{ clientId: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userAnswer: { type: object }
+              required: [userAnswer]
+      responses:
+        '200':
+          description: 採点結果
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JudgeResult' }
+        '400':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '404':
+          description: 問題が存在しない
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /admin/workbooks/{workbookId}/questions:
+    get:
+      tags: [admin]
+      summary: API-010 問題一覧（管理用・下書き含む）
+      description: クエリ key を検証する。
+      operationId: adminListQuestions
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/AdminKey'
+      responses:
+        '200':
+          description: 問題一覧（全ステータス）
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Question' }
+        '401':
+          description: key 検証失敗
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+    post:
+      tags: [admin]
+      summary: API-011 問題作成（管理）
+      description: クエリ key を検証する。
+      operationId: adminCreateQuestion
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/AdminKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Question' }
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Question' }
+        '400':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '401':
+          description: key 検証失敗
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /admin/workbooks/{workbookId}/questions/{questionId}:
+    get:
+      tags: [admin]
+      summary: API-012 問題取得（管理）
+      description: クエリ key を検証する。
+      operationId: adminGetQuestion
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/QuestionId'
+        - $ref: '#/components/parameters/AdminKey'
+      responses:
+        '200':
+          description: 問題
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Question' }
+        '401':
+          description: key 検証失敗
+        '404':
+          description: Not Found
+        '500':
+          description: サーバーエラー
+    put:
+      tags: [admin]
+      summary: API-013 問題更新（管理）
+      description: クエリ key を検証する。
+      operationId: adminUpdateQuestion
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/QuestionId'
+        - $ref: '#/components/parameters/AdminKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Question' }
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Question' }
+        '400':
+          description: バリデーションエラー
+        '401':
+          description: key 検証失敗
+        '404':
+          description: Not Found
+        '500':
+          description: サーバーエラー
+    delete:
+      tags: [admin]
+      summary: API-014 問題削除（管理）
+      description: クエリ key を検証する。
+      operationId: adminDeleteQuestion
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/QuestionId'
+        - $ref: '#/components/parameters/AdminKey'
+      responses:
+        '204':
+          description: 削除成功
+        '401':
+          description: key 検証失敗
+        '404':
+          description: Not Found
+        '500':
+          description: サーバーエラー
+
+  /admin/workbooks/{workbookId}/import:
+    post:
+      tags: [admin]
+      summary: API-015 問題 JSON インポート（管理）
+      description: クエリ key を検証する。1 件でもバリデーションエラーがあれば全体を拒否する。
+      operationId: adminImportQuestions
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/AdminKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items: { $ref: '#/components/schemas/Question' }
+      responses:
+        '200':
+          description: インポート成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  imported: { type: integer }
+        '400':
+          description: バリデーションエラー（1 件でもあれば拒否）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '401':
+          description: key 検証失敗
+        '500':
+          description: サーバーエラー
+
+  /admin/workbooks/{workbookId}/export:
+    get:
+      tags: [admin]
+      summary: API-016 問題 JSON エクスポート（管理）
+      description: クエリ key を検証する。全問題を 1 ファイル（配列）で返す。データセットは参照のみ含める。
+      operationId: adminExportQuestions
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/AdminKey'
+      responses:
+        '200':
+          description: 問題配列
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Question' }
+        '401':
+          description: key 検証失敗
+        '500':
+          description: サーバーエラー
+
+  /admin/workbooks/{workbookId}/datasets:
+    post:
+      tags: [admin]
+      summary: API-017 データセット（CSV）アップロード（管理）
+      description: クエリ key を検証する。CSV を別途インポートする。
+      operationId: adminUploadDataset
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/AdminKey'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200':
+          description: アップロード成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path: { type: string }
+                  fileName: { type: string }
+        '400':
+          description: ファイル形式エラー
+        '401':
+          description: key 検証失敗
+        '500':
+          description: サーバーエラー
