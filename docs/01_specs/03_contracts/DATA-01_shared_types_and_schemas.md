@@ -1,13 +1,14 @@
-# DATA-01 共有型・スキーマ
+# DATA-01 共有型・スキーマ（EXER 第一版）
 
 ## 1. ドキュメント情報
 
 | 項目 | 内容 |
 |------|------|
 | **ID** | DATA-01 |
+| **プロジェクト名** | EXER |
 | **関連ドキュメント** | REQ-01 §8 共通データ構造、ARC-01、API-01、DATA-02（プラグイン用拡張） |
 
-本ドキュメントは枠組みで共有する型と Firestore/Lowdb のスキーマを定義する。プラグイン用の型・問題 JSON スキーマは **DATA-02**（03_contracts/plugins/）に委ねる。
+本ドキュメントは枠組みで共有する型と Firestore/Lowdb のスキーマを定義する。プラグイン用の型・問題 JSON スキーマは **DATA-02**（03_contracts/plugins/）に委ねる。ワークブック ID の例として `py-value` を用いる場合、パンくず等の表示名は「Pythonデータ分析」とする（REQ-01 用語定義）。
 
 ---
 
@@ -34,16 +35,17 @@ interface QuestionBase {
   tags?: string[];
   status: QuestionStatus;
   order?: number;       // 登録順・ソート用
+  favoriteCount?: number; // お気に入り数（集計値。API レスポンスで返す。denormalized または都度集計）
   createdAt?: string;   // ISO 8601
   updatedAt?: string;
 }
 ```
 
-- **Question**: `QuestionBase` に type 別の拡張フィールドを付与した型。拡張の定義は DATA-02 等を参照する。実装では `QuestionBase & Record<string, unknown>` やプラグイン別の交差型で表現してよい。
+- **Question**: `QuestionBase` に type 別の拡張フィールドを付与した型。拡張の定義は DATA-02 等を参照する。実装では `QuestionBase & Record<string, unknown>` やプラグイン別の交差型で表現してよい。一覧・詳細 API のレスポンスには `favoriteCount` を含める（REQ-01 FR-F027, FR-F028）。
 
 ### 2.2 ワークブック（Workbook）
 
-1 つの問題集。URL パス（例: `/py-value`）で一意に識別する。
+1 つの問題集。URL パス（例: `/py-value`）で一意に識別する。表示名（パンくず等）はワークブックごとに設定可能（例: id `py-value` → 表示名「Pythonデータ分析」）。
 
 ```ts
 interface Workbook {
@@ -96,6 +98,23 @@ interface Draft {
 }
 ```
 
+### 2.5 お気に入り（Favorite）— MVP はモデル B
+
+MVP では **1 ユーザー（clientId）・1 問題（workbookId + questionId）あたり 1 ドキュメントで `count` を保持**する。押下で count を +1、解除で -1（0 になったらドキュメント削除してよい）。問題ごとの「お気に入り数」は、その問題に対する全 Favorite の `count` の合計で表現する（実装では Question に denormalized で `favoriteCount` を持たせてもよい）。REQ-01 FR-F027 準拠。
+
+```ts
+interface Favorite {
+  id: string;           // ドキュメント ID（workbookId + questionId + clientId の合成等で一意）
+  workbookId: string;
+  questionId: string;
+  clientId: string;     // 匿名識別子（X-Client-Id と対応）
+  count: number;        // 同一ユーザー・同一問題での押下回数。解除で -1。
+  updatedAt: string;    // ISO 8601
+}
+```
+
+- 一意制約: (workbookId, questionId, clientId) で 1 件。POST で追加時は既存があれば count+1、なければ新規作成（count=1）。DELETE で解除時は count-1、0 以下ならドキュメント削除。
+
 ---
 
 ## 3. Firestore スキーマ
@@ -110,6 +129,7 @@ interface Draft {
 | **questions** | 問題データ。**フラット**な 1 コレクションとし、ドキュメントに `workbookId` を持たせ、クエリで絞る。 |
 | **histories** | 解答履歴。`workbookId` + `questionId` + `clientId` 等でクエリ。 |
 | **drafts** | 下書き。`workbookId` + `questionId` + `clientId` で一意。 |
+| **favorites** | お気に入り。`workbookId` + `questionId` + `clientId` で一意。1 ドキュメントあたり `count` を保持（MVP モデル B）。 |
 
 ### 3.2 workbooks
 
@@ -140,9 +160,21 @@ interface Draft {
 | order | number | 登録順・ソート用 |
 | createdAt | string | ISO 8601 |
 | updatedAt | string | ISO 8601 |
+| favoriteCount | number | 任意。お気に入り数（denormalized の場合）。API レスポンスでは集計または本フィールドで返す。 |
 | （拡張） | 各種 | type に応じたフィールド（DATA-02 等参照） |
 
-### 3.4 histories
+### 3.4 favorites
+
+| フィールド | 型 | 説明 |
+|------------|-----|------|
+| id | string | ドキュメント ID。（workbookId + questionId + clientId の合成等で一意） |
+| workbookId | string | ワークブック ID |
+| questionId | string | 問題 ID |
+| clientId | string | 匿名識別子 |
+| count | number | 同一ユーザー・同一問題での押下回数。追加で +1、解除で -1。 |
+| updatedAt | string | ISO 8601 |
+
+### 3.5 histories
 
 | フィールド | 型 | 説明 |
 |------------|-----|------|
@@ -157,7 +189,7 @@ interface Draft {
 | createdAt | string | ISO 8601 |
 | updatedAt | string | ISO 8601 |
 
-### 3.5 drafts
+### 3.6 drafts
 
 | フィールド | 型 | 説明 |
 |------------|-----|------|
@@ -172,7 +204,7 @@ interface Draft {
 
 ## 4. Lowdb 互換（開発環境）
 
-開発時は Lowdb（JSON ベース）を使用する。**同じ型で JSON 化**し、Firestore のコレクションと対応するファイル（例: `workbooks.json`, `questions.json`, `histories.json`, `drafts.json`）で永続化する。スキーマは本ドキュメントの型・Firestore スキーマと互換を保つ。
+開発時は Lowdb（JSON ベース）を使用する。**同じ型で JSON 化**し、Firestore のコレクションと対応するファイル（例: `workbooks.json`, `questions.json`, `histories.json`, `drafts.json`, `favorites.json`）で永続化する。スキーマは本ドキュメントの型・Firestore スキーマと互換を保つ。
 
 - 実装では Repository の Lowdb 実装が上記 JSON を読み書きし、本番の Firestore 実装とインターフェースを共有する（ARC-01-005 参照）。
 
@@ -185,7 +217,64 @@ interface Draft {
 
 ---
 
-## 6. 参照
+## 6. エンティティ関係（概念）
+
+```mermaid
+erDiagram
+  Workbook ||--o{ Question : contains
+  Workbook ||--o{ History : contains
+  Workbook ||--o{ Draft : contains
+  Workbook ||--o{ Favorite : contains
+  Question ||--o{ History : has
+  Question ||--o{ Favorite : has
+  Workbook {
+    string id
+    string title
+    number historyLimit
+  }
+  Question {
+    string id
+    string workbookId
+    string title
+    array tags
+    number favoriteCount
+  }
+  History {
+    string id
+    string workbookId
+    string questionId
+    string clientId
+  }
+  Draft {
+    string id
+    string workbookId
+    string questionId
+    string clientId
+  }
+  Favorite {
+    string id
+    string workbookId
+    string questionId
+    string clientId
+    number count
+  }
+```
+
+---
+
+## 7. トレーサビリティ（本ドキュメントで定義する型と他ドキュメントの対応）
+
+| 本ドキュメント | 対応する REQ-01 | 対応する API-01 |
+|----------------|-----------------|-----------------|
+| QuestionBase, Question | FR-F016, FR-F025, FR-F027, FR-F028 | API-003, API-004（tags, favoriteCount） |
+| Workbook | FR-F024 | API-001, API-002 |
+| History | FR-F008, FR-F021 | API-005, API-006 |
+| Draft | FR-F005, FR-F021 | API-007, API-008 |
+| Favorite | FR-F027, FR-F028 | API-018, API-019, API-020 |
+
+---
+
+## 8. 参照
 
 - REQ-01 §8 共通データ構造
 - ARC-01 システム設計（環境切り替え ARC-01-005）

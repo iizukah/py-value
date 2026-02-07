@@ -1,11 +1,12 @@
-# API-01 REST 契約（枠組み）
+# API-01 REST 契約（枠組み）（EXER 第一版）
 
 ## 1. ドキュメント情報
 
 | 項目 | 内容 |
 |------|------|
 | **ID** | API-01 |
-| **関連ドキュメント** | DATA-01（共有型）、REQ-01 FR-F011〜F015, FR-F020、openapi.yaml |
+| **プロジェクト名** | EXER |
+| **関連ドキュメント** | DATA-01（共有型）、REQ-01 FR-F011〜F015, FR-F020, FR-F023〜F028、openapi.yaml |
 
 本ドキュメントは**契約のみ**を定義する。実装は Next.js Route Handlers でも別サーバーでもよい。**正本は 03_contracts/openapi.yaml** とし、本ドキュメントはその説明・一覧として参照する。
 
@@ -17,7 +18,7 @@
 
 履歴・下書きの紐づけに使用する匿名識別子は、**X-Client-Id** ヘッダで送る。クライアントは同一ブラウザで同じ識別子を保持し、サーバーはこれをキーに履歴・下書きを保存・取得する。
 
-- 対象 API: 履歴一覧・履歴詳細・下書き取得・下書き保存・解答送信
+- 対象 API: 履歴一覧・履歴詳細・下書き取得・下書き保存・解答送信、**お気に入り一覧・追加・解除**
 - 未指定時: 400 Bad Request 等でエラーを返してよい（openapi.yaml の各パスを参照）
 
 ### 2.2 管理系 API の認可
@@ -34,8 +35,8 @@
 |----|----------|------|------|
 | API-001 | GET | /api/workbooks | ワークブック一覧取得 |
 | API-002 | GET | /api/workbooks/{workbookId} | ワークブック取得 |
-| API-003 | GET | /api/workbooks/{workbookId}/questions | 問題一覧取得（公開済みのみ。sort=order\|difficulty\|title） |
-| API-004 | GET | /api/workbooks/{workbookId}/questions/{questionId} | 問題 1 件取得 |
+| API-003 | GET | /api/workbooks/{workbookId}/questions | 問題一覧取得（公開済みのみ。sort=order\|difficulty\|title\|favorites、tags=タグ1,タグ2 でフィルター。レスポンスに favoriteCount 含む） |
+| API-004 | GET | /api/workbooks/{workbookId}/questions/{questionId} | 問題 1 件取得（レスポンスに favoriteCount 含む） |
 | API-005 | GET | /api/workbooks/{workbookId}/histories | 履歴一覧取得（X-Client-Id 必須） |
 | API-006 | GET | /api/workbooks/{workbookId}/histories/{historyId} | 履歴詳細取得（X-Client-Id 必須、自分の履歴のみ） |
 | API-007 | GET | /api/workbooks/{workbookId}/questions/{questionId}/draft | 下書き取得（X-Client-Id 必須） |
@@ -49,18 +50,32 @@
 | API-015 | POST | /api/admin/workbooks/{workbookId}/import?key=xxx | 問題 JSON インポート（管理）。1 件でもバリデーションエラーがあれば全体拒否。key 検証。 |
 | API-016 | GET | /api/admin/workbooks/{workbookId}/export?key=xxx | 問題 JSON エクスポート（管理）。全問題を 1 配列で返す。データセットは参照のみ。key 検証。 |
 | API-017 | POST | /api/admin/workbooks/{workbookId}/datasets?key=xxx | データセット（CSV）アップロード（管理）。key 検証。 |
+| API-018 | GET | /api/workbooks/{workbookId}/favorites | お気に入り一覧取得（X-Client-Id 必須）。自分のお気に入り問題 ID 一覧または問題概要の配列を返す。 |
+| API-019 | POST | /api/workbooks/{workbookId}/questions/{questionId}/favorite | お気に入り追加（X-Client-Id 必須）。1 回で count+1。既存がなければ新規作成（count=1）。 |
+| API-020 | DELETE | /api/workbooks/{workbookId}/questions/{questionId}/favorite | お気に入り解除（X-Client-Id 必須）。1 回で count-1。0 以下ならドキュメント削除。 |
 
 ---
 
 ## 4. 成功時レスポンス型・エラー
 
-- **成功時**: 各パスに対応するスキーマは openapi.yaml の `components.schemas` および各レスポンスを参照する。Question は DATA-01 の共通基底と type 別拡張（DATA-02 参照）を同一オブジェクトに含めてよい。
+- **成功時**: 各パスに対応するスキーマは openapi.yaml の `components.schemas` および各レスポンスを参照する。Question は DATA-01 の共通基底（tags, favoriteCount 含む）と type 別拡張（DATA-02 参照）を同一オブジェクトに含めてよい。
 - **エラー**: `{ code: string, message: string }` 形式。HTTP ステータスは 400（バリデーション・X-Client-Id 未指定等）、401（key 検証失敗）、403（他クライアントの履歴アクセス）、404（Not Found）、500（サーバーエラー）を用いる。詳細は openapi.yaml の各パスの responses を参照する。
 
 ---
 
-## 5. 参照
+## 5. トレーサビリティ（本ドキュメントで定義する API と他ドキュメントの対応）
+
+| 本ドキュメント | 対応する REQ-01 | 対応する DATA-01 |
+|----------------|-----------------|------------------|
+| API-001, API-002 | FR-F023, FR-F024 | Workbook |
+| API-003 | FR-F003, FR-F025, FR-F026, FR-F028 | Question（tags, favoriteCount） |
+| API-004 | FR-F002 | Question（favoriteCount） |
+| API-018～API-020 | FR-F027 | Favorite |
+
+---
+
+## 6. 参照
 
 - **openapi.yaml**（03_contracts/openapi.yaml）: 正本。パス・メソッド・スキーマ・X-Client-Id を機械可読で定義する。
-- DATA-01 共有型・Firestore スキーマ
-- REQ-01 FR-F011〜F015（管理機能）、FR-F020（枠組みが提供する API）
+- DATA-01 共有型・Firestore スキーマ（Favorite, Question.favoriteCount）
+- REQ-01 FR-F011〜F015（管理機能）、FR-F020（枠組みが提供する API）、FR-F023〜F028（ホーム・タグ・お気に入り）

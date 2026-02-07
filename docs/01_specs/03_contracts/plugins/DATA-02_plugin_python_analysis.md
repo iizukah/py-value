@@ -1,11 +1,12 @@
-# DATA-02 データ分析プラグイン用型・スキーマ
+# DATA-02 データ分析プラグイン用型・スキーマ（EXER 第一版）
 
 ## 1. ドキュメント情報
 
 | 項目 | 内容 |
 |------|------|
 | **ID** | DATA-02 |
-| **関連ドキュメント** | REQ-02 §6 問題データ構造、DATA-01（共有型・QuestionBase）、ARC-02（プラグイン構成） |
+| **プロジェクト名** | EXER |
+| **関連ドキュメント** | REQ-02 §6 問題データ構造、DATA-01（共有型・QuestionBase、favoriteCount 含む）、ARC-02（プラグイン構成） |
 
 本ドキュメントはデータ分析プラグイン用の問題 JSON スキーマ、JudgeResult 等の型、仮想 FS・Pyodide 周りのデータ形式を定義する。REQ-02 §6 の確定版である。
 
@@ -141,7 +142,13 @@ interface QuestionPythonAnalysis extends QuestionBase {
 
 ---
 
-## 5. 参照
+## 5. トレーサビリティ
+
+本ドキュメントで定義する型・スキーマは、REQ-02 FR-P001～FR-P011、UC-P01～UC-P08、DATA-01 QuestionBase（tags 等）、API-01 解答送信レスポンス（JudgeResult）と対応する。
+
+---
+
+## 6. 参照
 
 - REQ-02 §6 問題データ構造
 - DATA-01 共有型・Firestore スキーマ（questions の拡張は本ドキュメント）

@@ -1,10 +1,10 @@
 openapi: 3.0.3
 info:
-  title: Py-Value 枠組み API（API-01）
+  title: EXER 枠組み API（API-01）
   description: |
-    問題集サイト枠組みの REST 契約。匿名識別子は **X-Client-Id** ヘッダで送る。
-    管理系 API はクエリ key を検証する。
-  version: 0.1.0
+    問題集サイト枠組みの REST 契約（EXER）。匿名識別子は **X-Client-Id** ヘッダで送る。
+    管理系 API はクエリ key を検証する。お気に入りは 1 user/1 question あたり count で保持（MVP モデル B）。
+  version: 0.2.0
 
 servers:
   - url: /api
@@ -19,6 +19,8 @@ tags:
     description: 解答履歴
   - name: drafts
     description: 下書き
+  - name: favorites
+    description: お気に入り（X-Client-Id 必須）
   - name: admin
     description: 管理（key 検証必須）
 
@@ -56,8 +58,14 @@ components:
       in: query
       schema:
         type: string
-        enum: [order, difficulty, title]
+        enum: [order, difficulty, title, favorites]
         default: order
+    TagsFilter:
+      name: tags
+      in: query
+      description: タグでフィルター（複数はカンマ区切り）
+      schema:
+        type: string
     AdminKey:
       name: key
       in: query
@@ -89,7 +97,18 @@ components:
         tags: { type: array, items: { type: string } }
         status: { type: string, enum: [draft, published] }
         order: { type: number }
+        favoriteCount: { type: integer, description: お気に入り数（集計値） }
         createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Favorite:
+      type: object
+      description: お気に入り（MVP は 1 user/1 question あたり count、DATA-01 参照）
+      properties:
+        id: { type: string }
+        workbookId: { type: string }
+        questionId: { type: string }
+        clientId: { type: string }
+        count: { type: integer }
         updatedAt: { type: string, format: date-time }
     History:
       type: object
@@ -173,10 +192,12 @@ paths:
     get:
       tags: [questions]
       summary: API-003 問題一覧取得（公開済みのみ）
+      description: sort=favorites でお気に入り数順。tags でタグフィルター。レスポンスに favoriteCount を含む。
       operationId: listQuestions
       parameters:
         - $ref: '#/components/parameters/WorkbookId'
         - $ref: '#/components/parameters/SortQuestions'
+        - $ref: '#/components/parameters/TagsFilter'
       responses:
         '200':
           description: 問題一覧（status=published のみ）
@@ -187,6 +208,37 @@ paths:
                 items: { $ref: '#/components/schemas/Question' }
         '404':
           description: ワークブックが存在しない
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /workbooks/{workbookId}/favorites:
+    get:
+      tags: [favorites]
+      summary: API-018 お気に入り一覧取得
+      description: 匿名識別子は X-Client-Id ヘッダで送る。自分のお気に入り（count>0）の問題一覧を返す。
+      operationId: listFavorites
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+      security: [{ clientId: [] }]
+      responses:
+        '200':
+          description: お気に入り問題 ID 一覧または問題概要の配列
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items: { type: string }
+                  - type: array
+                    items: { $ref: '#/components/schemas/Question' }
+        '400':
+          description: X-Client-Id 未指定
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -272,6 +324,70 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
         '404':
           description: Not Found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /workbooks/{workbookId}/questions/{questionId}/favorite:
+    post:
+      tags: [favorites]
+      summary: API-019 お気に入り追加
+      description: 匿名識別子は X-Client-Id ヘッダで送る。1 回で count+1。既存がなければ新規作成（count=1）。
+      operationId: addFavorite
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/QuestionId'
+      security: [{ clientId: [] }]
+      responses:
+        '200':
+          description: 追加成功（または更新後の Favorite）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Favorite' }
+        '400':
+          description: X-Client-Id 未指定
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '404':
+          description: 問題が存在しない
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+    delete:
+      tags: [favorites]
+      summary: API-020 お気に入り解除
+      description: 匿名識別子は X-Client-Id ヘッダで送る。1 回で count-1。0 以下ならドキュメント削除。
+      operationId: removeFavorite
+      parameters:
+        - $ref: '#/components/parameters/WorkbookId'
+        - $ref: '#/components/parameters/QuestionId'
+      security: [{ clientId: [] }]
+      responses:
+        '200':
+          description: 解除成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Favorite' }
+        '204':
+          description: 解除成功（ドキュメント削除時）
+        '400':
+          description: X-Client-Id 未指定
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '404':
+          description: お気に入りが存在しない
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }

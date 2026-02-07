@@ -1,10 +1,11 @@
-# ARC-01 システム設計書
+# ARC-01 システム設計書（EXER 第一版）
 
 ## 1. ドキュメント情報
 
 | 項目 | 内容 |
 |------|------|
 | **ID** | ARC-01 |
+| **プロジェクト名** | EXER |
 | **関連ドキュメント** | REQ-01（枠組み・プラグイン契約）、REQ-02（データ分析プラグイン）、DATA-01, API-01, ARC-02（プラグイン詳細） |
 
 本ドキュメントは REQ-01 のクリーンアーキテクチャ・プラグイン方式を具体化する。スコープは MVP のみ。将来 Phase（認証、i18n、複数ワークブック等）は 1 節にまとめる。
@@ -26,22 +27,26 @@ flowchart TB
     QuestionService["QuestionService"]
     HistoryService["HistoryService"]
     DraftService["DraftService"]
+    FavoriteService["FavoriteService"]
   end
   subgraph Repository["Repository"]
     WorkbookRepo["WorkbookRepository"]
     QuestionRepo["QuestionRepository"]
     HistoryRepo["HistoryRepository"]
     DraftRepo["DraftRepository"]
+    FavoriteRepo["FavoriteRepository"]
   end
   Pages --> WorkbookService
   Pages --> QuestionService
   Pages --> HistoryService
   Pages --> DraftService
+  Pages --> FavoriteService
   Components --> Service
   WorkbookService --> WorkbookRepo
   QuestionService --> QuestionRepo
   HistoryService --> HistoryRepo
   DraftService --> DraftRepo
+  FavoriteService --> FavoriteRepo
 ```
 
 - **App**: Next.js App Router のページ・Route Handlers、および React コンポーネント。Service を呼び出す。
@@ -56,7 +61,7 @@ Next.js App Router と整合する構成。ソースコードはすべて **src/
 
 | パス | 役割 |
 |------|------|
-| **src/app/** | Next.js App Router。`[workbookId]/` で動的ルーティング（例: `/py-value`）。`admin/` で管理画面。 |
+| **src/app/** | Next.js App Router。ルート `/` でホーム（SC-000）。`[workbookId]/` で動的ルーティング（例: `/py-value`、表示名「Pythonデータ分析」）。`admin/` で管理画面。 |
 | **src/app/api/** | Route Handlers（API-01 の契約を実装）。 |
 | **src/core/** | 枠組みの中核。Service・Repository のインターフェースと実装、プラグインレジストリ。 |
 | **src/core/plugins/** | プラグインを 1 プラグイン 1 ディレクトリで配置。詳細は **ARC-02 参照**。 |
@@ -69,6 +74,7 @@ Next.js App Router と整合する構成。ソースコードはすべて **src/
 ```
 src/
   app/
+    page.tsx               # ホーム（SC-000、ルート /）
     [workbookId]/          # 学習者向け（例: /py-value）
     admin/                 # 管理画面（?key=xxx）
     api/                   # Route Handlers
@@ -122,9 +128,27 @@ sequenceDiagram
   Service->>Repo: saveHistory(...)
   Service-->>App: JudgeResult
   App-->>Client: JSON
+
+  Note over Client,Plugin: ホーム・ワークブック一覧
+  Client->>App: GET /api/workbooks
+  App->>Service: listWorkbooks()
+  Service->>Repo: WorkbookRepo.list()
+  Repo-->>Service: Workbook[]
+  Service-->>App: Workbook[]
+  App-->>Client: JSON
+
+  Note over Client,Plugin: お気に入り追加・解除
+  Client->>App: POST/DELETE /api/.../favorite (X-Client-Id)
+  App->>Service: addFavorite / removeFavorite(...)
+  Service->>Repo: FavoriteRepo.upsert / decrement(...)
+  Repo-->>Service: Favorite
+  Service-->>App: Favorite
+  App-->>Client: JSON
 ```
 
-- **問題一覧取得**: クライアント → Route Handler → QuestionService → QuestionRepository。公開済みのみ返す。
+- **問題一覧取得**: クライアント → Route Handler → QuestionService → QuestionRepository。公開済みのみ返す。sort（order/difficulty/title/favorites）、tags フィルター対応。レスポンスに favoriteCount を含める（集計または denormalized）。
+- **ホーム・ワークブック一覧**: GET /api/workbooks → WorkbookService → WorkbookRepository。ホーム（SC-000）で問題集選択（FR-F024）に利用。
+- **お気に入り**: FavoriteService → FavoriteRepository。追加で count+1、解除で count-1（0 なら削除）。一覧取得は X-Client-Id で自分の Favorite を取得（API-018～020）。
 - **下書き保存**: クライアントが **X-Client-Id** ヘッダで識別子を送信。DraftService → DraftRepository で保存。
 - **解答送信**: 枠組みがプラグインの判定アダプタを呼び出し（Web Worker 想定）、結果を HistoryRepository に保存。
 - **管理画面**: クエリ `key` を検証したうえで、問題 CRUD・インポート/エクスポート・データセットアップロードを Route Handler 経由で実行。
@@ -150,9 +174,20 @@ MVP 外の拡張として、以下を 1 節で記載する。
 
 ---
 
-## 8. 参照
+## 8. トレーサビリティ（REQ-01 の FR/UC と本ドキュメントの対応）
+
+| REQ-01 | 本ドキュメント |
+|--------|----------------|
+| FR-F023, FR-F024, UC-F10 | App ルート `/`、WorkbookService/WorkbookRepo、API-001, API-002 |
+| FR-F025, FR-F026, FR-F028 | QuestionService/QuestionRepo（tags, sort=favorites, favoriteCount） |
+| FR-F027, UC-F12 | FavoriteService/FavoriteRepo、API-018～020 |
+| FR-F001～FR-F022（その他） | 既存 Service/Repository および API-003～API-017 |
+
+---
+
+## 9. 参照
 
 - REQ-01 §4 アーキテクチャ方針、§5 技術スタック、§7 プラグイン契約
-- DATA-01 共有型・Firestore スキーマ
+- DATA-01 共有型・Firestore スキーマ（Favorite 含む）
 - API-01 REST 契約（openapi.yaml が正本）
 - ARC-02 データ分析プラグイン（02_architecture/plugins/）
