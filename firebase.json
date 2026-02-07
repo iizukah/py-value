@@ -1,14 +1,18 @@
 {
   "hosting": {
-    "public": "out",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    "public": "static",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "exer-next",
+          "region": "asia-northeast1"
+        }
+      }
+    ]
   },
   "firestore": {
     "rules": "firestore.rules"
-  },
-  "functions": {
-    "source": ".",
-    "runtime": "nodejs20",
-    "predeploy": ["npm run build"]
   }
 }
