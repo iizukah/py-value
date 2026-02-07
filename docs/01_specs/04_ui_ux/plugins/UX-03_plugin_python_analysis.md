@@ -7,7 +7,7 @@
 | **ID** | UX-03 |
 | **関連ドキュメント** | REQ-02（データ分析プラグイン）、ARC-02, UX-01（SC-002 ワークスペース）, UX-02, DATA-02 |
 
-本ドキュメントはデータ分析プラグイン（type: `python-analysis`）の画面・コンポーネント構成を定義する。枠組みのワークスペース（SC-002）内に、本プラグインの 3 ペインおよび各エリアが描画される。ワイヤーフレームは [wireframes/](../wireframes/) のサブフォルダ（例: `plugins/python-analysis/`）から参照する。
+本ドキュメントはデータ分析プラグイン（type: `python-analysis`）の画面・コンポーネント構成を定義する。枠組みのワークスペース（SC-002）内に、本プラグインの 3 ペインおよび各エリアが描画される。**ワイヤーフレーム**は [../wireframes/wireframes.html](../wireframes/wireframes.html) をブラウザで開き、タブ「SC-002 ワークスペース」を選択した状態を参照する。
 
 ---
 
@@ -64,8 +64,7 @@ flowchart LR
 
 ## 5. ワイヤーフレーム参照
 
-- ワークスペース全体: [../wireframes/plugins/python-analysis/workspace.png](../wireframes/plugins/python-analysis/workspace.png)（用意次第で参照）
-- 変数パネル・プロット領域の詳細: 同一サブフォルダ内に必要に応じて画像を追加し、本ドキュメントまたは UX-01 から参照する。
+- ワークスペース全体（3 ペイン・変数パネル・プロット領域）: [../wireframes/wireframes.html](../wireframes/wireframes.html) のタブ「SC-002 ワークスペース」を参照。
 
 ---
 

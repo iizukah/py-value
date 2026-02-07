@@ -16,7 +16,7 @@
 | **02_architecture/plugins/** | プラグイン別アーキテクチャ（ARC-02 等） |
 | **03_contracts/** | 下流：データ・API 契約（DATA-01、API-01、openapi.yaml 等） |
 | **03_contracts/plugins/** | プラグイン別契約（DATA-02、API-02 等） |
-| **04_ui_ux/** | 下流：画面・コンポーネント（UX-01 画面・UX-02 コンポーネント）。wireframes/ にワイヤーフレーム画像を配置。 |
+| **04_ui_ux/** | 下流：画面・コンポーネント（UX-01, UX-02, UX-04 デザイン仕様）。wireframes/ にワイヤーフレーム HTML を配置。 |
 | **04_ui_ux/plugins/** | プラグイン別 UI/UX（UX-03 データ分析プラグイン等） |
 | **05_test/** | 下流：検証・テスト計画（TEST-01 等） |
 | **06_operations/** | 下流：運用・デプロイ（INFRA-01 等） |
@@ -40,7 +40,7 @@
 - **アーキテクチャ**: ARC-01, …（枠組み）。ARC-02 等は 02_architecture/plugins/ に配置。
 - **API**: API-001, API-002, …（枠組みは API-01、openapi.yaml が正本）。API-02 は 03_contracts/plugins/（将来用）。
 - **画面**: SC-001, …（UX-01 で定義）
-- **コンポーネント**: CP-001, …（UX-02 で定義）。プラグイン別の画面・コンポーネントは 04_ui_ux/plugins/（UX-03 等）に配置。
+- **コンポーネント**: CP-001, …（UX-02 で定義）。プラグイン別は 04_ui_ux/plugins/（UX-03）。デザイントークン・アイコンは UX-04 で定義。
 - **データ・型**: DATA-01, …（共有）。DATA-02 等は 03_contracts/plugins/ に配置。
 - **テストケース**: TC-001, …
 - **運用**: INFRA-01, …
