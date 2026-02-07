@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Py-Value | モック</title>
+  <title>EXER | モック</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400&display=swap">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -225,6 +225,115 @@
       filter: drop-shadow(0 0 6px rgba(100, 116, 139, 0.3));
     }
 
+    /* CP-000 ファーストビュー（SC-000）画像なし・CSS/JS のみ */
+    .first-view {
+      text-align: center;
+      padding: var(--space-6) var(--space-4);
+      position: relative;
+      overflow: hidden;
+    }
+    .first-view::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(16, 185, 129, 0.15) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .first-view h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--color-accent-emerald);
+      text-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
+      margin: 0 0 var(--space-2);
+      animation: fvGlow 3s ease-in-out infinite;
+    }
+    @keyframes fvGlow {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.1); }
+    }
+    .first-view p {
+      color: var(--color-text-muted);
+      font-size: 1rem;
+      max-width: 480px;
+      margin: 0 auto var(--space-6);
+      line-height: 1.6;
+    }
+    .workbook-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      justify-content: center;
+      margin-top: var(--space-6);
+    }
+    .workbook-card {
+      display: block;
+      text-align: left;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      min-width: 260px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .workbook-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    .workbook-card .label { margin-bottom: var(--space-2); }
+    .workbook-card .typography-heading { margin: 0; font-size: 1.1rem; }
+
+    /* タグ・お気に入り（CP-016, CP-017） */
+    .tile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-2); }
+    .tile-tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--color-accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .tile-favorite-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .btn-favorite {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .btn-favorite:hover { color: #f87171; transform: scale(1.05); }
+    .btn-favorite.is-favorited { color: #f87171; }
+    .tile-favorite-count { font-size: 12px; color: var(--color-text-muted); }
+    .tag-filter-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+    .tag-filter-row .tag-pill {
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .tag-filter-row .tag-pill:hover, .tag-filter-row .tag-pill.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: var(--color-accent-emerald);
+      color: var(--color-accent-emerald);
+    }
+
     /* SC-002: 3-pane workspace (pyvalue5 style) */
     .three-pane {
       display: grid;
@@ -442,15 +551,31 @@
   </div>
 
   <header class="app-header" id="app-header">
-    <a href="#/" class="logo-link" id="header-logo-link" aria-label="ホームへ"><span class="logo typography-title" id="header-logo">Py-Value</span></a>
+    <a href="#/" class="logo-link" id="header-logo-link" aria-label="ホームへ"><span class="logo typography-title" id="header-logo">EXER</span></a>
     <nav class="nav" aria-label="メインナビゲーション">
-      <a href="#/" id="nav-list"><i data-lucide="list" width="16" height="16"></i> 問題一覧</a>
-      <a href="#/history" id="nav-history"><i data-lucide="history" width="16" height="16"></i> 履歴</a>
+      <a href="#/py-value" id="nav-list"><i data-lucide="list" width="16" height="16"></i> 問題一覧</a>
+      <a href="#/py-value/favorites" id="nav-favorites"><i data-lucide="heart" width="16" height="16"></i> お気に入り</a>
+      <a href="#/py-value/history" id="nav-history"><i data-lucide="history" width="16" height="16"></i> 履歴</a>
       <a href="#/admin?key=admin" id="nav-admin"><i data-lucide="settings" width="16" height="16"></i> 管理</a>
     </nav>
   </header>
   <div class="breadcrumb" id="breadcrumb"></div>
   <main class="main-content" id="main-content">
+    <!-- SC-000 ホーム（ファーストビュー + 問題集選択） -->
+    <section id="panel-home" class="panel" data-sc="SC-000">
+      <div class="first-view">
+        <h1 id="first-view-title">EXER</h1>
+        <p>コードで学ぶ、データ分析。ブラウザだけで問題に挑戦し、採点まで完結します。</p>
+        <span class="label">問題集を選ぶ</span>
+        <div class="workbook-cards" id="workbook-cards">
+          <a href="#/py-value" class="workbook-card" data-workbook-id="py-value">
+            <span class="label">Pythonデータ分析</span>
+            <p class="typography-heading">統計・検定・データ分析の問題にコードで挑戦</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- SC-001 問題一覧 -->
     <section id="panel-list" class="panel" data-sc="SC-001">
       <div id="list-sort" class="card" style="margin-bottom: 16px;">
@@ -459,11 +584,17 @@
           <button type="button" class="btn btn-secondary" data-sort="order" aria-label="登録順でソート"><i data-lucide="arrow-down-up" width="16" height="16"></i> 登録順</button>
           <button type="button" class="btn btn-ghost" data-sort="difficulty"><i data-lucide="signal" width="16" height="16"></i> 難易度</button>
           <button type="button" class="btn btn-ghost" data-sort="title"><i data-lucide="type" width="16" height="16"></i> タイトル</button>
+          <button type="button" class="btn btn-ghost" data-sort="favorites"><i data-lucide="heart" width="16" height="16"></i> お気に入り数</button>
         </div>
+        <span class="label" style="display: block; margin-top: 12px;">タグでフィルター</span>
+        <div class="tag-filter-row" id="tag-filter-row"></div>
       </div>
       <div id="list-zero" class="card" style="display: none;"><p class="label">0 件時メッセージ</p><p>問題がありません。</p></div>
       <div class="question-tiles" id="question-tiles"></div>
-      <p style="margin-top: 16px;"><a href="#/history" class="btn btn-secondary"><i data-lucide="history" width="16" height="16"></i> 履歴へ</a></p>
+      <p style="margin-top: 16px;">
+        <a href="#/py-value/favorites" class="btn btn-secondary"><i data-lucide="heart" width="16" height="16"></i> お気に入り</a>
+        <a href="#/py-value/history" class="btn btn-secondary"><i data-lucide="history" width="16" height="16"></i> 履歴へ</a>
+      </p>
     </section>
 
     <!-- SC-002 ワークスペース (pyvalue5 style) -->
@@ -559,6 +690,16 @@
       <button type="button" class="btn btn-secondary" id="btn-history-detail-back"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
     </section>
 
+    <!-- SC-011 お気に入り一覧 -->
+    <section id="panel-favorites" class="panel" data-sc="SC-011">
+      <div class="card" style="margin-bottom: 16px;">
+        <span class="label">お気に入り</span>
+        <p id="favorites-zero" style="display: none; color: var(--color-text-muted);">お気に入りに追加した問題がここに表示されます。</p>
+        <div class="question-tiles" id="favorites-tiles"></div>
+      </div>
+      <button type="button" class="btn btn-secondary" id="btn-favorites-back"><i data-lucide="arrow-left" width="16" height="16"></i> 一覧へ戻る</button>
+    </section>
+
     <!-- SC-007 管理ダッシュボード (key required) -->
     <section id="panel-admin" class="panel" data-sc="SC-007">
       <div id="admin-key-required" class="card" style="display: none;">
@@ -643,15 +784,18 @@
   <script>
     (function() {
       const WORKBOOK_ID = 'py-value';
+      const WORKBOOK_DISPLAY_NAME = 'Pythonデータ分析';
       const VALID_ADMIN_KEY = 'admin';
 
       const dummyQuestions = [
-        { id: 'q1', order: 1, displayTitle: '平均値の計算', excerpt: '問題文の冒頭。データが与えられたとき、平均値を求めて ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'pass' },
-        { id: 'q2', order: 2, displayTitle: 't 検定', excerpt: '問題文の冒頭。2 群の平均の差について t 検定を行い、p_value を求めて...', difficulty: '中級', difficultyOrder: 2, badge: 'none' },
-        { id: 'q3', order: 3, displayTitle: '回帰分析', excerpt: '問題文の冒頭。単回帰分析を行い、回帰係数を ans に代入してください...', difficulty: '上級', difficultyOrder: 3, badge: 'none' },
+        { id: 'q1', order: 1, displayTitle: '平均値の計算', excerpt: '問題文の冒頭。データが与えられたとき、平均値を求めて ans に代入してください...', difficulty: '初級', difficultyOrder: 1, badge: 'pass', tags: ['統計', '記述統計'], favoriteCount: 12 },
+        { id: 'q2', order: 2, displayTitle: 't 検定', excerpt: '問題文の冒頭。2 群の平均の差について t 検定を行い、p_value を求めて...', difficulty: '中級', difficultyOrder: 2, badge: 'none', tags: ['統計', '検定'], favoriteCount: 8 },
+        { id: 'q3', order: 3, displayTitle: '回帰分析', excerpt: '問題文の冒頭。単回帰分析を行い、回帰係数を ans に代入してください...', difficulty: '上級', difficultyOrder: 3, badge: 'none', tags: ['回帰', '検定'], favoriteCount: 5 },
       ];
       let questions = dummyQuestions.slice();
       let sortBy = 'order';
+      let selectedTags = [];
+      var myFavorites = {};
 
       const dummyHistories = [
         { id: 'h1', questionId: 'q1', questionTitle: '平均値の計算', result: '合格', judgedAt: '2026-02-07T10:00:00Z' },
@@ -708,9 +852,15 @@
       function renderList() {
         const tiles = document.getElementById('question-tiles');
         const zero = document.getElementById('list-zero');
-        const list = [...questions].sort((a, b) => {
+        let list = questions.filter(q => {
+          if (selectedTags.length === 0) return true;
+          const qt = q.tags || [];
+          return selectedTags.every(t => qt.includes(t));
+        });
+        list = [...list].sort((a, b) => {
           if (sortBy === 'order') return a.order - b.order;
           if (sortBy === 'difficulty') return a.difficultyOrder - b.difficultyOrder;
+          if (sortBy === 'favorites') return (b.favoriteCount || 0) - (a.favoriteCount || 0);
           return (a.displayTitle || '').localeCompare(b.displayTitle || '');
         });
         if (list.length === 0) {
@@ -722,22 +872,98 @@
         tiles.innerHTML = list.map(q => {
           const sub = 'CHALLENGE ' + String(q.order).padStart(2, '0');
           const diffClass = q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced';
+          const tagsHtml = (q.tags || []).map(t => '<span class="tile-tag">' + t + '</span>').join('');
+          const favCount = (q.favoriteCount || 0) + (myFavorites[q.id] || 0);
+          const isFav = (myFavorites[q.id] || 0) > 0;
           return `
-          <div class="question-tile">
+          <div class="question-tile" data-question-id="${q.id}">
             <div class="tile-subtitle">${sub}</div>
             <div class="tile-title-row">
               <span class="tile-difficulty difficulty-${diffClass}">${difficultyIcon(q.difficulty)} ${q.difficulty}</span>
               <span class="tile-display-title">${q.displayTitle}</span>
             </div>
+            ${tagsHtml ? '<div class="tile-tags">' + tagsHtml + '</div>' : ''}
             <div class="tile-excerpt">${q.excerpt}</div>
             <div class="tile-footer">
-              <div class="tile-badge">${badgeHtml(q.badge)}</div>
-              <a href="#/questions/${q.id}" class="btn btn-primary"><i data-lucide="play" width="16" height="16"></i> Try</a>
+              <div>
+                <div class="tile-badge">${badgeHtml(q.badge)}</div>
+                <div class="tile-favorite-row">
+                  <button type="button" class="btn-favorite ${isFav ? 'is-favorited' : ''}" data-question-id="${q.id}" aria-label="お気に入り">${isFav ? '<i data-lucide="heart" width="18" height="18" fill="currentColor"></i>' : '<i data-lucide="heart" width="18" height="18"></i>'}</button>
+                  <span class="tile-favorite-count"><i data-lucide="heart" width="12" height="12"></i> ${favCount}</span>
+                </div>
+              </div>
+              <a href="#/py-value/questions/${q.id}" class="btn btn-primary"><i data-lucide="play" width="16" height="16"></i> Try</a>
             </div>
           </div>
         `;
         }).join('');
         lucide.createIcons();
+        document.querySelectorAll('.btn-favorite').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const qId = this.getAttribute('data-question-id');
+            myFavorites[qId] = (myFavorites[qId] || 0) + 1;
+            renderList();
+            renderTagFilter();
+          });
+        });
+      }
+
+      function renderTagFilter() {
+        const allTags = [];
+        questions.forEach(q => { (q.tags || []).forEach(t => { if (!allTags.includes(t)) allTags.push(t); }); });
+        const row = document.getElementById('tag-filter-row');
+        row.innerHTML = allTags.map(t => {
+          const active = selectedTags.includes(t);
+          return '<button type="button" class="tag-pill ' + (active ? 'active' : '') + '" data-tag="' + t + '">' + t + '</button>';
+        }).join('');
+        row.querySelectorAll('.tag-pill').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const t = this.getAttribute('data-tag');
+            if (selectedTags.includes(t)) selectedTags = selectedTags.filter(x => x !== t);
+            else selectedTags = selectedTags.concat(t);
+            renderList();
+            renderTagFilter();
+          });
+        });
+      }
+
+      function renderFavorites() {
+        const favList = questions.filter(q => (myFavorites[q.id] || 0) > 0);
+        const container = document.getElementById('favorites-tiles');
+        const zeroEl = document.getElementById('favorites-zero');
+        if (favList.length === 0) {
+          zeroEl.style.display = 'block';
+          container.innerHTML = '';
+          return;
+        }
+        zeroEl.style.display = 'none';
+        container.innerHTML = favList.map(q => {
+          const diffClass = q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced';
+          const favCount = (q.favoriteCount || 0) + (myFavorites[q.id] || 0);
+          return `
+          <div class="question-tile">
+            <div class="tile-title-row">
+              <span class="tile-difficulty difficulty-${diffClass}">${difficultyIcon(q.difficulty)} ${q.difficulty}</span>
+              <span class="tile-display-title">${q.displayTitle}</span>
+            </div>
+            <div class="tile-footer" style="margin-top: auto;">
+              <button type="button" class="btn btn-ghost btn-sm btn-unfavorite" data-question-id="${q.id}"><i data-lucide="heart-off" width="14" height="14"></i> 解除</button>
+              <a href="#/py-value/questions/${q.id}" class="btn btn-primary"><i data-lucide="play" width="16" height="16"></i> Try</a>
+            </div>
+          </div>
+        `;
+        }).join('');
+        lucide.createIcons();
+        container.querySelectorAll('.btn-unfavorite').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const qId = this.getAttribute('data-question-id');
+            if (myFavorites[qId]) { myFavorites[qId]--; if (myFavorites[qId] <= 0) delete myFavorites[qId]; }
+            renderFavorites();
+            renderList();
+            renderTagFilter();
+          });
+        });
       }
 
       function showPanel(id) {
@@ -751,6 +977,8 @@
           b.className = b.getAttribute('data-sort') === sortBy ? 'btn btn-secondary' : 'btn btn-ghost';
         });
       }
+
+      function breadcrumbWorkbook() { return '<a href="#/py-value">' + WORKBOOK_DISPLAY_NAME + '</a>'; }
 
       function route() {
         const path = getHashPath();
@@ -798,60 +1026,76 @@
         }
 
         if (parts[0] === 'history') {
-          if (parts[1]) {
-            const h = dummyHistories.find(x => x.id === parts[1]);
-            if (h) {
-              showPanel('panel-history-detail');
-              const card = document.getElementById('history-detail-card');
-              const resultBadge = h.result === '合格' ? 'pass' : 'fail';
-              card.innerHTML = `
-                <span class="label">履歴詳細</span>
-                <p><strong>問題:</strong> ${h.questionTitle}</p>
-                <p><strong>userAnswer 要約:</strong> cells: 2 セル</p>
-                <p><strong>結果:</strong> ${badgeHtml(resultBadge)}</p>
-                <p><strong>judgedAt:</strong> ${h.judgedAt}</p>
-              `;
-              setBreadcrumb(['<a href="#/">ホーム</a>', '<a href="#/history">履歴</a>', '詳細']);
-            } else { showPanel('panel-history'); renderHistoryList(); setBreadcrumb(['<a href="#/">ホーム</a>', '履歴']); }
+          window.location.hash = '#/py-value/history' + (parts[1] ? '/' + parts[1] : '');
+          return;
+        }
+
+        if (parts[0] === 'py-value') {
+          if (parts[1] === 'favorites') {
+            showPanel('panel-favorites');
+            renderFavorites();
+            setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), 'お気に入り']);
             return;
           }
-          showPanel('panel-history');
-          renderHistoryList();
-          setBreadcrumb(['<a href="#/">ホーム</a>', '履歴']);
+          if (parts[1] === 'history') {
+            if (parts[2]) {
+              const h = dummyHistories.find(x => x.id === parts[2]);
+              if (h) {
+                showPanel('panel-history-detail');
+                const card = document.getElementById('history-detail-card');
+                const resultBadge = h.result === '合格' ? 'pass' : 'fail';
+                card.innerHTML = `
+                  <span class="label">履歴詳細</span>
+                  <p><strong>問題:</strong> ${h.questionTitle}</p>
+                  <p><strong>userAnswer 要約:</strong> cells: 2 セル</p>
+                  <p><strong>結果:</strong> ${badgeHtml(resultBadge)}</p>
+                  <p><strong>judgedAt:</strong> ${h.judgedAt}</p>
+                `;
+                setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), '<a href="#/py-value/history">履歴</a>', '詳細']);
+              } else { showPanel('panel-history'); renderHistoryList(); setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), '履歴']); }
+              return;
+            }
+            showPanel('panel-history');
+            renderHistoryList();
+            setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), '履歴']);
+            return;
+          }
+          if (parts[1] === 'questions' && parts[2]) {
+            const qId = parts[2];
+            const q = questions.find(x => x.id === qId);
+            if (!q) { routeToList(); return; }
+            showPanel('panel-workspace');
+            document.getElementById('workspace-problem-body').innerHTML = `<div class="problem-title">${q.displayTitle}</div><p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">${q.excerpt}</p>`;
+            document.getElementById('workspace-judge-area').style.display = 'none';
+            setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), q.displayTitle]);
+            showLoading('問題を読み込み中...');
+            setTimeout(function() { hideLoading(); }, 1500);
+            return;
+          }
+          if (parts[1] === 'result' && parts[2]) {
+            showPanel('panel-result');
+            const qId = parts[2];
+            const q = questions.find(x => x.id === qId);
+            const nextQ = questions.filter(x => x.order > (q ? q.order : 0)).sort((a,b) => a.order - b.order)[0];
+            const allCorrect = !nextQ;
+            document.getElementById('btn-next').style.display = allCorrect ? 'none' : 'inline-flex';
+            document.getElementById('btn-to-complete').style.display = allCorrect ? 'inline-flex' : 'none';
+            document.getElementById('result-badges').innerHTML = '獲得バッジ: <span class="badge badge-pass">合格</span>';
+            setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook(), '採点結果']);
+            return;
+          }
+          if (parts[1] === 'complete') {
+            showPanel('panel-complete');
+            setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook()]);
+            return;
+          }
+          routeToList();
           return;
         }
 
-        if (parts[0] === 'questions' && parts[1]) {
-          const qId = parts[1];
-          const q = questions.find(x => x.id === qId);
-          if (!q) { routeToList(); return; }
-          showPanel('panel-workspace');
-          document.getElementById('workspace-problem-body').innerHTML = `<div class="problem-title">${q.displayTitle}</div><p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">${q.excerpt}</p>`;
-          document.getElementById('workspace-judge-area').style.display = 'none';
-          setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID, q.displayTitle]);
-          showLoading('問題を読み込み中...');
-          setTimeout(function() {
-            hideLoading();
-          }, 1500);
-          return;
-        }
-
-        if (parts[0] === 'result' && parts[1]) {
-          showPanel('panel-result');
-          const qId = parts[1];
-          const q = questions.find(x => x.id === qId);
-          const nextQ = questions.filter(x => x.order > (q ? q.order : 0)).sort((a,b) => a.order - b.order)[0];
-          const allCorrect = !nextQ;
-          document.getElementById('btn-next').style.display = allCorrect ? 'none' : 'inline-flex';
-          document.getElementById('btn-to-complete').style.display = allCorrect ? 'inline-flex' : 'none';
-          document.getElementById('result-badges').innerHTML = '獲得バッジ: <span class="badge badge-pass">合格</span>';
-          setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID, '採点結果']);
-          return;
-        }
-
-        if (parts[0] === 'complete') {
-          showPanel('panel-complete');
-          setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID]);
+        if (parts.length === 0 || (parts[0] === '')) {
+          showPanel('panel-home');
+          setBreadcrumb(['ホーム']);
           return;
         }
 
@@ -859,10 +1103,12 @@
       }
 
       function routeToList() {
+        if (getHashPath() !== '/py-value') { window.location.hash = '#/py-value'; return; }
         showPanel('panel-list');
         setSortButtons();
         renderList();
-        setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID]);
+        renderTagFilter();
+        setBreadcrumb(['<a href="#/">ホーム</a>', breadcrumbWorkbook()]);
       }
 
       function renderHistoryList() {
@@ -874,7 +1120,7 @@
             <td>${h.questionTitle}</td>
             <td>${badgeHtml(badge)}</td>
             <td>${new Date(h.judgedAt).toLocaleString('ja-JP')}</td>
-            <td><a href="#/history/${h.id}" class="btn btn-ghost btn-sm"><i data-lucide="eye" width="14" height="14"></i> 詳細</a></td>
+            <td><a href="#/py-value/history/${h.id}" class="btn btn-ghost btn-sm"><i data-lucide="eye" width="14" height="14"></i> 詳細</a></td>
           </tr>
         `;
         }).join('');
@@ -900,7 +1146,7 @@
           document.getElementById('workspace-judge-content').innerHTML = '<p>合格です。</p>';
           const hash = getHashPath();
           const qId = (hash.match(/questions\/([^/]+)/) || [])[1];
-          if (qId) window.location.hash = '#/result/' + qId;
+          if (qId) window.location.hash = '#/py-value/result/' + qId;
         }, 1800);
       });
       document.getElementById('btn-draft').addEventListener('click', function() {
@@ -935,14 +1181,15 @@
         const qId = (path.match(/result\/([^/]+)/) || [])[1];
         const q = questions.find(x => x.id === qId);
         const nextQ = q && questions.filter(x => x.order > q.order).sort((a,b) => a.order - b.order)[0];
-        if (nextQ) window.location.hash = '#/questions/' + nextQ.id;
-        else window.location.hash = '#/complete';
+        if (nextQ) window.location.hash = '#/py-value/questions/' + nextQ.id;
+        else window.location.hash = '#/py-value/complete';
       });
-      document.getElementById('btn-back-list').addEventListener('click', function() { window.location.hash = '#/'; });
-      document.getElementById('btn-to-complete').addEventListener('click', function() { window.location.hash = '#/complete'; });
-      document.getElementById('btn-complete-back').addEventListener('click', function() { window.location.hash = '#/'; });
-      document.getElementById('btn-history-back').addEventListener('click', function() { window.location.hash = '#/'; });
-      document.getElementById('btn-history-detail-back').addEventListener('click', function() { window.location.hash = '#/history'; });
+      document.getElementById('btn-back-list').addEventListener('click', function() { window.location.hash = '#/py-value'; });
+      document.getElementById('btn-to-complete').addEventListener('click', function() { window.location.hash = '#/py-value/complete'; });
+      document.getElementById('btn-complete-back').addEventListener('click', function() { window.location.hash = '#/py-value'; });
+      document.getElementById('btn-history-back').addEventListener('click', function() { window.location.hash = '#/py-value'; });
+      document.getElementById('btn-history-detail-back').addEventListener('click', function() { window.location.hash = '#/py-value/history'; });
+      document.getElementById('btn-favorites-back').addEventListener('click', function() { window.location.hash = '#/py-value'; });
 
       document.getElementById('btn-admin-new').addEventListener('click', function() { window.location.hash = '#/admin/edit/new?key=admin'; });
       document.getElementById('btn-edit-save').addEventListener('click', function() {
@@ -985,8 +1232,10 @@
       });
 
       window.addEventListener('hashchange', route);
+      if (!window.location.hash || window.location.hash === '#') window.location.hash = '#/';
       route();
       renderList();
+      renderTagFilter();
       setSortButtons();
       lucide.createIcons();
     })();
