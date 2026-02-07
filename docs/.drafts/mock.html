@@ -143,6 +143,7 @@
       border: 1px solid var(--color-border);
     }
     .btn-ghost:hover { background: rgba(255, 255, 255, 0.06); }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
 
     /* SC-001: question tiles */
     .question-tiles {
@@ -161,9 +162,9 @@
       min-height: var(--tile-min-height);
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: stretch;
       justify-content: space-between;
-      text-align: center;
+      text-align: left;
     }
     .question-tile .tile-subtitle {
       font-size: 11px;
@@ -172,52 +173,123 @@
       margin-bottom: var(--space-1);
       text-transform: uppercase;
     }
-    .question-tile .tile-display-title { font-size: 1.1rem; font-weight: 700; margin-bottom: var(--space-1); }
+    .question-tile .tile-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: var(--space-2);
+    }
+    .question-tile .tile-difficulty { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; flex-shrink: 0; }
+    .question-tile .tile-display-title { font-size: 1.1rem; font-weight: 700; flex: 1; min-width: 0; }
     .question-tile .tile-excerpt { font-size: 13px; color: var(--color-text-muted); margin-bottom: var(--space-2); flex: 1; }
-    .question-tile .tile-meta { font-size: 12px; margin-bottom: var(--space-2); display: inline-flex; align-items: center; gap: 6px; }
+    .question-tile .tile-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-top: auto;
+    }
     .difficulty-beginner { color: var(--color-text-muted); }
     .difficulty-intermediate { color: var(--color-accent-blue); }
     .difficulty-advanced { color: var(--color-accent-emerald); }
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
+      gap: 6px;
+      padding: 10px 20px;
       border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 700;
+      animation: badge-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
-    .badge-pass { background: rgba(16, 185, 129, 0.2); color: var(--color-accent-emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
-    .badge-fail { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
-    .badge-none { background: rgba(139, 148, 158, 0.15); color: var(--color-text-muted); border: 1px solid var(--color-border); }
+    @keyframes badge-pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .badge-pass {
+      background: linear-gradient(135deg, #10b981, #0d9488);
+      color: #fff;
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.5));
+    }
+    .badge-fail {
+      background: linear-gradient(135deg, #f87171, #dc2626);
+      color: #fff;
+      border: 1px solid rgba(248, 113, 113, 0.5);
+      filter: drop-shadow(0 0 12px rgba(248, 113, 113, 0.5));
+    }
+    .badge-none {
+      background: linear-gradient(135deg, #64748b, #475569);
+      color: #e2e8f0;
+      border: 1px solid var(--color-border);
+      filter: drop-shadow(0 0 6px rgba(100, 116, 139, 0.3));
+    }
 
-    /* SC-002: 3-pane workspace */
+    /* SC-002: 3-pane workspace (pyvalue5 style) */
     .three-pane {
       display: grid;
-      grid-template-columns: 1fr 1.5fr 1fr;
-      gap: var(--space-3);
-      min-height: 360px;
+      grid-template-columns: 25% 1fr 30%;
+      gap: 0;
+      min-height: 400px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
     }
     @media (max-width: 900px) { .three-pane { grid-template-columns: 1fr; } }
     .pane {
-      background: var(--glass-bg);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
-      padding: var(--space-3);
+      background: var(--color-bg-main);
+      border-right: 1px solid var(--color-border);
+      padding: var(--space-4);
       overflow: auto;
     }
-    .cell-box {
-      border: 1px dashed var(--color-border);
+    .pane:last-child { border-right: none; }
+    .pane .label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+    }
+    .workspace-problem-pane .problem-title { font-size: 1rem; font-weight: 700; margin-top: var(--space-2); margin-bottom: var(--space-2); }
+    .workspace-variable-watcher {
+      background: rgba(1, 4, 9, 0.9);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
       padding: var(--space-3);
-      margin-bottom: var(--space-2);
+      margin-top: var(--space-4);
+    }
+    .workspace-variable-watcher .label { margin-bottom: var(--space-2); }
+    .workspace-variable-watcher .font-mono { font-size: 11px; }
+    .workspace-judge-success { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--color-accent-emerald); border-radius: var(--radius-md); padding: var(--space-3); margin-top: var(--space-2); }
+    .workspace-judge-fail { background: rgba(248, 113, 113, 0.1); border: 1px solid #f87171; border-radius: var(--radius-md); padding: var(--space-3); margin-top: var(--space-2); }
+    .cell-group-ws {
+      border-left: 4px solid transparent;
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-3);
+      transition: border-color 0.2s;
+    }
+    .cell-group-ws:hover { border-left-color: var(--color-accent-emerald); }
+    .cell-box {
+      border: 1px solid var(--color-border);
+      padding: var(--space-3);
+      margin-top: var(--space-2);
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px;
       min-height: 60px;
-      background: rgba(13, 17, 23, 0.5);
+      background: var(--color-bg-main);
       border-radius: var(--radius-sm);
     }
+    .workspace-plot-header {
+      padding: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      background: rgba(22, 27, 34, 0.5);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-muted);
+    }
+    .workspace-plot-body { padding: var(--space-4); min-height: 120px; }
 
     /* Center block SC-003, SC-004 */
     .center-block {
@@ -236,6 +308,7 @@
     tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
     .history-table th, .history-table td { border-color: var(--glass-border); }
     .history-table thead th { padding: var(--space-3); }
+    .admin-actions { display: inline-flex; gap: 8px; flex-wrap: wrap; }
     .file-input-hidden { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
     .file-input-trigger {
       display: inline-flex;
@@ -333,6 +406,30 @@
     @keyframes scan { from { left: -40px; } to { left: 200px; } }
     .loading-text { margin-top: var(--space-4); font-size: 10px; font-family: monospace; color: var(--color-accent-emerald); letter-spacing: 0.2em; }
     .color-text-muted { color: var(--color-text-muted); }
+
+    /* SC-003 採点結果アニメーション */
+    .panel-result .center-block .card {
+      animation: resultCardIn 0.5s ease-out forwards;
+    }
+    @keyframes resultCardIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .panel-result #result-message {
+      animation: resultTextPulse 1s ease-in-out 0.2s both;
+    }
+    @keyframes resultTextPulse {
+      0% { opacity: 0; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.02); text-shadow: 0 0 24px rgba(16, 185, 129, 0.5); }
+      100% { opacity: 1; transform: scale(1); text-shadow: 0 0 16px rgba(16, 185, 129, 0.3); }
+    }
+    .panel-result #result-badges .badge {
+      animation: badgePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;
+    }
+    @keyframes badgePop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -369,36 +466,50 @@
       <p style="margin-top: 16px;"><a href="#/history" class="btn btn-secondary"><i data-lucide="history" width="16" height="16"></i> 履歴へ</a></p>
     </section>
 
-    <!-- SC-002 ワークスペース -->
+    <!-- SC-002 ワークスペース (pyvalue5 style) -->
     <section id="panel-workspace" class="panel" data-sc="SC-002">
       <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
         <button type="button" class="btn btn-ghost" id="btn-draft" aria-label="下書き保存"><i data-lucide="bookmark" width="16" height="16"></i> 下書き保存</button>
         <button type="button" class="btn btn-primary" id="btn-submit" aria-label="解答送信"><i data-lucide="send" width="16" height="16"></i> 解答送信</button>
         <button type="button" class="btn btn-ghost" id="btn-error-demo" aria-label="エラー表示例（FR-P011）"><i data-lucide="alert-circle" width="16" height="16"></i> エラー表示例</button>
       </div>
-      <div class="card" id="workspace-judge-area" style="display: none;">
-        <span class="label">採点結果</span>
-        <div id="workspace-judge-content"><p id="workspace-judge-text"></p></div>
-      </div>
       <div class="three-pane">
-        <div class="pane">
-          <span class="label">問題ペイン</span>
+        <div class="pane workspace-problem-pane">
+          <span class="label">問題</span>
           <div id="workspace-problem-body"></div>
+          <div class="workspace-variable-watcher">
+            <span class="label">Variable Watcher</span>
+            <p id="workspace-vars" class="font-mono">ans: —<br>p_value: —</p>
+          </div>
+          <div class="workspace-judge-success" id="workspace-judge-area" style="display: none;">
+            <span class="label">採点結果</span>
+            <div id="workspace-judge-content"><p id="workspace-judge-text"></p></div>
+          </div>
         </div>
         <div class="pane">
-          <span class="label">エディタ・セル領域</span>
-          <div class="cell-box" id="workspace-cell1">import pandas as pd</div>
-          <div class="cell-box" id="workspace-cell2">ans = df['x'].mean()</div>
-          <p style="margin-top: 8px;"><span class="label">実行制御</span></p>
+          <span class="label">エディタ・セル</span>
+          <div class="cell-group-ws">
+            <div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [1]</div>
+            <div class="cell-box" id="workspace-cell1">import pandas as pd</div>
+          </div>
+          <div class="cell-group-ws">
+            <div style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 4px;">In [2]</div>
+            <div class="cell-box" id="workspace-cell2">ans = df['x'].mean()</div>
+          </div>
+          <p style="margin-top: 12px;"><span class="label">実行制御</span></p>
           <div style="display: flex; gap: 8px;">
             <button type="button" class="btn btn-ghost" aria-label="中断"><i data-lucide="square" width="14" height="14"></i> Interrupt</button>
             <button type="button" class="btn btn-ghost" aria-label="カーネルリセット"><i data-lucide="refresh-cw" width="14" height="14"></i> リセット</button>
           </div>
         </div>
-        <div class="pane">
-          <span class="label">可視化・変数パネル</span>
-          <div class="card"><span class="label">変数</span><p id="workspace-vars" class="font-mono">ans: —<br>p_value: —</p></div>
-          <div class="card"><span class="label">プロット領域</span><p class="color-text-muted" style="font-size: 12px;">（Matplotlib 出力）</p></div>
+        <div class="pane" style="padding: 0; display: flex; flex-direction: column;">
+          <div class="workspace-plot-header">Result Plot</div>
+          <div class="workspace-plot-body">
+            <span class="label">変数</span>
+            <p id="workspace-vars-right" class="font-mono" style="font-size: 11px;">ans: —<br>p_value: —</p>
+            <span class="label" style="margin-top: 12px;">プロット</span>
+            <p class="color-text-muted" style="font-size: 12px; margin-top: 4px;">（Matplotlib 出力）</p>
+          </div>
         </div>
       </div>
     </section>
@@ -467,7 +578,7 @@
         <p><button type="button" class="btn btn-primary" id="btn-admin-new"><i data-lucide="plus" width="16" height="16"></i> 新規作成</button></p>
         <div class="card" style="margin-top: 16px;">
           <span class="label">問題一覧（下書き含む）</span>
-          <table>
+          <table class="history-table">
             <thead><tr><th>タイトル</th><th>ステータス</th><th>操作</th></tr></thead>
             <tbody id="admin-tbody"></tbody>
           </table>
@@ -515,7 +626,14 @@
     <section id="panel-admin-dataset" class="panel" data-sc="SC-010">
       <div class="card">
         <span class="label">データセットアップロード</span>
-        <div class="form-group"><label>ファイル（CSV等）</label><input type="file" id="dataset-file" accept=".csv,.txt"></div>
+        <div class="form-group">
+          <label class="label">ファイル（CSV等）</label>
+          <input type="file" id="dataset-file" accept=".csv,.txt" class="file-input-hidden">
+          <label for="dataset-file" class="file-input-trigger">
+            <i data-lucide="upload" width="20" height="20"></i>
+            <span>ファイルを選択</span>
+          </label>
+        </div>
         <button type="button" class="btn btn-primary" id="btn-dataset-upload"><i data-lucide="upload" width="16" height="16"></i> アップロード</button>
         <div id="dataset-result" class="card" style="margin-top: 16px; display: none;"><p id="dataset-message"></p></div>
       </div>
@@ -603,14 +721,19 @@
         zero.style.display = 'none';
         tiles.innerHTML = list.map(q => {
           const sub = 'CHALLENGE ' + String(q.order).padStart(2, '0');
+          const diffClass = q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced';
           return `
           <div class="question-tile">
             <div class="tile-subtitle">${sub}</div>
-            <div class="tile-display-title">${q.displayTitle}</div>
+            <div class="tile-title-row">
+              <span class="tile-difficulty difficulty-${diffClass}">${difficultyIcon(q.difficulty)} ${q.difficulty}</span>
+              <span class="tile-display-title">${q.displayTitle}</span>
+            </div>
             <div class="tile-excerpt">${q.excerpt}</div>
-            <div class="tile-meta difficulty-${q.difficulty === '初級' ? 'beginner' : q.difficulty === '中級' ? 'intermediate' : 'advanced'}">${difficultyIcon(q.difficulty)} ${q.difficulty}</div>
-            <div class="tile-badge">${badgeHtml(q.badge)}</div>
-            <a href="#/questions/${q.id}" class="btn btn-primary"><i data-lucide="play" width="16" height="16"></i> Try</a>
+            <div class="tile-footer">
+              <div class="tile-badge">${badgeHtml(q.badge)}</div>
+              <a href="#/questions/${q.id}" class="btn btn-primary"><i data-lucide="play" width="16" height="16"></i> Try</a>
+            </div>
           </div>
         `;
         }).join('');
@@ -666,10 +789,7 @@
             <tr>
               <td>${q.title}</td>
               <td>${q.status}</td>
-              <td>
-                <a href="#/admin/edit/${q.id}?key=admin" style="margin-right:8px;"><i data-lucide="pencil" width="14" height="14"></i> 編集</a>
-                <a href="#" data-delete-id="${q.id}" class="link-delete"><i data-lucide="trash-2" width="14" height="14"></i> 削除</a>
-              </td>
+              <td><span class="admin-actions"><a href="#/admin/edit/${q.id}?key=admin" class="btn btn-ghost btn-sm"><i data-lucide="pencil" width="14" height="14"></i> 編集</a><a href="#" data-delete-id="${q.id}" class="btn btn-ghost btn-sm link-delete"><i data-lucide="trash-2" width="14" height="14"></i> 削除</a></span></td>
             </tr>
           `).join('');
           lucide.createIcons();
@@ -706,7 +826,7 @@
           const q = questions.find(x => x.id === qId);
           if (!q) { routeToList(); return; }
           showPanel('panel-workspace');
-          document.getElementById('workspace-problem-body').innerHTML = `<p><strong>${q.displayTitle}</strong></p><p>${q.excerpt}</p>`;
+          document.getElementById('workspace-problem-body').innerHTML = `<div class="problem-title">${q.displayTitle}</div><p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5;">${q.excerpt}</p>`;
           document.getElementById('workspace-judge-area').style.display = 'none';
           setBreadcrumb(['<a href="#/">ホーム</a>', WORKBOOK_ID, q.displayTitle]);
           showLoading('問題を読み込み中...');
@@ -754,7 +874,7 @@
             <td>${h.questionTitle}</td>
             <td>${badgeHtml(badge)}</td>
             <td>${new Date(h.judgedAt).toLocaleString('ja-JP')}</td>
-            <td><a href="#/history/${h.id}"><i data-lucide="eye" width="14" height="14"></i> 詳細</a></td>
+            <td><a href="#/history/${h.id}" class="btn btn-ghost btn-sm"><i data-lucide="eye" width="14" height="14"></i> 詳細</a></td>
           </tr>
         `;
         }).join('');
@@ -775,6 +895,8 @@
           hideLoading();
           const judgeArea = document.getElementById('workspace-judge-area');
           judgeArea.style.display = 'block';
+          judgeArea.classList.remove('workspace-judge-fail');
+          judgeArea.classList.add('workspace-judge-success');
           document.getElementById('workspace-judge-content').innerHTML = '<p>合格です。</p>';
           const hash = getHashPath();
           const qId = (hash.match(/questions\/([^/]+)/) || [])[1];
@@ -789,6 +911,8 @@
         const area = document.getElementById('workspace-judge-area');
         const content = document.getElementById('workspace-judge-content');
         area.style.display = 'block';
+        area.classList.remove('workspace-judge-success');
+        area.classList.add('workspace-judge-fail');
         content.innerHTML = `
           <p class="label">FR-P011 エラー表示例</p>
           <div class="error-block"><strong>タイムアウト</strong><br>実行がタイムアウトしました（制限時間 60 秒）。</div>
