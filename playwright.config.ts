@@ -18,5 +18,9 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
+    env: {
+      ...process.env,
+      ADMIN_API_KEY: process.env.ADMIN_API_KEY ?? "test-admin-key",
+    },
   },
 });
