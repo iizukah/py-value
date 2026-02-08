@@ -9,5 +9,21 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
+    match /questions/{questionId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /histories/{historyId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /drafts/{draftId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /favorites/{favoriteId} {
+      allow read: if true;
+      allow write: if false;
+    }
   }
 }
