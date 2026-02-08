@@ -5,6 +5,6 @@
 
 export function validateAdminKey(key: string | null | undefined): boolean {
   if (key == null || key.trim() === "") return false;
-  const expected = process.env.ADMIN_API_KEY ?? "";
+  const expected = process.env.ADMIN_API_KEY ?? process.env.ADMIN_KEY ?? "";
   return expected !== "" && key.trim() === expected;
 }

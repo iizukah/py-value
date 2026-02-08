@@ -1,5 +1,17 @@
 // TEST-01 E2E: Playwright 設定（TC-E2E-01〜07 必須範囲）
 import { defineConfig, devices } from "@playwright/test";
+import { readFileSync, existsSync } from "fs";
+import { resolve } from "path";
+
+// E2E 実行時に .env を読み、ADMIN_KEY/ADMIN_API_KEY を test と webServer で揃える
+const envPath = resolve(process.cwd(), ".env");
+if (existsSync(envPath)) {
+  const content = readFileSync(envPath, "utf-8");
+  for (const line of content.split("\n")) {
+    const m = line.match(/^([^#=]+)=(.*)$/);
+    if (m) process.env[m[1].trim()] = m[2].trim().replace(/^["']|["']$/g, "");
+  }
+}
 
 export default defineConfig({
   testDir: "src/tests/e2e",
@@ -20,7 +32,8 @@ export default defineConfig({
     timeout: 60_000,
     env: {
       ...process.env,
-      ADMIN_API_KEY: process.env.ADMIN_API_KEY ?? "test-admin-key",
+      ADMIN_API_KEY: process.env.ADMIN_API_KEY ?? process.env.ADMIN_KEY ?? "test-admin-key",
+      ADMIN_KEY: process.env.ADMIN_KEY ?? process.env.ADMIN_API_KEY ?? "test-admin-key",
     },
   },
 });
