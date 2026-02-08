@@ -1,6 +1,6 @@
 /**
  * DD-022: Lightweight Python syntax highlight (replaceable by Prism/Monaco later).
- * Escapes HTML and wraps keywords, strings, comments in spans for styling.
+ * data-ps は数値のみ使用（"comment" 等の文字列を DOM に出さず、テキストエリアへの混入を防ぐ）。
  */
 
 const PY_KEYWORDS =
@@ -12,24 +12,19 @@ function escapeHtml(text: string): string {
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
-    "'": "&#39;",
   };
-  return text.replace(/[&<>"']/g, (ch) => map[ch] ?? ch);
+  return text.replace(/[&<>"]/g, (ch) => map[ch] ?? ch);
 }
 
 export function highlightPython(code: string): string {
   if (!code) return "";
   const keywordRe = new RegExp(`\\b(${PY_KEYWORDS})\\b`, "g");
   let out = escapeHtml(code);
-  // Comments (# to EOL)
-  out = out.replace(/(#.*)$/gm, '<span class="py-comment">$1</span>');
-  // Double-quoted strings (simple: no escape inside)
-  out = out.replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, '<span class="py-string">"$1"</span>');
-  // Single-quoted strings
-  out = out.replace(/'([^'\\]*(\\.[^'\\]*)*)'/g, "<span class=\"py-string\">'$1'</span>");
-  // Keywords (after strings/comments so we don't double-wrap)
-  out = out.replace(keywordRe, '<span class="py-keyword">$1</span>');
-  // Builtins / numbers simple pass-through; optional: number highlight
-  out = out.replace(/\b(\d+\.?\d*)\b/g, '<span class="py-number">$1</span>');
+  // data-ps は 0=comment, 1=string, 2=keyword, 3=number（文字列を DOM に載せない）
+  out = out.replace(/(#.*)$/gm, '<span data-ps="0">$1</span>');
+  out = out.replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, '<span data-ps="1">"$1"</span>');
+  out = out.replace(/'([^'\\]*(\\.[^'\\]*)*)'/g, '<span data-ps="1">\'$1\'</span>');
+  out = out.replace(keywordRe, '<span data-ps="2">$1</span>');
+  out = out.replace(/\b(\d+\.?\d*)\b/g, '<span data-ps="3">$1</span>');
   return out;
 }
