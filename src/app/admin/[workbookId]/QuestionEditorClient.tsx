@@ -1,7 +1,12 @@
 "use client";
 
+/**
+ * CD-025, CD-026: 管理画面 入力・ラベル・ボタンを mock の .form-group, .btn に合わせ、WCAG コントラスト
+ */
+
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import { Save, X, FileText, Globe } from "lucide-react";
 import type { Question } from "@/lib/types";
 
 export function QuestionEditorClient({
@@ -113,130 +118,137 @@ export function QuestionEditorClient({
 
   return (
     <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-      <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-          タイトル
-        </label>
+      <div className="form-group">
+        <label htmlFor="title">タイトル</label>
         <input
           id="title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
           required
         />
       </div>
-      <div>
-        <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-          type
-        </label>
+      <div className="form-group">
+        <label htmlFor="type">type</label>
         <select
           id="type"
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="mt-1 rounded border border-gray-300 px-2 py-1.5 text-sm"
         >
           <option value="python-analysis">python-analysis</option>
         </select>
       </div>
-      <div>
-        <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700">
-          難易度
-        </label>
+      <div className="form-group">
+        <label htmlFor="difficulty">難易度</label>
         <input
           id="difficulty"
           type="text"
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value)}
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
         />
       </div>
-      <div>
-        <label htmlFor="explanation" className="block text-sm font-medium text-gray-700">
-          解説
-        </label>
+      <div className="form-group">
+        <label htmlFor="explanation">解説</label>
         <textarea
           id="explanation"
           rows={2}
           value={explanation}
           onChange={(e) => setExplanation(e.target.value)}
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
         />
       </div>
-      <div>
-        <span className="block text-sm font-medium text-gray-700">拡張フィールド（データ分析）</span>
-        <label htmlFor="problem_statement" className="mt-2 block text-sm text-gray-600">
-          問題文（problem_statement）
-        </label>
-        <textarea
-          id="problem_statement"
-          rows={2}
-          value={problemStatement}
-          onChange={(e) => setProblemStatement(e.target.value)}
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
-        />
-        <label htmlFor="initial_code" className="mt-2 block text-sm text-gray-600">
-          初期コード（initial_code）
-        </label>
-        <textarea
-          id="initial_code"
-          rows={2}
-          value={initialCode}
-          onChange={(e) => setInitialCode(e.target.value)}
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 font-mono text-sm"
-        />
-        <label htmlFor="dataset" className="mt-2 block text-sm text-gray-600">
-          データセット（dataset）
-        </label>
-        <input
-          id="dataset"
-          type="text"
-          value={dataset}
-          onChange={(e) => setDataset(e.target.value)}
-          placeholder="file_name, url/path"
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
-        />
-        <label htmlFor="validation" className="mt-2 block text-sm text-gray-600">
-          validation（JSON）
-        </label>
-        <textarea
-          id="validation"
-          rows={3}
-          value={validationJson}
-          onChange={(e) => setValidationJson(e.target.value)}
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 font-mono text-sm"
-        />
-        <label htmlFor="watchVariables" className="mt-2 block text-sm text-gray-600">
-          watchVariables（カンマ区切り）
-        </label>
-        <input
-          id="watchVariables"
-          type="text"
-          value={watchVariables}
-          onChange={(e) => setWatchVariables(e.target.value)}
-          placeholder="ans, p_value"
-          className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
-        />
+      <div className="mb-3">
+        <span className="label block text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
+          拡張フィールド（データ分析）
+        </span>
+        <div className="form-group">
+          <label htmlFor="problem_statement">問題文（problem_statement）</label>
+          <textarea
+            id="problem_statement"
+            rows={2}
+            value={problemStatement}
+            onChange={(e) => setProblemStatement(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="initial_code">初期コード（initial_code）</label>
+          <textarea
+            id="initial_code"
+            rows={2}
+            value={initialCode}
+            onChange={(e) => setInitialCode(e.target.value)}
+            className="font-mono"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="dataset">データセット（dataset）</label>
+          <input
+            id="dataset"
+            type="text"
+            value={dataset}
+            onChange={(e) => setDataset(e.target.value)}
+            placeholder="file_name, url/path"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="validation">validation（JSON）</label>
+          <textarea
+            id="validation"
+            rows={3}
+            value={validationJson}
+            onChange={(e) => setValidationJson(e.target.value)}
+            className="font-mono"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="watchVariables">watchVariables（カンマ区切り）</label>
+          <input
+            id="watchVariables"
+            type="text"
+            value={watchVariables}
+            onChange={(e) => setWatchVariables(e.target.value)}
+            placeholder="ans, p_value"
+          />
+        </div>
       </div>
-      <div>
-        <span className="block text-sm font-medium text-gray-700">ステータス</span>
+      <div className="form-group">
+        <span className="label mb-1 block text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
+          ステータス
+        </span>
         <div className="mt-1 flex gap-2">
           <button
             type="button"
             onClick={() => setStatus("draft")}
-            className={`rounded px-3 py-1.5 text-sm ${
-              status === "draft" ? "bg-gray-200" : "bg-gray-100 hover:bg-gray-200"
+            className={`btn inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
+              status === "draft"
+                ? "btn-secondary text-white"
+                : "btn-ghost text-[var(--color-text)] hover:bg-[rgba(255,255,255,0.06)]"
             }`}
+            style={
+              status === "draft"
+                ? { background: "var(--color-accent-blue)", boxShadow: "var(--shadow-btn-secondary)" }
+                : { border: "1px solid var(--color-border)", background: "transparent" }
+            }
+            aria-pressed={status === "draft"}
           >
+            <FileText size={14} aria-hidden />
             下書き
           </button>
           <button
             type="button"
             onClick={() => setStatus("published")}
-            className={`rounded px-3 py-1.5 text-sm ${
-              status === "published" ? "bg-blue-200" : "bg-gray-100 hover:bg-gray-200"
+            className={`btn inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
+              status === "published"
+                ? "btn-secondary text-white"
+                : "btn-ghost text-[var(--color-text)] hover:bg-[rgba(255,255,255,0.06)]"
             }`}
+            style={
+              status === "published"
+                ? { background: "var(--color-accent-blue)", boxShadow: "var(--shadow-btn-secondary)" }
+                : { border: "1px solid var(--color-border)", background: "transparent" }
+            }
+            aria-pressed={status === "published"}
           >
+            <Globe size={14} aria-hidden />
             公開
           </button>
         </div>
@@ -244,7 +256,7 @@ export function QuestionEditorClient({
       {message && (
         <p
           role="alert"
-          className={message.type === "error" ? "text-red-600" : "text-green-700"}
+          className={message.type === "error" ? "text-[var(--color-error-text)]" : "text-[var(--color-accent-emerald)]"}
         >
           {message.text}
         </p>
@@ -253,14 +265,21 @@ export function QuestionEditorClient({
         <button
           type="submit"
           disabled={saving}
-          className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+          className="btn btn-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)]"
+          style={{
+            background: "linear-gradient(135deg, var(--color-accent-emerald) 0%, #0d9488 100%)",
+            boxShadow: "var(--shadow-btn-primary)",
+          }}
         >
+          <Save size={16} aria-hidden />
           {saving ? "保存中..." : "保存"}
         </button>
         <Link
           href={backUrl}
-          className="rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+          className="btn btn-ghost inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold text-[var(--color-text)] no-underline hover:bg-[rgba(255,255,255,0.06)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)]"
+          style={{ borderColor: "var(--color-border)" }}
         >
+          <X size={16} aria-hidden />
           キャンセル
         </Link>
       </div>

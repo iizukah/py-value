@@ -1,11 +1,12 @@
 "use client";
 
 /**
- * FR-F025, F026, F027, F009: 問題一覧のタグ表示・タグフィルター・お気に入りボタン・バッジ（SC-001, CP-003, CP-004, CP-016, CP-017）
+ * FR-F025, F026, F027, F009 / CD-009～015: 問題一覧 mock 準拠（ソートボタン・tag-pill・question-tile・円形バッジ・btn-favorite-block・Try）
  */
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { ArrowDownUp, Signal, Type, Heart, Award, XCircle, CircleDashed, Play } from "lucide-react";
 import { getOrCreateClientId } from "@/lib/client-id";
 
 interface QuestionItem {
@@ -13,6 +14,9 @@ interface QuestionItem {
   title: string;
   tags?: string[];
   favoriteCount?: number;
+  order?: number;
+  difficulty?: string;
+  excerpt?: string;
 }
 
 interface SortLink {
@@ -42,6 +46,13 @@ interface HistoryItem {
 interface FavoriteItem {
   questionId: string;
 }
+
+const SORT_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
+  order: ArrowDownUp,
+  difficulty: Signal,
+  title: Type,
+  favorites: Heart,
+};
 
 function useQuestionStatuses(workbookId: string, questionIds: string[]) {
   const [statusByQuestion, setStatusByQuestion] = useState<Record<string, "pass" | "fail" | "none">>({});
@@ -109,17 +120,42 @@ function useFavoritedSet(workbookId: string) {
   return { favoritedSet, loading, refresh };
 }
 
-function Badge({ status }: { status: "pass" | "fail" | "none" }) {
+function TileBadge({ status }: { status: "pass" | "fail" | "none" }) {
   const label = status === "pass" ? "合格" : status === "fail" ? "不合格" : "未挑戦";
+  const Icon = status === "pass" ? Award : status === "fail" ? XCircle : CircleDashed;
   const className =
     status === "pass"
-      ? "rounded-full px-2 py-0.5 text-xs font-bold text-white bg-emerald-500 shadow-[0_0_16px_rgba(16,185,129,0.5)]"
+      ? "badge badge-pass"
       : status === "fail"
-        ? "rounded-full px-2 py-0.5 text-xs font-bold text-white bg-red-500 shadow-[0_0_12px_rgba(248,113,113,0.5)]"
-        : "rounded-full px-2 py-0.5 text-xs font-bold text-slate-200 bg-slate-500 shadow-[0_0_6px_rgba(100,116,139,0.3)]";
+        ? "badge badge-fail"
+        : "badge badge-none";
   return (
-    <span className={className} aria-label={`状態: ${label}`}>
-      {label}
+    <span
+      className={`inline-flex h-[90px] w-[90px] min-h-[90px] min-w-[90px] flex-shrink-0 items-center justify-center rounded-full border-2 ${className}`}
+      style={
+        status === "pass"
+          ? {
+              background: "linear-gradient(135deg, #10b981 0%, #0d9488 50%, #0f766e 100%)",
+              borderColor: "rgba(255,255,255,0.35)",
+              boxShadow: "0 0 20px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255,255,255,0.25)",
+              color: "#fff",
+            }
+          : status === "fail"
+            ? {
+                background: "linear-gradient(135deg, #f87171 0%, #dc2626 50%, #b91c1c 100%)",
+                borderColor: "rgba(255,255,255,0.3)",
+                boxShadow: "0 0 16px rgba(248, 113, 113, 0.4)",
+                color: "#fff",
+              }
+            : {
+                background: "linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%)",
+                borderColor: "var(--color-border)",
+                color: "#e2e8f0",
+              }
+      }
+      aria-label={label}
+    >
+      <Icon size={28} aria-hidden />
     </span>
   );
 }
@@ -143,59 +179,102 @@ function QuestionCard({
   onFavoriteToggle: () => void;
   toggling: boolean;
 }) {
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!toggling) onFavoriteToggle();
-  };
-
+  const order = question.order ?? 1;
+  const difficulty = question.difficulty ?? "初級";
+  const diffClass =
+    difficulty === "初級" ? "difficulty-beginner" : difficulty === "中級" ? "difficulty-intermediate" : "difficulty-advanced";
   const tags = question.tags ?? [];
-  const tagsLabel = tags.length ? `タグ: ${tags.join(", ")}` : "";
+  const excerpt = question.excerpt ?? question.title;
 
   return (
     <li
-      className="flex min-h-[var(--tile-min-height)] flex-col rounded-[var(--radius-lg)] border p-4 transition-colors hover:opacity-95"
+      className="question-tile flex min-h-[300px] flex-col rounded-[var(--radius-lg)] border p-4 text-left"
       style={{
         minWidth: "var(--tile-min-width)",
-        backgroundColor: "var(--color-bg-secondary)",
-        borderColor: "var(--color-border)",
+        backgroundColor: "var(--glass-bg)",
+        borderColor: "var(--glass-border)",
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
       }}
     >
-      <div className="mb-2 flex flex-wrap items-center gap-2">
-        <Link
-          href={`${baseUrl}/questions/${question.id}`}
-          className="font-medium text-[var(--color-text)] hover:text-[var(--color-accent-emerald)] hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] rounded"
-        >
-          {question.title}
-        </Link>
-        <Badge status={status} />
+      <div
+        className="tile-header mb-2 rounded-[var(--radius-md)] border px-3 py-2"
+        style={{
+          background: "linear-gradient(135deg, rgba(16,185,129,0.22) 0%, rgba(13,148,136,0.14) 100%)",
+          borderColor: "rgba(16,185,129,0.4)",
+        }}
+      >
+        <div className="tile-subtitle mb-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-accent-emerald)]">
+          CHALLENGE {String(order).padStart(2, "0")}
+        </div>
+        <div className="tile-title-row flex items-center gap-3">
+          <span className={`tile-difficulty flex-shrink-0 text-xs ${diffClass}`}>{difficulty}</span>
+          <span className="tile-display-title min-w-0 flex-1 text-[1.1rem] font-bold text-[var(--color-text)]">
+            {question.title}
+          </span>
+        </div>
       </div>
-      {tags.length > 0 && (
-        <p className="mb-2 text-sm text-[var(--color-text-muted)]" aria-label={tagsLabel}>
-          タグ: {tags.map((t) => (
-            <span
-              key={t}
-              className="mr-1 inline-block rounded px-1.5 py-0.5"
-              style={{ backgroundColor: "var(--glass-bg)", color: "var(--color-text-muted)" }}
-            >
-              {t}
-            </span>
-          ))}
-        </p>
-      )}
-      <div className="mt-auto flex items-center gap-2">
+      <div className="tile-body mb-2 flex flex-1 min-h-0 gap-4">
+        <div className="tile-body-left flex min-w-0 flex-1 flex-col justify-center">
+          {tags.length > 0 && (
+            <div className="tile-tags mb-2 flex flex-wrap gap-1.5">
+              {tags.map((t) => (
+                <span
+                  key={t}
+                  className="tile-tag rounded-full border px-2.5 py-1 text-[11px]"
+                  style={{
+                    background: "rgba(16,185,129,0.15)",
+                    color: "var(--color-accent-emerald)",
+                    borderColor: "rgba(16,185,129,0.3)",
+                  }}
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+          <div
+            className="tile-excerpt line-clamp-5 text-[13px] leading-relaxed text-[var(--color-text-muted)]"
+            style={{ display: "-webkit-box", WebkitLineClamp: 5, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+          >
+            {excerpt}
+          </div>
+        </div>
+        <div className="tile-body-right flex flex-shrink-0 items-center justify-center">
+          <TileBadge status={status} />
+        </div>
+      </div>
+      <div className="tile-footer mt-auto flex w-full items-center justify-between gap-2">
         <button
           type="button"
-          onClick={handleClick}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!toggling) onFavoriteToggle();
+          }}
           disabled={toggling}
+          className="btn-favorite-block inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold no-underline transition-colors hover:-translate-y-0.5 disabled:opacity-50"
+          style={{
+            borderColor: "var(--color-border)",
+            background: "rgba(255,255,255,0.04)",
+            color: isFavorited ? "#f87171" : "var(--color-text-muted)",
+          }}
           aria-label={isFavorited ? "お気に入りを解除" : "お気に入りに追加"}
-          className="rounded p-1 text-red-400 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] disabled:opacity-50"
         >
-          {isFavorited ? "♥" : "♡"}
+          <Heart size={16} fill={isFavorited ? "currentColor" : "none"} aria-hidden />
+          <span className="tile-favorite-count m-0">{favoriteCount}</span>
         </button>
-        <span className="text-xs text-[var(--color-text-muted)]" aria-hidden="true">
-          {favoriteCount}
-        </span>
+        <Link
+          href={`${baseUrl}/questions/${question.id}`}
+          className="btn btn-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white no-underline focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] focus:ring-offset-2 hover:opacity-90"
+          style={{
+            background: "linear-gradient(135deg, var(--color-accent-emerald) 0%, #0d9488 100%)",
+            boxShadow: "0 2px 8px rgba(16, 185, 129, 0.35)",
+          }}
+        >
+          <Play size={16} aria-hidden />
+          Try
+        </Link>
       </div>
     </li>
   );
@@ -232,71 +311,84 @@ export function QuestionListClient({
     [workbookId, favoritedSet, refresh]
   );
 
+  const currentTags = tagsParam ? tagsParam.replace(/^&tags=/, "").split(",").map((s) => s.trim()) : [];
+
   return (
     <div className="mx-auto max-w-4xl p-6">
       <h1 className="text-xl font-bold text-[var(--color-text)]">{workbookTitle}</h1>
       <p className="mt-1 text-sm text-[var(--color-text-muted)]">問題一覧</p>
 
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="ソート">
-        {sortLinks.map(({ label, value }) => (
-          <Link
-            key={value}
-            href={
+      <div className="list-sort card mb-4 rounded-[var(--radius-md)] border p-3" style={{ backgroundColor: "var(--glass-bg)", borderColor: "var(--glass-border)" }}>
+        <span className="label mb-1 block text-[11px] uppercase text-[var(--color-text-muted)]">ソート</span>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {sortLinks.map(({ label, value }) => {
+            const Icon = SORT_ICONS[value];
+            const isActive = sortOption === value;
+            const href =
               value === "order"
                 ? tagsParam ? `${baseUrl}?${tagsParam.slice(1)}` : baseUrl
-                : `${baseUrl}?sort=${value}${tagsParam}`
-            }
-            className={`rounded-[var(--radius-pill)] px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
-              sortOption === value
-                ? "text-white"
-                : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text)]"
-            }`}
-            style={
-              sortOption === value
-                ? { backgroundColor: "var(--color-accent-blue)", boxShadow: "var(--shadow-btn-secondary)" }
-                : undefined
-            }
-          >
-            {label}
-          </Link>
-        ))}
-      </div>
-
-      {uniqueTags.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="タグでフィルター">
-          <span className="self-center text-sm text-[var(--color-text-muted)]">タグ:</span>
-          {uniqueTags.map((tag) => {
-            const currentTags = tagsParam ? tagsParam.replace(/^&tags=/, "").split(",").map((s) => s.trim()) : [];
-            const isActive = currentTags.includes(tag);
-            const newTags = isActive ? currentTags.filter((t) => t !== tag) : [...currentTags, tag];
-            const href = newTags.length ? `${baseUrl}?tags=${newTags.join(",")}${sortOption !== "order" ? `&sort=${sortOption}` : ""}` : (sortOption !== "order" ? `${baseUrl}?sort=${sortOption}` : baseUrl);
+                : `${baseUrl}?sort=${value}${tagsParam}`;
             return (
               <Link
-                key={tag}
+                key={value}
                 href={href}
-                className={`rounded-[var(--radius-md)] px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
-                  isActive ? "font-medium" : ""
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
+                  isActive ? "btn btn-secondary text-white" : "btn btn-ghost text-[var(--color-text-muted)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-text)]"
                 }`}
-                style={{
-                  backgroundColor: isActive ? "var(--glass-bg)" : "transparent",
-                  color: isActive ? "var(--color-text)" : "var(--color-text-muted)",
-                  borderColor: "var(--color-border)",
-                }}
-                aria-pressed={isActive}
-                aria-label={`タグ「${tag}」でフィルター`}
+                style={
+                  isActive
+                    ? { background: "var(--color-accent-blue)", boxShadow: "var(--shadow-btn-secondary)" }
+                    : { border: "1px solid var(--color-border)", background: "transparent" }
+                }
+                aria-label={`${label}でソート`}
               >
-                {tag}
+                {Icon && <Icon size={16} aria-hidden />}
+                {label}
               </Link>
             );
           })}
         </div>
-      )}
+        {uniqueTags.length > 0 && (
+          <>
+            <span className="label mt-3 block text-[11px] uppercase text-[var(--color-text-muted)]">タグでフィルター</span>
+            <div className="tag-filter-row mt-2 flex flex-wrap gap-2">
+              {uniqueTags.map((tag) => {
+                const isActive = currentTags.includes(tag);
+                const newTags = isActive ? currentTags.filter((t) => t !== tag) : [...currentTags, tag];
+                const href = newTags.length
+                  ? `${baseUrl}?tags=${newTags.join(",")}${sortOption !== "order" ? `&sort=${sortOption}` : ""}`
+                  : sortOption !== "order"
+                    ? `${baseUrl}?sort=${sortOption}`
+                    : baseUrl;
+                return (
+                  <Link
+                    key={tag}
+                    href={href}
+                    className={`tag-pill rounded-full border px-3 py-1.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
+                      isActive ? "active font-medium" : ""
+                    }`}
+                    style={{
+                      borderColor: isActive ? "var(--color-accent-emerald)" : "var(--color-border)",
+                      background: isActive ? "rgba(16,185,129,0.15)" : "transparent",
+                      color: isActive ? "var(--color-accent-emerald)" : "var(--color-text-muted)",
+                    }}
+                    aria-pressed={isActive}
+                    aria-label={`タグ「${tag}」でフィルター`}
+                  >
+                    {tag}
+                  </Link>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
 
       {questions.length === 0 ? (
         <p className="mt-6 text-[var(--color-text-muted)]">問題がありません。</p>
       ) : (
         <ul
-          className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          className="question-tiles mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
           style={{ gap: "var(--space-4)" }}
           aria-busy={statusLoading || favLoading}
         >

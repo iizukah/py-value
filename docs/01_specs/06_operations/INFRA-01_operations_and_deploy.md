@@ -81,10 +81,10 @@
 | 変数名（例） | 説明 | 本番 |
 |--------------|------|------|
 | `DATA_SOURCE` | `firestore` | `firestore` |
-| `ADMIN_KEY` | 管理 API の key | Firebase Console / シークレット管理で設定。コードにハードコードしない。 |
+| `ADMIN_KEY` | 管理 API の key（?key=xxx）。**人間が値を決め、コンソールで設定する。** | Firebase Console（Functions の環境変数）または利用プラットフォームのシークレット管理。コードにハードコードしない。 |
 | Firebase 設定 | プロジェクト ID 等 | 環境変数または Firebase SDK のデフォルト（Hosting と同一プロジェクト時） |
 
-- 本番のシークレットは **Firebase Console** または利用プラットフォームのシークレット管理で設定する。reference.md に「本番は Firebase Console 等で設定」と明記する。
+- 本番のシークレットは **人間が** Firebase Console または利用プラットフォームのシークレット管理で設定する。reference.md および **docs/02_manuals/02_デプロイマニュアル.md** に設定場所・IAM・サービス有効化の詳細を記載する。
 
 ### 5.3 ビルド・デプロイ
 
@@ -102,6 +102,8 @@
 - **開発**: .env に `DATA_SOURCE=lowdb`, `LOWDB_PATH`, `ADMIN_KEY` 等を記載。.env.example にキー名と説明のみを残す。
 - **本番**: プラットフォームのシークレット機能（Firebase Console、Vercel Environment Variables、Cloud Run の Secret Manager 等）で設定する。**reference.md**（infra-engineer が整備）に、どこに何を設定するかを記載する。
 - **.env**: リポジトリにコミットしない。.gitignore に含める。
+
+**詳細（IAM・サービス有効化・環境変数一覧・人間実施 vs 自動化の区別）**: `docs/02_manuals/02_デプロイマニュアル.md` を参照すること。
 
 ---
 

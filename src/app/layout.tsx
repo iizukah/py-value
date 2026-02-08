@@ -4,6 +4,9 @@ import "@/app/globals.css";
 import "@/core/plugins/register-plugins";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
+import Breadcrumb from "./components/layout/Breadcrumb";
+import { LoadingProvider, LoadingOverlay } from "./components/layout/LoadingOverlay";
+import HomeBgLayer from "./components/home/HomeBgLayer";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -34,10 +37,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className={`${outfit.variable} ${spaceGrotesk.variable}`}>
-      <body className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+      <body className="flex min-h-screen flex-col pb-12">
+        <LoadingProvider>
+          <LoadingOverlay />
+          <HomeBgLayer />
+          <Header />
+          <Breadcrumb />
+          <main className="main-content flex-1">{children}</main>
+          <Footer />
+        </LoadingProvider>
       </body>
     </html>
   );

@@ -52,7 +52,8 @@ describe("POST submit (TC-015)", () => {
       "wb1",
       "q1",
       "client1",
-      expect.objectContaining({ cells: expect.any(Array) })
+      expect.objectContaining({ cells: expect.any(Array) }),
+      undefined
     );
   });
 

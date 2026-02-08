@@ -11,7 +11,8 @@
     "validation": {
       "method": "value_match",
       "expected_value": 1
-    }
+    },
+    "tags": ["統計", "基礎"]
   },
   {
     "id": "q2",
@@ -25,7 +26,8 @@
     "validation": {
       "method": "value_match",
       "expected_value": 5
-    }
+    },
+    "tags": ["統計"]
   },
   {
     "id": "q3",
@@ -39,7 +41,8 @@
     "validation": {
       "method": "value_match",
       "expected_value": 15
-    }
+    },
+    "tags": ["回帰"]
   },
   {
     "id": "q4",

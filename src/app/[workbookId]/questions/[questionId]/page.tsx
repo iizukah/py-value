@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { getWorkbookById } from "@/core/services/workbook-service";
 import { getQuestionById } from "@/core/services/question-service";
 import { getPlugin } from "@/core/plugins/registry";
@@ -31,23 +32,25 @@ export default async function QuestionPage({
   const PluginComponent = plugin.Component;
 
   return (
-    <div className="mx-auto max-w-4xl p-6">
-      <div className="mb-4 flex items-center gap-2 text-sm text-gray-500">
-        <Link href="/" className="hover:underline">ホーム</Link>
-        <span>/</span>
-        <Link href={`/${workbookId}`} className="hover:underline">{workbook.title}</Link>
-        <span>/</span>
-        <span>{question.title}</span>
-      </div>
-      <h1 className="text-xl font-bold">{question.title}</h1>
+    <div className="mx-auto max-w-6xl p-6">
+      <h1 className="text-xl font-bold text-[var(--color-text)]">{question.title}</h1>
       <div className="mt-6">
-        <PluginComponent question={question} />
+        <PluginComponent
+          question={question}
+          workbookId={workbookId}
+          questionId={questionId}
+        />
       </div>
-      <div className="mt-6 flex gap-2">
+      <div className="mt-6">
         <Link
           href={`/${workbookId}`}
-          className="rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+          className="btn btn-secondary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white no-underline focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] hover:opacity-90"
+          style={{
+            background: "var(--color-accent-blue)",
+            boxShadow: "var(--shadow-btn-secondary)",
+          }}
         >
+          <ArrowLeft size={16} aria-hidden />
           一覧へ戻る
         </Link>
       </div>

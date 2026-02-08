@@ -25,6 +25,9 @@ export interface PluginComponentProps {
   onRunJudge?: () => void;
   judgeResult?: JudgeResult | null;
   isJudging?: boolean;
+  /** 解答送信 API 用（POST submit）。省略時はプラグイン内で runJudge のみ実行。 */
+  workbookId?: string;
+  questionId?: string;
 }
 
 const registry = new Map<string, PluginEntry>();

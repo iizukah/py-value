@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EXER | モック2（問題パネル単体）</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400&display=swap">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --color-bg-main: #0d1117;
+      --color-bg-secondary: #161b22;
+      --color-text: #e6edf3;
+      --color-text-muted: #8b949e;
+      --color-accent-emerald: #10b981;
+      --color-accent-blue: #3b82f6;
+      --color-border: #30363d;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --tile-min-width: 280px;
+      --tile-min-height: 180px;
+      --glass-bg: rgba(22, 27, 34, 0.75);
+      --glass-border: rgba(48, 54, 61, 0.6);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Outfit', system-ui, sans-serif;
+      background: var(--color-bg-main);
+      color: var(--color-text);
+      min-height: 100vh;
+      font-size: 14px;
+    }
+    .typography-heading { font-weight: 600; letter-spacing: 0.01em; }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+    }
+    .app-header .logo-link { text-decoration: none; color: inherit; }
+    .app-header .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--color-accent-emerald);
+    }
+    .breadcrumb {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin: var(--space-2) var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .breadcrumb a { color: var(--color-accent-emerald); text-decoration: none; }
+    .main-content { max-width: 1200px; margin: 0 auto; padding: var(--space-4); min-height: 60vh; }
+
+    /* SC-001: question tiles（問題一覧の1パネルのみ表示用） */
+    .question-tiles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+    .question-tile {
+      position: relative;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      min-width: var(--tile-min-width);
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+      text-align: left;
+    }
+    .question-tile .tile-header {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(13, 148, 136, 0.14) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+    .question-tile .tile-subtitle {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--color-accent-emerald);
+      margin-bottom: var(--space-1);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .question-tile .tile-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .question-tile .tile-title-row .tile-difficulty { color: var(--color-text); }
+    .question-tile .tile-difficulty { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; flex-shrink: 0; }
+    .question-tile .tile-display-title { font-size: 1.1rem; font-weight: 700; flex: 1; min-width: 0; color: var(--color-text); }
+    .question-tile .tile-excerpt { font-size: 13px; color: var(--color-text-muted); margin-bottom: var(--space-2); flex: 1; }
+    .question-tile .tile-badge-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: var(--space-3) 0;
+      margin-bottom: var(--space-2);
+    }
+    .question-tile .tile-badge-row .badge {
+      width: 90px;
+      height: 90px;
+      min-width: 90px;
+      min-height: 90px;
+      border-radius: 50%;
+    }
+    .question-tile .tile-badge-row .badge i {
+      width: 58px;
+      height: 58px;
+    }
+    .question-tile .tile-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-top: auto;
+      gap: var(--space-2);
+    }
+    .question-tile .tile-footer-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .question-tile .tile-footer .btn-favorite-block {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--color-text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .question-tile .tile-footer .btn-favorite-block:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f87171;
+      transform: translateY(-1px);
+    }
+    .question-tile .tile-footer .btn-favorite-block .tile-favorite-count { margin: 0; }
+    .difficulty-beginner { color: var(--color-text-muted); }
+    .difficulty-intermediate { color: var(--color-accent-blue); }
+    .difficulty-advanced { color: var(--color-accent-emerald); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+    }
+    .badge i { flex-shrink: 0; }
+    .badge-pass {
+      background: linear-gradient(135deg, #10b981 0%, #0d9488 50%, #0f766e 100%);
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    }
+    .badge-fail {
+      background: linear-gradient(135deg, #f87171 0%, #dc2626 50%, #b91c1c 100%);
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 16px rgba(248, 113, 113, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    }
+    .badge-none {
+      background: linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%);
+      color: #e2e8f0;
+      border: 2px solid var(--color-border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      filter: drop-shadow(0 0 6px rgba(100, 116, 139, 0.3));
+    }
+    .tile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-2); }
+    .tile-tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--color-accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .btn-favorite.is-favorited { color: #f87171; }
+    .tile-favorite-count { font-size: 14px; font-weight: 600; color: inherit; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 10px 20px;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-accent-emerald) 0%, #0d9488 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .btn-primary:hover { box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45); }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="#/" class="logo-link" aria-label="ホームへ"><span class="logo">EXER</span></a>
+  </header>
+  <div class="breadcrumb">
+    <span><i data-lucide="home" width="14" height="14"></i></span>
+    <a href="#/">ホーム</a>
+    <span><i data-lucide="chevron-right" width="14" height="14"></i></span>
+    <span>Pythonデータ分析</span>
+  </div>
+  <main class="main-content">
+    <p style="color: var(--color-text-muted); margin-bottom: 16px;">問題一覧の「平均値の計算」パネルのみ表示（パネル修正用の前準備）。</p>
+    <div class="question-tiles" id="question-tiles">
+      <div class="question-tile" data-question-id="q1">
+        <div class="tile-header">
+          <div class="tile-subtitle">CHALLENGE 01</div>
+          <div class="tile-title-row">
+            <span class="tile-difficulty difficulty-beginner"><i data-lucide="circle-dot" width="14" height="14"></i> 初級</span>
+            <span class="tile-display-title">平均値の計算</span>
+          </div>
+        </div>
+        <div class="tile-tags">
+          <span class="tile-tag">統計</span>
+          <span class="tile-tag">記述統計</span>
+        </div>
+        <div class="tile-excerpt">問題文の冒頭。データが与えられたとき、平均値を求めて ans に代入してください...</div>
+        <div class="tile-badge-row">
+          <span class="badge badge-pass" aria-label="合格"><i data-lucide="award" width="58" height="58"></i></span>
+        </div>
+        <div class="tile-footer">
+          <button type="button" class="btn-favorite-block" aria-label="お気に入り">
+            <i data-lucide="heart" width="16" height="16"></i>
+            <span class="tile-favorite-count">12</span>
+          </button>
+          <a href="#/py-value/questions/q1" class="btn btn-primary"><i data-lucide="play" width="16" height="16"></i> Try</a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

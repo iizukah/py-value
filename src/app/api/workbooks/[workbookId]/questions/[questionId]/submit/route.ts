@@ -26,7 +26,7 @@ export async function POST(
     );
   }
 
-  let body: { userAnswer?: Record<string, unknown> };
+  let body: { userAnswer?: Record<string, unknown>; judgeResult?: import("@/lib/types").JudgeResult };
   try {
     body = await request.json();
   } catch {
@@ -45,7 +45,13 @@ export async function POST(
   }
 
   try {
-    const result = await submitAnswer(workbookId, questionId, clientId, userAnswer as Record<string, unknown>);
+    const result = await submitAnswer(
+      workbookId,
+      questionId,
+      clientId,
+      userAnswer as Record<string, unknown>,
+      body?.judgeResult
+    );
     return NextResponse.json(result);
   } catch (e) {
     console.error(e);

@@ -13,7 +13,8 @@ export async function submitAnswer(
   workbookId: string,
   questionId: string,
   clientId: string,
-  userAnswer: Record<string, unknown>
+  userAnswer: Record<string, unknown>,
+  clientJudgeResult?: JudgeResult
 ): Promise<JudgeResult> {
   const question = await getQuestionById(workbookId, questionId);
   if (!question) {
@@ -24,16 +25,20 @@ export async function submitAnswer(
     };
   }
 
-  const plugin = getPlugin(question.type ?? "python-analysis");
-  if (!plugin?.judgeAdapter?.runJudge) {
-    return {
-      isCorrect: false,
-      message: "この問題タイプには採点機能がありません。",
-      details: { kind: "judge_error" },
-    };
+  let judgeResult: JudgeResult;
+  if (clientJudgeResult != null && typeof clientJudgeResult === "object" && typeof clientJudgeResult.isCorrect === "boolean") {
+    judgeResult = clientJudgeResult;
+  } else {
+    const plugin = getPlugin(question.type ?? "python-analysis");
+    if (!plugin?.judgeAdapter?.runJudge) {
+      return {
+        isCorrect: false,
+        message: "この問題タイプには採点機能がありません。",
+        details: { kind: "judge_error" },
+      };
+    }
+    judgeResult = await plugin.judgeAdapter.runJudge(question, userAnswer);
   }
-
-  const judgeResult = await plugin.judgeAdapter.runJudge(question, userAnswer);
 
   const history: History = {
     id: `hist-${workbookId}-${questionId}-${clientId}-${Date.now()}`,

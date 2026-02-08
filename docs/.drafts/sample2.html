@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXER | Exercise the Mind, Master the Skill.</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23161b22'/%3E%3Cpath d='M8 10h16M8 16h12M8 22h16' stroke='%2310b981' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='24' cy='16' r='2' fill='%2310b981'/%3E%3C/svg%3E">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg-main: #0d1117;
+            --color-bg-secondary: #161b22;
+            --color-text: #e6edf3;
+            --color-text-muted: #8b949e;
+            --color-accent-emerald: #10b981;
+            --color-accent-blue: #3b82f6;
+            --color-border: #30363d;
+            --glass-bg: rgba(22, 27, 34, 0.75);
+        }
+
+        body {
+            background-color: var(--color-bg-main);
+            color: var(--color-text);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .font-logo { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* FR-F023: 背景アニメーション */
+        .hero-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
+        }
+
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(var(--color-border) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(ellipse at center, black, transparent 85%);
+            opacity: 0.15;
+            animation: moveGrid 20s infinite linear;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: perspective(500px) rotateX(20deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(20deg) translateY(50px); }
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(48, 54, 61, 0.6);
+        }
+
+        .logo-glow {
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
+        }
+
+        .text-gradient-emerald {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-gradient-blue {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero-bg">
+        <div class="grid-overlay"></div>
+    </div>
+
+    <nav class="sticky top-0 z-50 glass border-b border-[var(--color-border)] px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <svg width="110" height="32" viewBox="0 0 130 40" class="logo-glow">
+                    <path d="M5 10H25M5 20H18M5 30H25" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+                    <circle cx="28" cy="20" r="3.5" fill="#10b981"/>
+                    <text x="42" y="32" fill="#e6edf3" class="font-logo font-bold" style="font-size: 30px; letter-spacing: 0.05em;">EXER</text>
+                </svg>
+            </div>
+            <div class="hidden md:flex gap-8 text-[11px] font-bold tracking-[0.2em] text-[var(--color-text-muted)]">
+                <a href="#" class="hover:text-[var(--color-accent-emerald)] transition-colors">LIBRARY</a>
+                <a href="#" class="hover:text-[var(--color-accent-emerald)] transition-colors">HISTORY</a>
+                <a href="#" class="hover:text-[var(--color-accent-emerald)] transition-colors">DOCS</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 pt-24 pb-20 text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-8 glass rounded-full border-[var(--color-accent-emerald)]/20 text-[10px] font-bold tracking-[0.15em] text-[var(--color-accent-emerald)] uppercase">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-accent-emerald)] opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-accent-emerald)]"></span>
+            </span>
+            Ready for Practice
+        </div>
+
+        <h1 class="text-5xl md:text-7xl font-logo font-bold mb-8 tracking-tight leading-[1.1]">
+            Exercise the <span class="text-gradient-emerald">Mind</span>,<br>
+            Master the <span class="text-gradient-blue">Skill</span>.
+        </h1>
+
+        <p class="text-[var(--color-text-muted)] max-w-2xl mx-auto mb-12 text-lg leading-relaxed">
+            EXERは、実戦的な問題集を通じてあなたのスキルを研ぎ澄ます<br class="hidden md:block">
+            プログラミング・データサイエンス学習プラットフォームです。
+        </p>
+
+        <div class="flex flex-wrap justify-center gap-4">
+            <button class="px-8 py-3 bg-[var(--color-accent-emerald)] text-black font-bold rounded-full hover:scale-105 transition-transform shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                GET STARTED
+            </button>
+            <button class="px-8 py-3 glass border-[var(--color-border)] text-[var(--color-text)] font-bold rounded-full hover:bg-[var(--color-border)] transition-colors">
+                EXPLORE WORKBOOKS
+            </button>
+        </div>
+
+        <div class="mt-24 grid grid-cols-1 md:grid-cols-3 gap-6 opacity-80">
+             <div class="glass p-1 rounded-[var(--radius-lg)]">
+                <div class="bg-[var(--color-bg-main)] p-6 rounded-[calc(var(--radius-lg)-4px)] text-left">
+                    <div class="text-[var(--color-accent-emerald)] mb-4 font-mono text-xs">#01 Python</div>
+                    <div class="text-lg font-bold mb-1">Data Analysis</div>
+                    <div class="text-xs text-[var(--color-text-muted)]">Pandas / Visualization</div>
+                </div>
+             </div>
+             <div class="glass p-1 rounded-[var(--radius-lg)]">
+                <div class="bg-[var(--color-bg-main)] p-6 rounded-[calc(var(--radius-lg)-4px)] text-left">
+                    <div class="text-[var(--color-accent-blue)] mb-4 font-mono text-xs">#02 Database</div>
+                    <div class="text-lg font-bold mb-1">SQL Expert</div>
+                    <div class="text-xs text-[var(--color-text-muted)]">Complex Queries / Optimization</div>
+                </div>
+             </div>
+             <div class="glass p-1 rounded-[var(--radius-lg)]">
+                <div class="bg-[var(--color-bg-main)] p-6 rounded-[calc(var(--radius-lg)-4px)] text-left">
+                    <div class="text-gray-500 mb-4 font-mono text-xs">#03 Coming Soon</div>
+                    <div class="text-lg font-bold mb-1 text-gray-600">Statistics</div>
+                    <div class="text-xs text-[var(--color-text-muted)]">Foundational Math</div>
+                </div>
+             </div>
+        </div>
+    </main>
+
+    <footer class="fixed bottom-0 w-full border-t border-[var(--color-border)] bg-[var(--color-bg-main)] px-6 py-3 text-[9px] font-mono text-[var(--color-text-muted)] flex justify-between tracking-widest">
+        <div class="flex gap-4">
+            <span class="text-[var(--color-accent-emerald)]">● SYSTEM ONLINE</span>
+            <span>NODE_ENV: DEVELOPMENT</span>
+        </div>
+        <div>EXER FRAMEWORK © 2026</div>
+    </footer>
+
+</body>
+</html>

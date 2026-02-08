@@ -1,0 +1,82 @@
+[
+  {
+    "id": "fav-py-value-q1-client-0j2s2x9bmwll-1770516500463",
+    "workbookId": "py-value",
+    "questionId": "q1",
+    "clientId": "client-0j2s2x9bmwll-1770516500463",
+    "count": 1,
+    "updatedAt": "2026-02-08T02:08:34.360Z"
+  },
+  {
+    "id": "fav-py-value-q1-client-kdazqbnkrm-1770518861608",
+    "workbookId": "py-value",
+    "questionId": "q1",
+    "clientId": "client-kdazqbnkrm-1770518861608",
+    "count": 1,
+    "updatedAt": "2026-02-08T02:48:00.588Z"
+  },
+  {
+    "id": "fav-py-value-q1-client-3ukooctv4dk-1770519504461",
+    "workbookId": "py-value",
+    "questionId": "q1",
+    "clientId": "client-3ukooctv4dk-1770519504461",
+    "count": 1,
+    "updatedAt": "2026-02-08T02:58:36.281Z"
+  },
+  {
+    "id": "fav-py-value-q1-client-r0uyybk1zg-1770519967161",
+    "workbookId": "py-value",
+    "questionId": "q1",
+    "clientId": "client-r0uyybk1zg-1770519967161",
+    "count": 1,
+    "updatedAt": "2026-02-08T03:06:18.433Z"
+  },
+  {
+    "id": "fav-py-value-q1-client-oewsfoxkag-1770520369172",
+    "workbookId": "py-value",
+    "questionId": "q1",
+    "clientId": "client-oewsfoxkag-1770520369172",
+    "count": 1,
+    "updatedAt": "2026-02-08T03:12:55.533Z"
+  },
+  {
+    "id": "fav-py-value-q1-client-6x387a668ek-1770520705118",
+    "workbookId": "py-value",
+    "questionId": "q1",
+    "clientId": "client-6x387a668ek-1770520705118",
+    "count": 1,
+    "updatedAt": "2026-02-08T03:18:26.467Z"
+  },
+  {
+    "id": "fav-py-value-q1-client-71ehfqe2ytw-1770521463289",
+    "workbookId": "py-value",
+    "questionId": "q1",
+    "clientId": "client-71ehfqe2ytw-1770521463289",
+    "count": 1,
+    "updatedAt": "2026-02-08T03:31:05.339Z"
+  },
+  {
+    "id": "fav-py-value-q4-client-3zzd9idcnrx-1770521265081",
+    "workbookId": "py-value",
+    "questionId": "q4",
+    "clientId": "client-3zzd9idcnrx-1770521265081",
+    "count": 1,
+    "updatedAt": "2026-02-08T04:38:42.429Z"
+  },
+  {
+    "id": "fav-py-value-q2-client-3zzd9idcnrx-1770521265081",
+    "workbookId": "py-value",
+    "questionId": "q2",
+    "clientId": "client-3zzd9idcnrx-1770521265081",
+    "count": 1,
+    "updatedAt": "2026-02-08T04:39:15.293Z"
+  },
+  {
+    "id": "fav-py-value-q5-client-3zzd9idcnrx-1770521265081",
+    "workbookId": "py-value",
+    "questionId": "q5",
+    "clientId": "client-3zzd9idcnrx-1770521265081",
+    "count": 1,
+    "updatedAt": "2026-02-08T04:39:38.873Z"
+  }
+]

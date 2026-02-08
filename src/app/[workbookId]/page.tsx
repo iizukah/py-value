@@ -37,11 +37,14 @@ export default async function WorkbookPage({
     <QuestionListClient
       workbookId={workbookId}
       workbookTitle={workbook.title}
-      questions={questions.map((q) => ({
+      questions={questions.map((q, i) => ({
         id: q.id,
         title: q.title,
         tags: q.tags,
         favoriteCount: q.favoriteCount,
+        order: q.order ?? i + 1,
+        difficulty: q.difficulty ?? "初級",
+        excerpt: q.problem_statement?.slice(0, 150) ?? q.title,
       }))}
       baseUrl={baseUrl}
       sortLinks={sortLinks}

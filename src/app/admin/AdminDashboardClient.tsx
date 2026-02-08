@@ -1,7 +1,12 @@
 "use client";
 
+/**
+ * CD-029: 管理画面のリンクをボタン風＋アイコン
+ */
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ListOrdered, FileInput, Database, Plus, Pencil, Trash2 } from "lucide-react";
 import type { Question } from "@/lib/types";
 
 interface WorkbookInfo {
@@ -84,35 +89,42 @@ export function AdminDashboardClient({
   return (
     <div className="mx-auto max-w-4xl p-6" data-sc="SC-007" role="region" aria-label="管理ダッシュボード">
       <h1 className="text-xl font-bold text-[var(--color-text)]">管理ダッシュボード</h1>
-      <nav className="mt-4 flex flex-wrap gap-4 text-sm" aria-label="管理ナビ">
+      <nav className="mt-4 flex flex-wrap gap-2 text-sm" aria-label="管理ナビ">
         <Link
           href={`${base}${keyQuery}`}
-          className="font-medium text-[var(--color-accent-emerald)] hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] rounded"
+          className="btn btn-ghost inline-flex items-center gap-2 rounded-full border px-4 py-2 font-semibold text-[var(--color-accent-emerald)] no-underline hover:bg-[rgba(16,185,129,0.12)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)]"
+          style={{ borderColor: "rgba(16,185,129,0.4)" }}
         >
+          <ListOrdered size={16} aria-hidden />
           問題一覧
         </Link>
         <Link
           href={`${base}/import${keyQuery}`}
-          className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] rounded"
+          className="btn btn-ghost inline-flex items-center gap-2 rounded-full border px-4 py-2 font-semibold text-[var(--color-text-muted)] no-underline hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)]"
+          style={{ borderColor: "var(--color-border)" }}
         >
+          <FileInput size={16} aria-hidden />
           インポート/エクスポート
         </Link>
         <Link
           href={`${base}/datasets${keyQuery}`}
-          className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] rounded"
+          className="btn btn-ghost inline-flex items-center gap-2 rounded-full border px-4 py-2 font-semibold text-[var(--color-text-muted)] no-underline hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)]"
+          style={{ borderColor: "var(--color-border)" }}
         >
+          <Database size={16} aria-hidden />
           データセットアップロード
         </Link>
       </nav>
       <div className="mt-6 flex flex-wrap items-end gap-4">
         <Link
           href={`${base}/questions/new${keyQuery}`}
-          className="inline-block rounded-full px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] focus:ring-offset-2 focus:ring-offset-[var(--color-bg-main)]"
+          className="btn btn-primary inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white no-underline hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] focus:ring-offset-2 focus:ring-offset-[var(--color-bg-main)]"
           style={{
-            backgroundColor: "var(--color-accent-emerald)",
+            background: "linear-gradient(135deg, var(--color-accent-emerald) 0%, #0d9488 100%)",
             boxShadow: "var(--shadow-btn-primary)",
           }}
         >
+          <Plus size={16} aria-hidden />
           新規作成
         </Link>
         {workbook && (
@@ -208,21 +220,25 @@ export function AdminDashboardClient({
                     <td className="px-3 py-2">{q.title}</td>
                     <td className="px-3 py-2">{q.status === "published" ? "公開" : "下書き"}</td>
                     <td className="px-3 py-2">
-                      <Link
-                        href={`${base}/questions/${q.id}/edit${keyQuery}`}
-                        className="text-[var(--color-accent-emerald)] hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] rounded"
-                      >
-                        編集
-                      </Link>
-                      {" | "}
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(q.id)}
-                        className="text-red-400 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 rounded"
-                        aria-label={`${q.title} を削除`}
-                      >
-                        削除
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`${base}/questions/${q.id}/edit${keyQuery}`}
+                          className="btn btn-ghost inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold text-[var(--color-accent-emerald)] no-underline hover:bg-[rgba(16,185,129,0.12)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)]"
+                          style={{ borderColor: "rgba(16,185,129,0.4)" }}
+                        >
+                          <Pencil size={14} aria-hidden />
+                          編集
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(q.id)}
+                          className="btn btn-ghost inline-flex items-center gap-1.5 rounded-full border border-red-400/50 px-3 py-1.5 text-sm font-semibold text-red-400 hover:bg-red-400/10 focus:outline-none focus:ring-2 focus:ring-red-400"
+                          aria-label={`${q.title} を削除`}
+                        >
+                          <Trash2 size={14} aria-hidden />
+                          削除
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

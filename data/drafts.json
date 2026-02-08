@@ -1,0 +1,17 @@
+[
+  {
+    "id": "draft-py-value-q1-draft-test-client",
+    "workbookId": "py-value",
+    "questionId": "q1",
+    "clientId": "draft-test-client",
+    "userAnswer": {
+      "cells": [
+        {
+          "id": "1",
+          "content": "ans = 42"
+        }
+      ]
+    },
+    "updatedAt": "2026-02-08T02:51:23.567Z"
+  }
+]
