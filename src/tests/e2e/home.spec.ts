@@ -20,6 +20,7 @@ test.describe("TC-E2E-02: 問題集選択で一覧へ遷移", () => {
   }) => {
     await page.goto("/");
     await page.getByRole("link", { name: /Pythonデータ分析.*問題一覧へ/ }).click();
+    await page.waitForURL(/\/py-value$/, { timeout: 15000 });
     await expect(page).toHaveURL(/\/py-value$/);
     await expect(page.locator("h1")).toHaveText("Pythonデータ分析");
     // 少なくとも1問のカードがある（問題一覧画面であることの確認）
