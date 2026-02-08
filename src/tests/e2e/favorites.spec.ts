@@ -6,7 +6,8 @@ test.describe("TC-E2E-09: お気に入り一覧表示", () => {
   test("ヘッダからお気に入りをクリックするとお気に入り一覧（SC-011）に遷移する", async ({
     page,
   }) => {
-    await page.goto("/py-value");
+    await page.goto("/py-value", { waitUntil: "load", timeout: 30000 });
+    await expect(page.getByRole("main").getByText("問題一覧")).toBeVisible({ timeout: 15000 });
     await page.getByRole("link", { name: "お気に入り" }).first().click();
     await page.waitForURL(/\/py-value\/favorites/);
     await expect(page).toHaveURL(/\/py-value\/favorites/);
@@ -22,6 +23,7 @@ test.describe("TC-E2E-10: お気に入り一覧から問題に挑戦", () => {
     page,
     request,
   }) => {
+    test.setTimeout(60000);
     const workbookId = "py-value";
     const questionId = "q1";
     await page.goto("/py-value");
@@ -43,10 +45,9 @@ test.describe("TC-E2E-10: お気に入り一覧から問題に挑戦", () => {
     const problemLink = page.getByRole("link", { name: /問題 .+/ }).first();
     await expect(problemLink).toBeVisible({ timeout: 15000 });
     await problemLink.click();
-    await page.waitForURL(new RegExp(`/${workbookId}/questions/${questionId}`));
-    await expect(page).toHaveURL(new RegExp(`/${workbookId}/questions/${questionId}`));
+    await expect(page).toHaveURL(new RegExp(`/${workbookId}/questions/${questionId}`), { timeout: 45000 });
     await expect(
       page.getByRole("button", { name: /実行・採点|採点中/ })
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   });
 });

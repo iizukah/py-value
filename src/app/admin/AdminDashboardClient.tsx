@@ -4,6 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Question } from "@/lib/types";
 
+interface WorkbookInfo {
+  id: string;
+  title?: string;
+  historyLimit?: number;
+}
+
 export function AdminDashboardClient({
   keyParam,
   workbookId,
@@ -12,28 +18,38 @@ export function AdminDashboardClient({
   workbookId: string;
 }) {
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [workbook, setWorkbook] = useState<WorkbookInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [historyLimitInput, setHistoryLimitInput] = useState<string>("");
+  const [savingHistoryLimit, setSavingHistoryLimit] = useState(false);
   const q = new URLSearchParams({ key: keyParam }).toString();
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(
-          `/api/admin/workbooks/${workbookId}/questions?${q}`,
-          { cache: "no-store" }
-        );
-        if (!res.ok) {
-          if (res.status === 401) {
-            setError("キーが無効です。");
+        const [questionsRes, workbookRes] = await Promise.all([
+          fetch(`/api/admin/workbooks/${workbookId}/questions?${q}`, { cache: "no-store" }),
+          fetch(`/api/admin/workbooks/${workbookId}?${q}`, { cache: "no-store" }),
+        ]);
+        if (!questionsRes.ok) {
+          if (questionsRes.status === 401) {
+            if (!cancelled) setError("キーが無効です。");
             return;
           }
-          setError("問題一覧の取得に失敗しました。");
+          if (!cancelled) setError("問題一覧の取得に失敗しました。");
           return;
         }
-        const data = await res.json();
+        const data = await questionsRes.json();
         if (!cancelled) setQuestions(Array.isArray(data) ? data : []);
+        if (workbookRes.ok) {
+          const wb = await workbookRes.json();
+          if (!cancelled) {
+            setWorkbook(wb);
+            setHistoryLimitInput(String(wb.historyLimit ?? "10"));
+          }
+        }
       } catch {
         if (!cancelled) setError("通信エラー");
       } finally {
@@ -88,13 +104,58 @@ export function AdminDashboardClient({
           データセットアップロード
         </Link>
       </nav>
-      <div className="mt-6">
+      <div className="mt-6 flex flex-wrap items-end gap-4">
         <Link
           href={`${base}/questions/new${keyQuery}`}
           className="inline-block rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
         >
           新規作成
         </Link>
+        {workbook && (
+          <div className="flex items-center gap-2" role="group" aria-label="履歴の最大件数">
+            <label htmlFor="history-limit" className="text-sm font-medium text-gray-700">
+              履歴の最大件数
+            </label>
+            <input
+              id="history-limit"
+              type="number"
+              min={0}
+              max={999}
+              value={historyLimitInput}
+              onChange={(e) => setHistoryLimitInput(e.target.value)}
+              className="w-20 rounded border border-gray-300 px-2 py-1 text-sm"
+              aria-describedby="history-limit-desc"
+            />
+            <button
+              type="button"
+              disabled={savingHistoryLimit}
+              onClick={async () => {
+                const n = parseInt(historyLimitInput, 10);
+                if (Number.isNaN(n) || n < 0) return;
+                setSavingHistoryLimit(true);
+                try {
+                  const res = await fetch(`/api/admin/workbooks/${workbookId}?${q}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ historyLimit: n }),
+                  });
+                  if (res.ok) {
+                    const wb = await res.json();
+                    setWorkbook(wb);
+                  }
+                } finally {
+                  setSavingHistoryLimit(false);
+                }
+              }}
+              className="rounded border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50"
+            >
+              {savingHistoryLimit ? "保存中..." : "保存"}
+            </button>
+            <span id="history-limit-desc" className="text-xs text-gray-500">
+              ユーザーごとの履歴保持件数
+            </span>
+          </div>
+        )}
       </div>
       <p className="mt-4 text-sm text-gray-600">問題一覧（下書き含む）:</p>
       {loading && <p className="mt-2 text-gray-500">読み込み中...</p>}

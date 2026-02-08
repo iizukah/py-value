@@ -25,5 +25,17 @@ export function createLowdbWorkbookRepository(dataDir: string): WorkbookReposito
       const list = await this.list();
       return list.find((w) => w.id === id) ?? null;
     },
+
+    async update(id: string, data: Partial<Pick<Workbook, "title" | "description" | "historyLimit">>): Promise<void> {
+      const filePath = path.join(dataDir, "workbooks.json");
+      const raw = await fs.readFile(filePath, "utf-8");
+      const parsed = JSON.parse(raw);
+      const list: Workbook[] = Array.isArray(parsed) ? parsed : parsed.workbooks ?? [];
+      const idx = list.findIndex((w) => w.id === id);
+      if (idx < 0) return;
+      list[idx] = { ...list[idx], ...data };
+      const out = Array.isArray(parsed) ? list : { ...parsed, workbooks: list };
+      await fs.writeFile(filePath, JSON.stringify(out, null, 2), "utf-8");
+    },
   };
 }

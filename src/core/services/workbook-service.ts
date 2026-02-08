@@ -14,3 +14,12 @@ export async function getWorkbookById(id: string): Promise<Workbook | null> {
   const repo = getWorkbookRepository();
   return repo.getById(id);
 }
+
+/** FR-F008: ワークブック設定の更新 */
+export async function updateWorkbook(
+  id: string,
+  data: Partial<Pick<Workbook, "title" | "description" | "historyLimit">>
+): Promise<void> {
+  const repo = getWorkbookRepository();
+  await repo.update(id, data);
+}

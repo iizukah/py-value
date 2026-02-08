@@ -21,5 +21,13 @@ export function createFirestoreWorkbookRepository(): WorkbookRepository {
       if (!doc.exists) return null;
       return { id: doc.id, ...doc.data() } as Workbook;
     },
+
+    async update(id: string, data: Partial<Pick<Workbook, "title" | "description" | "historyLimit">>): Promise<void> {
+      const db = getFirestoreSafe();
+      const ref = db.collection("workbooks").doc(id);
+      const doc = await ref.get();
+      if (!doc.exists) return;
+      await ref.update(data);
+    },
   };
 }

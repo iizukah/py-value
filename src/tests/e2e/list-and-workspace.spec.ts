@@ -64,6 +64,59 @@ test.describe("TC-E2E-06: 完了画面（SC-004）", () => {
       page.getByRole("link", { name: "一覧へ戻る" })
     ).toBeVisible();
   });
+
+  test("全問正解時は採点結果（SC-003）から完了画面へリンクで遷移できる（FR-F010）", async ({
+    page,
+  }) => {
+    test.setTimeout(90000);
+    await page.goto("/py-value");
+    await expect(firstQuestionLink(page)).toBeVisible({ timeout: 15000 });
+    const href = await firstQuestionLink(page).getAttribute("href");
+    const questionId = href?.split("/questions/")[1]?.split("?")[0] ?? "";
+    await firstQuestionLink(page).click();
+    await page.waitForURL(/\/py-value\/questions\/.+/);
+
+    await page.route("**/api/workbooks/py-value/questions**", async (route) => {
+      const res = await route.fetch();
+      const body = await res.json();
+      const list = Array.isArray(body) ? body : [];
+      const single = list.find((q: { id: string }) => q.id === questionId) ?? list[0];
+      await route.fulfill({
+        status: 200,
+        body: JSON.stringify(single ? [single] : list),
+      });
+    });
+    await page.route("**/api/workbooks/py-value/histories**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        body: JSON.stringify([
+          {
+            id: "h1",
+            workbookId: "py-value",
+            questionId,
+            clientId: "e2e-client",
+            status: "submitted",
+            isCorrect: true,
+            judgedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+          },
+        ]),
+      });
+    });
+
+    await page.getByRole("textbox").first().fill("ans = 1");
+    const runButton = page.getByRole("button", { name: /実行・採点|採点中/ });
+    await runButton.click();
+    await expect(page.getByText("Passed")).toBeVisible({ timeout: 60000 });
+    const completeLink = page.getByRole("link", { name: "完了画面へ" });
+    await expect(completeLink).toBeVisible({ timeout: 10000 });
+    await completeLink.click();
+    await page.waitForURL(/\/py-value\/complete/);
+    await expect(page).toHaveURL(/\/py-value\/complete/);
+    await expect(
+      page.getByRole("heading", { name: "お疲れさまです" })
+    ).toBeVisible();
+  });
 });
 
 test.describe("TC-E2E-07: 一覧へ戻る", () => {

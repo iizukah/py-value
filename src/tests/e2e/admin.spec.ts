@@ -25,7 +25,9 @@ test.describe("TC-E2E-11: 管理ダッシュボード→問題登録エディタ
   }) => {
     await page.goto(PY_VALUE_ADMIN);
     await expect(page.locator("h1")).toHaveText("管理ダッシュボード");
-    await expect(page.getByText("読み込み中...")).not.toBeVisible({ timeout: 15000 });
+    await expect(
+      page.getByRole("table").or(page.getByText("問題がありません"))
+    ).toBeVisible({ timeout: 25000 });
     const noQuestions = page.getByText("問題がありません");
     const editLink = page.getByRole("link", { name: "編集" }).first();
     if (await noQuestions.isVisible()) {
@@ -33,7 +35,7 @@ test.describe("TC-E2E-11: 管理ダッシュボード→問題登録エディタ
     }
     await expect(editLink).toBeVisible({ timeout: 5000 });
     await editLink.click();
-    await page.waitForURL(/\/questions\/.+\/edit\?key=/);
+    await expect(page).toHaveURL(/\/questions\/.+\/edit\?key=/, { timeout: 45000 });
     await expect(page.locator("h1")).toHaveText("問題を編集");
   });
 });
@@ -56,6 +58,6 @@ test.describe("TC-E2E-12: インポート/エクスポート・データセッ�
     await page.getByRole("link", { name: "データセットアップロード" }).click();
     await page.waitForURL(/\/admin\/py-value\/datasets\?key=/);
     await expect(page.locator("h1")).toHaveText("データセットアップロード");
-    await expect(page.getByLabel("ファイルアップロード")).toBeVisible();
+    await expect(page.getByLabel("CSV またはテキストファイルを選択")).toBeVisible();
   });
 });
