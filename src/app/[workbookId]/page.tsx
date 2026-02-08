@@ -1,40 +1,53 @@
-import Link from "next/link";
 import { getWorkbookById } from "@/core/services/workbook-service";
 import { listQuestions } from "@/core/services/question-service";
 import { notFound } from "next/navigation";
+import { QuestionListClient } from "./QuestionListClient";
+
+type SortOption = "order" | "difficulty" | "title" | "favorites";
 
 export default async function WorkbookPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ workbookId: string }>;
+  searchParams: Promise<{ sort?: string; tags?: string }>;
 }) {
   const { workbookId } = await params;
+  const { sort, tags } = await searchParams;
+  const sortOption = (sort as SortOption) || "order";
+  const tagsArray = tags ? tags.split(",").map((s) => s.trim()).filter(Boolean) : undefined;
   const [workbook, questions] = await Promise.all([
     getWorkbookById(workbookId),
-    listQuestions(workbookId),
+    listQuestions(workbookId, sortOption, tagsArray),
   ]);
   if (!workbook) notFound();
 
+  const baseUrl = `/${workbookId}`;
+  const tagsParam = tagsArray?.length ? `&tags=${tagsArray.join(",")}` : "";
+  const sortLinks: { label: string; value: SortOption }[] = [
+    { label: "登録順", value: "order" },
+    { label: "難易度", value: "difficulty" },
+    { label: "タイトル", value: "title" },
+    { label: "お気に入り数", value: "favorites" },
+  ];
+
+  const uniqueTags = Array.from(new Set(questions.flatMap((q) => q.tags ?? []))).sort();
+
   return (
-    <div className="mx-auto max-w-4xl p-6">
-      <h1 className="text-xl font-bold">{workbook.title}</h1>
-      <p className="mt-1 text-sm text-gray-500">問題一覧</p>
-      {questions.length === 0 ? (
-        <p className="mt-6 text-gray-500">問題がありません。</p>
-      ) : (
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {questions.map((q) => (
-            <li key={q.id}>
-              <Link
-                href={`/${workbookId}/questions/${q.id}`}
-                className="block rounded border border-gray-200 p-4 hover:bg-gray-50"
-              >
-                <span className="font-medium">{q.title}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <QuestionListClient
+      workbookId={workbookId}
+      workbookTitle={workbook.title}
+      questions={questions.map((q) => ({
+        id: q.id,
+        title: q.title,
+        tags: q.tags,
+        favoriteCount: q.favoriteCount,
+      }))}
+      baseUrl={baseUrl}
+      sortLinks={sortLinks}
+      sortOption={sortOption}
+      tagsParam={tagsParam}
+      uniqueTags={uniqueTags}
+    />
   );
 }

@@ -1,6 +1,8 @@
 # INFRA-01: Cloud Run で Next.js を動かし、Firebase Hosting から転送する構成
 FROM node:20-slim AS builder
 WORKDIR /app
+# Next.js ビルド時のメモリ不足を防ぐ（Cloud Build 用）
+ENV NODE_OPTIONS=--max-old-space-size=4096
 COPY package.json package-lock.json* ./
 RUN npm ci
 COPY . .
