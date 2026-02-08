@@ -70,5 +70,13 @@
     "clientId": "client-3zzd9idcnrx-1770521265081",
     "count": 1,
     "updatedAt": "2026-02-08T07:12:34.069Z"
+  },
+  {
+    "id": "fav-py-value-import-chukyu-02-client-3zzd9idcnrx-1770521265081",
+    "workbookId": "py-value",
+    "questionId": "import-chukyu-02",
+    "clientId": "client-3zzd9idcnrx-1770521265081",
+    "count": 1,
+    "updatedAt": "2026-02-08T11:56:49.839Z"
   }
 ]

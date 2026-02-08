@@ -1,6 +1,5 @@
-fix(mock): 採点結果をメダル廃止、バッジ＋Passed/Fail＋採点中ローディングに変更
+docs(DD-022): Pythonセル HTML混入対策・Monaco導入・セル高さ自動調整 報告書
 
-- メダル・アニメーションを廃止
-- バッジを2倍サイズ(112px)、その下にPassed/Failをタイポグラフィで表示
-- 表示前に2秒間「採点中」用スピナー＋テキストをパネル内で表示
-- 2秒後にバッジ・ラベル・result-tileを同時表示
+- 報告書: docs/99_history/0042_Pythonセル_HTML混入対策とMonaco導入_報告.md
+- オーバーレイ廃止、decode-html-entities 追加、MonacoCodeCell 新規、
+  CodeInputWithHighlight を Monaco 動的読み込みに変更、高さ自動調整

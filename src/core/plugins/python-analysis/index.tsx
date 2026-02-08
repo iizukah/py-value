@@ -17,7 +17,7 @@ import { runJudge, getCombinedCode, runCodeAndGetVariables, getPyodide } from ".
 import { getOrCreateClientId } from "@/lib/client-id";
 import { CodeInputWithHighlight } from "./CodeInputWithHighlight";
 import { ProblemStatementMarkdown } from "./ProblemStatementMarkdown";
-import { decodeHtmlEntities } from "./decode-html-entities";
+import { decodeHtmlEntities, stripHtmlToPlainText } from "./decode-html-entities";
 
 export interface PythonAnalysisPluginProps {
   question: Question;
@@ -44,9 +44,9 @@ export default function PythonAnalysisPlugin({
     answerCells && answerCells.length > 0
       ? answerCells.map((c) => ({
           id: c.id,
-          content: decodeHtmlEntities(c.content ?? ""),
+          content: stripHtmlToPlainText(c.content ?? ""),
         }))
-      : [{ id: "1", content: decodeHtmlEntities(question.initial_code ?? "") }];
+      : [{ id: "1", content: stripHtmlToPlainText(question.initial_code ?? "") }];
   const [cells, setCells] = useState<{ id: string; content: string }[]>(initialCells);
   const [judgeResult, setJudgeResult] = useState<JudgeResult | null>(externalJudgeResult ?? null);
   const [isJudging, setIsJudging] = useState(false);
@@ -81,7 +81,7 @@ export default function PythonAnalysisPlugin({
   useEffect(() => {
     const next = (initialAnswer as PythonAnalysisUserAnswer)?.cells;
     if (next && Array.isArray(next) && next.length > 0) {
-      setCells(next.map((c) => ({ id: c.id, content: decodeHtmlEntities(c.content ?? "") })));
+      setCells(next.map((c) => ({ id: c.id, content: stripHtmlToPlainText(c.content ?? "") })));
     }
   }, [initialAnswer]);
 
@@ -142,7 +142,7 @@ export default function PythonAnalysisPlugin({
 
   /** DD-024: リセット — セル・採点・変数・プロットを初期状態に戻す */
   const handleReset = useCallback(() => {
-    const initial = [{ id: "1", content: decodeHtmlEntities(question.initial_code ?? "") }];
+    const initial = [{ id: "1", content: stripHtmlToPlainText(question.initial_code ?? "") }];
     setCells(initial);
     notifyAnswer(initial);
     setJudgeResult(null);

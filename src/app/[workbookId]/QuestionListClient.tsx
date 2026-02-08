@@ -48,7 +48,7 @@ interface FavoriteItem {
   questionId: string;
 }
 
-const SORT_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
+const SORT_ICONS: Record<string, React.ComponentType<{ size?: number | string }>> = {
   order: ArrowDownUp,
   difficulty: Signal,
   title: Type,

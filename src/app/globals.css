@@ -149,6 +149,14 @@
   scrollbar-width: thin;
 }
 
+/* DD-022: セル内コードの文字色を必ず表示（背景と同色で見えない不具合対策） */
+.code-mirror-pre,
+.code-mirror-pre code { color: #e6edf3 !important; }
+.code-mirror-pre .py-keyword { color: #c678dd !important; }
+.code-mirror-pre .py-string { color: #98c379 !important; }
+.code-mirror-pre .py-comment { color: #6a737d !important; }
+.code-mirror-pre .py-number { color: #d19a66 !important; }
+
 /* ワークスペース中央ペイン（セル一覧スクロール）を DD-043 と同トーンに */
 .workspace-code-pane::-webkit-scrollbar {
   width: 8px;
