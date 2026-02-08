@@ -19,9 +19,9 @@ function requireAdminKey(searchParams: URLSearchParams): NextResponse | null {
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ workbookId: string }> }
+  { params }: { params: { workbookId: string } }
 ) {
-  const { workbookId } = await params;
+  const { workbookId } = params;
   const { searchParams } = new URL(request.url);
   const err = requireAdminKey(searchParams);
   if (err) return err;

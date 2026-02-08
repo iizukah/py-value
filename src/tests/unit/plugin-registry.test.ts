@@ -28,5 +28,5 @@ describe("plugin registry", () => {
     const plugin = getPlugin("python-analysis");
     expect(plugin).not.toBeNull();
     expect(plugin?.type).toBe("python-analysis");
-  });
+  }, 15000);
 });

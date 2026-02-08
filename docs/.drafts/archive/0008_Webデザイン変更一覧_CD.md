@@ -48,24 +48,6 @@
 
 ---
 
-## mock クラス名・対象ファイル早見
-
-- **CD-001～003**: app-header, logo-link, logo, nav → Header.tsx
-- **CD-004**: breadcrumb, breadcrumb-sep, breadcrumb-workbook-link → 新規 Breadcrumb
-- **CD-005**: home-bg-layer, fv-shape, fv-light-sweep → 新規 HomeBgLayer 等
-- **CD-006～008**: first-view-hero, text-gradient-*, workbook-cards, btn-get-started → page.tsx
-- **CD-009～015**: list-sort, tag-pill, question-tile, tile-header, tile-body, badge, btn-favorite-block → QuestionListClient.tsx
-- **CD-016～020**: three-pane, workspace-toolbar, workspace-judge-*, result-* → python-analysis/index.tsx
-- **CD-021**: center-block, card → complete/page.tsx
-- **CD-022～023**: history-table, history-detail-* → HistoryListClient, HistoryDetailClient
-- **CD-024**: favorites-tiles → FavoritesListClient.tsx
-- **CD-025～026**: form-group, btn → QuestionEditorClient 等
-- **CD-027**: loading-overlay, stats-loader, scanning-line → 新規 LoadingOverlay
-- **CD-028**: app-footer, footer-status, .online → Footer.tsx
-- **CD-029**: 各画面の残りリンク
-
----
-
 ## 関連
 
 - 0007_実装とmock差分_デザイン.md

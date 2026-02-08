@@ -2,18 +2,19 @@
 
 /**
  * データ分析プラグイン Renderer（ARC-02）
+ * 仕様・差分: docs/01_specs/99_diff/01_2025-02-08.md
  * CD-016～020: 3-pane ワークスペース、ツールバー、採点結果 mock 準拠
  * FR-F010: 全問正解時に完了画面（SC-004）への導線を表示
  */
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Bookmark, Send, Award, XCircle, RotateCcw, Play, Plus, Trash2, Undo2, Heart } from "lucide-react";
 /** DD-006: 採点結果後の Retry はツールバーのみ。押下で状態リセットのみ（ユーザーが再入力し解答送信） */
 import type { Question } from "@/lib/types";
 import type { JudgeResult } from "@/lib/types";
 import type { PythonAnalysisUserAnswer } from "@/lib/types";
-import { runJudge, getCombinedCode, runCodeAndGetVariables, getPyodide } from "./judge";
+import { runJudge, runCodeAndGetVariables, getPyodide } from "./judge";
 import { getOrCreateClientId } from "@/lib/client-id";
 import { CodeInputWithHighlight } from "./CodeInputWithHighlight";
 import { ProblemStatementMarkdown } from "./ProblemStatementMarkdown";
@@ -61,6 +62,8 @@ export default function PythonAnalysisPlugin({
   const [isCellRunning, setIsCellRunning] = useState(false);
   /** FR-P003: Matplotlib 描画結果（base64） */
   const [plotImageBase64, setPlotImageBase64] = useState<string | null>(null);
+  /** Jupyter 相当: 最後に Run したセル番号（そのセルのみ実行・状態共有用） */
+  const lastRunCellIndexRef = useRef(-1);
   /** DD-021: 採点結果表示時の問題一覧（ランダム最大10問）。Retry で非表示。中央ペイン表示用に order/difficulty/tags/problem_statement を含む */
   const [resultQuestionList, setResultQuestionList] = useState<
     { id: string; title: string; order?: number; difficulty?: string; tags?: string[]; problem_statement?: string }[]
@@ -140,6 +143,11 @@ export default function PythonAnalysisPlugin({
     setResultQuestionList([]);
   }, []);
 
+  /** セル追加・削除で番号がずれるため、Jupyter 用 lastRun をリセット */
+  useEffect(() => {
+    lastRunCellIndexRef.current = -1;
+  }, [cells.length]);
+
   /** DD-024: リセット — セル・採点・変数・プロットを初期状態に戻す */
   const handleReset = useCallback(() => {
     const initial = [{ id: "1", content: stripHtmlToPlainText(question.initial_code ?? "") }];
@@ -151,6 +159,7 @@ export default function PythonAnalysisPlugin({
     setLastRunVariables({});
     setCellRunOutput({});
     setPlotImageBase64(null);
+    lastRunCellIndexRef.current = -1;
   }, [question.initial_code, notifyAnswer]);
 
   /** DD-023: mount 時に Pyodide をプリロードし、完了までオーバーレイ表示 */
@@ -224,27 +233,32 @@ export default function PythonAnalysisPlugin({
     }
   }, [workbookId, questionId, isCurrentFavorited]);
 
-  /** セル単位 Run（stdout/stderr をセル下に、Variable Watcher と Result Plot を更新） */
+  /** セル単位 Run（Jupyter 相当: そのセルのみ実行、前セルの状態は共有。未実行の上流は順に実行してから表示は押したセルのみ） */
   const handleRunCell = useCallback(
     async (cellIndex: number) => {
       setIsCellRunning(true);
-      const combined = getCombinedCode({
-        cells: cells.slice(0, cellIndex + 1).map((c) => ({ id: c.id, content: c.content })),
-      });
       const watchNames = question.watchVariables?.length ? question.watchVariables : ["ans"];
+      const fromIndex =
+        cellIndex <= lastRunCellIndexRef.current ? 0 : lastRunCellIndexRef.current + 1;
       try {
-        const result = await runCodeAndGetVariables(combined, watchNames);
-        const cellId = cells[cellIndex]?.id ?? "";
-        setLastRunVariables(result.variables);
-        setCellRunOutput((prev) => ({
-          ...prev,
-          [cellId]: {
-            stdout: result.stdout,
-            stderr: result.stderr,
-            error: result.error,
-          },
-        }));
-        if (result.plotBase64) setPlotImageBase64(result.plotBase64);
+        for (let i = fromIndex; i <= cellIndex; i++) {
+          const cell = cells[i];
+          if (!cell) continue;
+          const result = await runCodeAndGetVariables(cell.content, watchNames);
+          setCellRunOutput((prev) => ({
+            ...prev,
+            [cell.id]: {
+              stdout: result.stdout,
+              stderr: result.stderr,
+              error: result.error,
+            },
+          }));
+          if (i === cellIndex) {
+            setLastRunVariables(result.variables);
+            if (result.plotBase64) setPlotImageBase64(result.plotBase64);
+          }
+        }
+        lastRunCellIndexRef.current = cellIndex;
       } finally {
         setIsCellRunning(false);
       }
@@ -442,7 +456,7 @@ export default function PythonAnalysisPlugin({
         </div>
         )}
           <div
-            className="workspace-problem-readability rounded-[var(--radius-md)] border p-3 text-[14px] leading-relaxed"
+            className="workspace-problem-readability mt-4 rounded-[var(--radius-md)] border p-3 text-[14px] leading-relaxed"
             style={{
               backgroundColor: "rgba(255,255,255,0.03)",
               borderColor: "var(--color-border)",
@@ -721,7 +735,7 @@ export default function PythonAnalysisPlugin({
           </span>
           {Object.keys(lastRunVariables).length === 0 ? (
             <p className="font-mono text-[11px] text-[var(--color-text-muted)]">
-              （セル Run または解答送信後に表示）
+              Shown after cell Run or submit
             </p>
           ) : (
             <pre className="font-mono text-[11px] text-[var(--color-text)] whitespace-pre-wrap break-all">
@@ -732,33 +746,26 @@ export default function PythonAnalysisPlugin({
           )}
         </div>
         <div
-          className="workspace-plot-header mt-4 rounded-t-[var(--radius-md)] border border-b-0 p-3 text-sm font-semibold text-[var(--color-text)]"
-          style={{ borderColor: "var(--color-border)" }}
-        >
-          Result Plot
-        </div>
-        <div
-          className="workspace-plot-body rounded-b-[var(--radius-md)] border p-4"
+          className="workspace-plot mt-4 rounded-[var(--radius-md)] border p-3"
           style={{
+            background: "rgba(1, 4, 9, 0.9)",
             borderColor: "var(--color-border)",
             minHeight: "120px",
           }}
         >
+          <span className="label mb-2 block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
+            RESULT PLOT
+          </span>
           {plotImageBase64 ? (
             <img
               src={`data:image/png;base64,${plotImageBase64}`}
-              alt="Matplotlib 出力"
+              alt="Matplotlib output"
               className="max-h-[280px] w-auto max-w-full object-contain"
             />
           ) : (
-            <>
-              <span className="label block text-[11px] font-bold uppercase text-[var(--color-text-muted)]">
-                プロット
-              </span>
-              <p className="mt-1 text-[12px] text-[var(--color-text-muted)]">
-                （plt.show() 実行後に表示）
-              </p>
-            </>
+            <p className="font-mono text-[11px] text-[var(--color-text-muted)]">
+              Displayed after plt.show() runs
+            </p>
           )}
         </div>
       </div>
