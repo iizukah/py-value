@@ -32,7 +32,7 @@ export function createFirestoreHistoryRepository(): HistoryRepository {
       if (!doc.exists) return null;
       const data = doc.data() as History;
       if (data.workbookId !== workbookId || data.clientId !== clientId) return null;
-      return { id: doc.id, ...data };
+      return { ...data, id: doc.id };
     },
 
     async enforceLimit(workbookId: string, clientId: string, limit: number): Promise<void> {
