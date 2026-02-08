@@ -19,8 +19,10 @@ export async function GET(
   }
   const { searchParams } = new URL(request.url);
   const sort = (searchParams.get("sort") as "order" | "difficulty" | "title" | "favorites") ?? "order";
+  const tagsParam = searchParams.get("tags");
+  const tags = tagsParam ? tagsParam.split(",").map((s) => s.trim()).filter(Boolean) : undefined;
   try {
-    const questions = await listQuestions(workbookId, sort);
+    const questions = await listQuestions(workbookId, sort, tags);
     return NextResponse.json(questions);
   } catch (e) {
     console.error(e);

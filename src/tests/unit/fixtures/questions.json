@@ -1,0 +1,6 @@
+[
+  { "id": "q1", "workbookId": "wb1", "title": "Beta", "type": "python-analysis", "status": "published", "order": 2, "difficulty": "中級", "favoriteCount": 10, "tags": ["統計", "検定"] },
+  { "id": "q2", "workbookId": "wb1", "title": "Alpha", "type": "python-analysis", "status": "published", "order": 1, "difficulty": "初級", "favoriteCount": 20, "tags": ["統計"] },
+  { "id": "q3", "workbookId": "wb1", "title": "Gamma", "type": "python-analysis", "status": "published", "order": 3, "difficulty": "上級", "favoriteCount": 5, "tags": ["回帰"] },
+  { "id": "q4", "workbookId": "wb1", "title": "Delta", "type": "python-analysis", "status": "draft", "order": 4, "difficulty": "初級", "favoriteCount": 0, "tags": [] }
+]

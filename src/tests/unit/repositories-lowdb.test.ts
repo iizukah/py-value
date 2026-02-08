@@ -21,15 +21,64 @@ describe("Lowdb WorkbookRepository", () => {
 });
 
 describe("Lowdb QuestionRepository", () => {
+  const noDataDir = path.join(__dirname, "nonexistent-dir");
+  const fixtureDir = path.join(__dirname, "fixtures");
+
   it("returns empty array when file does not exist", async () => {
-    const repo = createLowdbQuestionRepository(path.join(__dirname, "nonexistent-dir"));
+    const repo = createLowdbQuestionRepository(noDataDir);
     const list = await repo.listByWorkbookId({ workbookId: "wb1" });
     expect(list).toEqual([]);
   });
 
   it("getById returns null when file does not exist", async () => {
-    const repo = createLowdbQuestionRepository(path.join(__dirname, "nonexistent-dir"));
+    const repo = createLowdbQuestionRepository(noDataDir);
     const q = await repo.getById("wb1", "q1");
     expect(q).toBeNull();
+  });
+
+  /** TC-003: 一覧・ソート・tags が正しく適用される */
+  describe("TC-003 sort and tags", () => {
+    it("sort=order returns by order field", async () => {
+      const repo = createLowdbQuestionRepository(fixtureDir);
+      const list = await repo.listByWorkbookId({ workbookId: "wb1", sort: "order" });
+      expect(list.map((q) => q.id)).toEqual(["q2", "q1", "q3"]);
+    });
+
+    it("sort=title returns alphabetically by title", async () => {
+      const repo = createLowdbQuestionRepository(fixtureDir);
+      const list = await repo.listByWorkbookId({ workbookId: "wb1", sort: "title" });
+      expect(list.map((q) => q.title)).toEqual(["Alpha", "Beta", "Gamma"]);
+    });
+
+    it("sort=difficulty returns by 初級<中級<上級", async () => {
+      const repo = createLowdbQuestionRepository(fixtureDir);
+      const list = await repo.listByWorkbookId({ workbookId: "wb1", sort: "difficulty" });
+      expect(list.map((q) => q.difficulty)).toEqual(["初級", "中級", "上級"]);
+    });
+
+    it("sort=favorites returns by favoriteCount descending", async () => {
+      const repo = createLowdbQuestionRepository(fixtureDir);
+      const list = await repo.listByWorkbookId({ workbookId: "wb1", sort: "favorites" });
+      expect(list.map((q) => q.favoriteCount)).toEqual([20, 10, 5]);
+    });
+
+    it("tags filter returns only questions with at least one matching tag", async () => {
+      const repo = createLowdbQuestionRepository(fixtureDir);
+      const list = await repo.listByWorkbookId({ workbookId: "wb1", tags: ["統計"] });
+      expect(list.map((q) => q.id).sort()).toEqual(["q1", "q2"]);
+    });
+
+    it("tags 回帰 returns only q3", async () => {
+      const repo = createLowdbQuestionRepository(fixtureDir);
+      const list = await repo.listByWorkbookId({ workbookId: "wb1", tags: ["回帰"] });
+      expect(list.map((q) => q.id)).toEqual(["q3"]);
+    });
+  });
+
+  /** TC-004: 0 件時は空配列 */
+  it("returns empty array for workbook with no published questions (TC-004)", async () => {
+    const repo = createLowdbQuestionRepository(fixtureDir);
+    const list = await repo.listByWorkbookId({ workbookId: "other-wb" });
+    expect(list).toEqual([]);
   });
 });

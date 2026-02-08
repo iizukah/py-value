@@ -76,3 +76,39 @@ export interface PythonAnalysisQuestionExtension {
 export interface Question extends QuestionBase, PythonAnalysisQuestionExtension {
   workbookId?: string;
 }
+
+/** DATA-01 §2.3 履歴 */
+export type HistoryStatus = "draft" | "submitted";
+
+export interface History {
+  id: string;
+  workbookId: string;
+  questionId: string;
+  clientId: string;
+  status: HistoryStatus;
+  userAnswer: Record<string, unknown>;
+  isCorrect?: boolean;
+  judgedAt?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/** DATA-01 §2.4 下書き（1 問題 1 件上書き） */
+export interface Draft {
+  id: string;
+  workbookId: string;
+  questionId: string;
+  clientId: string;
+  userAnswer: Record<string, unknown>;
+  updatedAt: string;
+}
+
+/** DATA-01 §2.5 お気に入り（モデル B: count で +1/-1、0 で削除） */
+export interface Favorite {
+  id: string;
+  workbookId: string;
+  questionId: string;
+  clientId: string;
+  count: number;
+  updatedAt: string;
+}

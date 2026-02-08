@@ -14,4 +14,12 @@ export interface ListQuestionsOptions {
 export interface QuestionRepository {
   listByWorkbookId(options: ListQuestionsOptions): Promise<Question[]>;
   getById(workbookId: string, questionId: string): Promise<Question | null>;
+  /** 管理用: 下書き含む全問題一覧 */
+  listAllByWorkbookId(workbookId: string): Promise<Question[]>;
+  /** 管理用: 問題作成 */
+  create(question: Question): Promise<Question>;
+  /** 管理用: 問題更新（status 含む） */
+  update(workbookId: string, questionId: string, data: Partial<Question>): Promise<Question | null>;
+  /** 管理用: 問題削除 */
+  delete(workbookId: string, questionId: string): Promise<boolean>;
 }

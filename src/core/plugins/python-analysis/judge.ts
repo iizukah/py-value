@@ -11,7 +11,8 @@ interface PyodideRuntime {
 }
 import type { JudgeResult } from "@/lib/types";
 
-function getCombinedCode(userAnswer: Record<string, unknown>): string {
+/** TC-P04: 複数セルを結合して 1 スクリプトにする。単体テスト用に export。 */
+export function getCombinedCode(userAnswer: Record<string, unknown>): string {
   const cells = (userAnswer.cells as { id: string; content: string }[] | undefined) ?? [];
   if (cells.length === 0) return "";
   return cells.map((c) => c.content).join("\n\n");
@@ -27,9 +28,58 @@ function compareWithTolerance(
   return diff <= atol + rtol * Math.abs(expected);
 }
 
+/** TC-P05: watchVariables で指定した変数の値を取得。単体テスト用に export。 */
+export function getWatchVariableValues(
+  globals: { get(name: string): unknown },
+  names: string[]
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const name of names) {
+    const v = globals.get(name);
+    const js = typeof (v as { toJs?: () => unknown })?.toJs === "function"
+      ? (v as { toJs: () => unknown }).toJs()
+      : v;
+    out[name] = js;
+  }
+  return out;
+}
+
+/** TC-P06: 2 配列のピアソン相関 r。r > 0.99 で一致とみなす（FR-P009）。単体テスト用に export。 */
+export function computeCorrelation(a: number[], b: number[]): number {
+  if (a.length !== b.length || a.length === 0) return 0;
+  const n = a.length;
+  const sumA = a.reduce((s, x) => s + x, 0);
+  const sumB = b.reduce((s, x) => s + x, 0);
+  const meanA = sumA / n;
+  const meanB = sumB / n;
+  let num = 0;
+  let denA = 0;
+  let denB = 0;
+  for (let i = 0; i < n; i++) {
+    const da = a[i]! - meanA;
+    const db = b[i]! - meanB;
+    num += da * db;
+    denA += da * da;
+    denB += db * db;
+  }
+  const den = Math.sqrt(denA * denB);
+  return den === 0 ? 0 : num / den;
+}
+
+const DEFAULT_TIMEOUT_MS = 60_000;
+
+/** TC-P02: タイムアウト時は details.kind: "timeout" を返すための race 用。単体テスト用に export。 */
+export function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | "timeout"> {
+  return Promise.race([
+    promise,
+    new Promise<"timeout">((resolve) => setTimeout(() => resolve("timeout"), ms)),
+  ]);
+}
+
 export async function runJudge(
   question: Question,
-  userAnswer: Record<string, unknown>
+  userAnswer: Record<string, unknown>,
+  options?: { timeoutMs?: number }
 ): Promise<JudgeResult> {
   const code = getCombinedCode(userAnswer);
   const validation = question.validation;
@@ -49,6 +99,8 @@ export async function runJudge(
       details: { kind: "judge_error" },
     };
   }
+
+  const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 
   try {
     if (typeof window === "undefined") {
@@ -72,7 +124,14 @@ export async function runJudge(
     const pyodide = await loadPyodideFn({
       indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
     });
-    await pyodide.runPythonAsync(code);
+    const runResult = await withTimeout(pyodide.runPythonAsync(code), timeoutMs);
+    if (runResult === "timeout") {
+      return {
+        isCorrect: false,
+        message: "実行がタイムアウトしました。",
+        details: { kind: "timeout" },
+      };
+    }
     const ans = pyodide.globals.get("ans");
     if (ans === undefined) {
       return {

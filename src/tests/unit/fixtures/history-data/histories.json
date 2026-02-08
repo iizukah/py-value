@@ -1,0 +1,20 @@
+[
+  {
+    "id": "h-3",
+    "workbookId": "wb1",
+    "questionId": "q1",
+    "clientId": "client1",
+    "status": "submitted",
+    "userAnswer": {},
+    "createdAt": "2025-01-03T15:00:00.000Z"
+  },
+  {
+    "id": "h-4",
+    "workbookId": "wb1",
+    "questionId": "q1",
+    "clientId": "client1",
+    "status": "submitted",
+    "userAnswer": {},
+    "createdAt": "2025-01-04T15:00:00.000Z"
+  }
+]

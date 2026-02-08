@@ -1,0 +1,18 @@
+[
+  {
+    "id": "fav-wb1-q1-client1",
+    "workbookId": "wb1",
+    "questionId": "q1",
+    "clientId": "client1",
+    "count": 2,
+    "updatedAt": "2026-02-08T00:52:00.571Z"
+  },
+  {
+    "id": "fav-wb1-q1-client2",
+    "workbookId": "wb1",
+    "questionId": "q1",
+    "clientId": "client2",
+    "count": 1,
+    "updatedAt": "2026-02-08T00:52:00.573Z"
+  }
+]
