@@ -56,7 +56,7 @@ export default function HomePage() {
         className="first-view-p relative z-[1] mx-auto mb-6 max-w-[480px] text-base leading-relaxed text-[var(--color-text-muted)]"
         style={{ margin: "0 auto var(--space-6)" }}
       >
-        コードで学ぶ、データ分析。ブラウザだけで問題に挑戦し、採点まで完結します。
+        準備はゼロ。思考をコードへ。
       </p>
       <div className="first-view-cta relative z-[1] flex justify-center mb-6">
         <Link

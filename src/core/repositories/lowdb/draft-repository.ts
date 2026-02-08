@@ -46,5 +46,12 @@ export function createLowdbDraftRepository(dataDir: string): DraftRepository {
       next.push(draft);
       await writeAll(next);
     },
+
+    async listQuestionIds(workbookId: string, clientId: string): Promise<string[]> {
+      const list = await readAll();
+      return list
+        .filter((d) => d.workbookId === workbookId && d.clientId === clientId)
+        .map((d) => d.questionId);
+    },
   };
 }

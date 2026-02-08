@@ -5,7 +5,7 @@
     "questionId": "q1",
     "clientId": "client1",
     "count": 2,
-    "updatedAt": "2026-02-08T02:50:54.545Z"
+    "updatedAt": "2026-02-08T07:57:28.931Z"
   },
   {
     "id": "fav-wb1-q1-client2",
@@ -13,6 +13,6 @@
     "questionId": "q1",
     "clientId": "client2",
     "count": 1,
-    "updatedAt": "2026-02-08T02:50:54.548Z"
+    "updatedAt": "2026-02-08T07:57:28.937Z"
   }
 ]

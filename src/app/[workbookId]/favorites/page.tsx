@@ -15,8 +15,7 @@ export default async function FavoritesPage({
 
   return (
     <div className="mx-auto max-w-4xl p-6">
-      <h1 className="text-xl font-bold text-[var(--color-text)]">お気に入り</h1>
-      <p className="mt-1 text-sm text-[var(--color-text-muted)]">{workbook.title} のお気に入り問題</p>
+      <h1 className="typography-page-title text-[var(--color-text)]">お気に入り</h1>
       <FavoritesListClient workbookId={workbookId} />
       <div className="mt-6">
         <Link

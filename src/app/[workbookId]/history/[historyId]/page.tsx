@@ -15,7 +15,7 @@ export default async function HistoryDetailPage({
 
   return (
     <div className="mx-auto max-w-4xl p-6">
-      <h1 className="text-xl font-bold text-[var(--color-text)]">履歴詳細</h1>
+      <h1 className="typography-page-title text-[var(--color-text)]">履歴詳細</h1>
       <HistoryDetailClient workbookId={workbookId} historyId={historyId} />
       <div className="mt-6">
         <Link

@@ -14,7 +14,7 @@ export default async function HistoryPage({
 
   return (
     <div className="mx-auto max-w-4xl p-6">
-      <h1 className="text-xl font-bold text-[var(--color-text)]">履歴</h1>
+      <h1 className="typography-page-title text-[var(--color-text)]">履歴</h1>
       <HistoryListClient workbookId={workbookId} />
     </div>
   );

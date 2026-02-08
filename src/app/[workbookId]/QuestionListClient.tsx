@@ -4,9 +4,10 @@
  * FR-F025, F026, F027, F009 / CD-009～015: 問題一覧 mock 準拠（ソートボタン・tag-pill・question-tile・円形バッジ・btn-favorite-block・Try）
  */
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
-import { ArrowDownUp, Signal, Type, Heart, Award, XCircle, CircleDashed, Play } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { ArrowDownUp, Signal, Type, Heart, Award, XCircle, CircleDashed, Play, Bookmark, ChevronDown, ChevronUp, SlidersHorizontal, ArrowUp, ArrowDown } from "lucide-react";
 import { getOrCreateClientId } from "@/lib/client-id";
 
 interface QuestionItem {
@@ -120,6 +121,25 @@ function useFavoritedSet(workbookId: string) {
   return { favoritedSet, loading, refresh };
 }
 
+/** API-021: 下書きがある questionId 一覧（DD-008, DD-009） */
+function useDraftSet(workbookId: string) {
+  const [draftSet, setDraftSet] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const clientId = getOrCreateClientId();
+    fetch(`/api/workbooks/${workbookId}/drafts`, { headers: { "X-Client-Id": clientId } })
+      .then((res) => (res.ok ? res.json() : { questionIds: [] }))
+      .then((data: { questionIds?: string[] }) => {
+        const ids = Array.isArray(data?.questionIds) ? data.questionIds : [];
+        setDraftSet(new Set(ids));
+      })
+      .finally(() => setLoading(false));
+  }, [workbookId]);
+
+  return { draftSet, loading };
+}
+
 function TileBadge({ status }: { status: "pass" | "fail" | "none" }) {
   const label = status === "pass" ? "合格" : status === "fail" ? "不合格" : "未挑戦";
   const Icon = status === "pass" ? Award : status === "fail" ? XCircle : CircleDashed;
@@ -167,6 +187,7 @@ function QuestionCard({
   status,
   isFavorited,
   favoriteCount,
+  hasDraft,
   onFavoriteToggle,
   toggling,
 }: {
@@ -176,6 +197,7 @@ function QuestionCard({
   status: "pass" | "fail" | "none";
   isFavorited: boolean;
   favoriteCount: number;
+  hasDraft: boolean;
   onFavoriteToggle: () => void;
   toggling: boolean;
 }) {
@@ -188,9 +210,10 @@ function QuestionCard({
 
   return (
     <li
-      className="question-tile flex min-h-[300px] flex-col rounded-[var(--radius-lg)] border p-4 text-left"
+      className="question-tile flex min-h-[300px] min-w-0 flex-col rounded-[var(--radius-lg)] border p-4 text-left"
       style={{
         minWidth: "var(--tile-min-width)",
+        maxWidth: "100%",
         backgroundColor: "var(--glass-bg)",
         borderColor: "var(--glass-border)",
         backdropFilter: "blur(10px)",
@@ -244,7 +267,7 @@ function QuestionCard({
           <TileBadge status={status} />
         </div>
       </div>
-      <div className="tile-footer mt-auto flex w-full items-center justify-between gap-2">
+      <div className="tile-footer mt-auto flex w-full min-w-0 flex-wrap items-center justify-between gap-2">
         <button
           type="button"
           onClick={(e) => {
@@ -253,7 +276,7 @@ function QuestionCard({
             if (!toggling) onFavoriteToggle();
           }}
           disabled={toggling}
-          className="btn-favorite-block inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold no-underline transition-colors hover:-translate-y-0.5 disabled:opacity-50"
+          className="btn-favorite-block inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold no-underline transition-colors hover:-translate-y-0.5 disabled:opacity-50"
           style={{
             borderColor: "var(--color-border)",
             background: "rgba(255,255,255,0.04)",
@@ -264,15 +287,35 @@ function QuestionCard({
           <Heart size={16} fill={isFavorited ? "currentColor" : "none"} aria-hidden />
           <span className="tile-favorite-count m-0">{favoriteCount}</span>
         </button>
+        {hasDraft ? (
+          <Link
+            href={`${baseUrl}/questions/${question.id}`}
+            className="btn btn-ghost inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-sm font-semibold text-[var(--color-accent-emerald)] no-underline hover:bg-[rgba(16,185,129,0.12)]"
+            style={{ borderColor: "rgba(16,185,129,0.4)" }}
+            aria-label="下書きを開く"
+          >
+            <Bookmark size={14} aria-hidden />
+            Draft
+          </Link>
+        ) : (
+          <span
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-sm font-semibold opacity-50 cursor-not-allowed"
+            style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}
+            aria-label="下書きなし"
+          >
+            <Bookmark size={14} aria-hidden />
+            Draft
+          </span>
+        )}
         <Link
           href={`${baseUrl}/questions/${question.id}`}
-          className="btn btn-primary inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white no-underline focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] focus:ring-offset-2 hover:opacity-90"
+          className="btn btn-primary inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-white no-underline focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] focus:ring-offset-2 hover:opacity-90"
           style={{
             background: "linear-gradient(135deg, var(--color-accent-emerald) 0%, #0d9488 100%)",
             boxShadow: "0 2px 8px rgba(16, 185, 129, 0.35)",
           }}
         >
-          <Play size={16} aria-hidden />
+          <Play size={14} aria-hidden />
           Try
         </Link>
       </div>
@@ -290,10 +333,74 @@ export function QuestionListClient({
   tagsParam,
   uniqueTags,
 }: QuestionListClientProps) {
-  const questionIds = questions.map((q) => q.id);
+  const searchParams = useSearchParams();
+  const statusParam = searchParams.get("status") ?? "all";
+  const difficultyParam = searchParams.get("difficulty") ?? "all";
+  const sortDirParam = searchParams.get("dir") ?? "asc";
+  const [questionList, setQuestionList] = useState<QuestionItem[]>(questions);
+  const questionIds = questionList.map((q) => q.id);
   const { statusByQuestion, loading: statusLoading } = useQuestionStatuses(workbookId, questionIds);
   const { favoritedSet, loading: favLoading, refresh } = useFavoritedSet(workbookId);
+  const { draftSet } = useDraftSet(workbookId);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [filterCollapsed, setFilterCollapsed] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(12);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setQuestionList(questions);
+  }, [questions]);
+
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [statusParam, difficultyParam, sortOption, sortDirParam, tagsParam ?? ""]);
+
+  const filteredByStatus = useCallback(
+    (list: QuestionItem[]) => {
+      if (statusParam === "all") return list;
+      return list.filter((q) => {
+        const s = statusByQuestion[q.id] ?? "none";
+        if (statusParam === "not_attempted") return s === "none";
+        if (statusParam === "not_passed") return s === "none" || s === "fail";
+        if (statusParam === "passed") return s === "pass";
+        return true;
+      });
+    },
+    [statusParam, statusByQuestion]
+  );
+  const filteredByDifficulty = useCallback(
+    (list: QuestionItem[]) => {
+      if (difficultyParam === "all") return list;
+      return list.filter((q) => (q.difficulty ?? "初級") === difficultyParam);
+    },
+    [difficultyParam]
+  );
+  const filteredQuestionsBase = filteredByDifficulty(filteredByStatus(questionList));
+  const filteredQuestions = sortDirParam === "desc" ? [...filteredQuestionsBase].reverse() : filteredQuestionsBase;
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || visibleCount >= filteredQuestions.length) return;
+    const observer = new IntersectionObserver(
+      ([e]) => {
+        if (e?.isIntersecting) setVisibleCount((n) => Math.min(n + 6, filteredQuestions.length));
+      },
+      { rootMargin: "100px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [visibleCount, filteredQuestions.length]);
+
+  const buildQuery = (overrides: { sort?: string; tags?: string; status?: string; difficulty?: string; dir?: string }) => {
+    const qs = new URLSearchParams(searchParams.toString());
+    if (overrides.sort !== undefined) (overrides.sort === "order" ? qs.delete("sort") : qs.set("sort", overrides.sort));
+    if (overrides.tags !== undefined) (overrides.tags ? qs.set("tags", overrides.tags) : qs.delete("tags"));
+    if (overrides.status !== undefined) (overrides.status === "all" ? qs.delete("status") : qs.set("status", overrides.status));
+    if (overrides.difficulty !== undefined) (overrides.difficulty === "all" ? qs.delete("difficulty") : qs.set("difficulty", overrides.difficulty));
+    if (overrides.dir !== undefined) (overrides.dir === "asc" ? qs.delete("dir") : qs.set("dir", overrides.dir));
+    const s = qs.toString();
+    return s ? `${baseUrl}?${s}` : baseUrl;
+  };
 
   const handleFavoriteToggle = useCallback(
     (questionId: string) => {
@@ -305,107 +412,185 @@ export function QuestionListClient({
         method: isFav ? "DELETE" : "POST",
         headers: { "X-Client-Id": clientId },
       })
-        .then(() => refresh())
+        .then(() => {
+          refresh();
+          const sort = searchParams.get("sort") ?? "order";
+          const tags = searchParams.get("tags") ?? "";
+          const qs = new URLSearchParams();
+          if (sort !== "order") qs.set("sort", sort);
+          if (tags) qs.set("tags", tags);
+          return fetch(`/api/workbooks/${workbookId}/questions?${qs.toString()}`).then((r) => (r.ok ? r.json() : []));
+        })
+        .then((list: QuestionItem[]) => {
+          if (Array.isArray(list)) setQuestionList(list);
+        })
         .finally(() => setTogglingId(null));
     },
-    [workbookId, favoritedSet, refresh]
+    [workbookId, favoritedSet, refresh, searchParams]
   );
 
   const currentTags = tagsParam ? tagsParam.replace(/^&tags=/, "").split(",").map((s) => s.trim()) : [];
 
+  const visibleQuestions = filteredQuestions.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredQuestions.length;
+
   return (
     <div className="mx-auto max-w-4xl p-6">
-      <h1 className="text-xl font-bold text-[var(--color-text)]">{workbookTitle}</h1>
-      <p className="mt-1 text-sm text-[var(--color-text-muted)]">問題一覧</p>
+      <h1 className="typography-page-title mb-6 text-[var(--color-text)]">{workbookTitle}：問題一覧</h1>
 
-      <div className="list-sort card mb-4 rounded-[var(--radius-md)] border p-3" style={{ backgroundColor: "var(--glass-bg)", borderColor: "var(--glass-border)" }}>
-        <span className="label mb-1 block text-[11px] uppercase text-[var(--color-text-muted)]">ソート</span>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {sortLinks.map(({ label, value }) => {
-            const Icon = SORT_ICONS[value];
-            const isActive = sortOption === value;
-            const href =
-              value === "order"
-                ? tagsParam ? `${baseUrl}?${tagsParam.slice(1)}` : baseUrl
-                : `${baseUrl}?sort=${value}${tagsParam}`;
-            return (
-              <Link
-                key={value}
-                href={href}
-                className={`inline-flex items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
-                  isActive ? "btn btn-secondary text-white" : "btn btn-ghost text-[var(--color-text-muted)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-text)]"
-                }`}
-                style={
-                  isActive
-                    ? { background: "var(--color-accent-blue)", boxShadow: "var(--shadow-btn-secondary)" }
-                    : { border: "1px solid var(--color-border)", background: "transparent" }
-                }
-                aria-label={`${label}でソート`}
-              >
-                {Icon && <Icon size={16} aria-hidden />}
-                {label}
-              </Link>
-            );
-          })}
+      <div className="list-sort card mb-6 rounded-[var(--radius-md)] border overflow-hidden" style={{ backgroundColor: "var(--glass-bg)", borderColor: "var(--glass-border)" }}>
+        <button
+          type="button"
+          className="flex w-full items-center justify-between px-4 py-3 text-left focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] focus:ring-inset"
+          style={{ color: "var(--color-text)" }}
+          onClick={() => setFilterCollapsed((c) => !c)}
+          aria-expanded={!filterCollapsed}
+          aria-controls="filter-content"
+        >
+          <span className="inline-flex items-center gap-2 text-sm font-bold tracking-wide text-[var(--color-text)]">
+            <SlidersHorizontal size={18} aria-hidden />
+            ソート・フィルター
+          </span>
+          {filterCollapsed ? <ChevronDown size={18} aria-hidden /> : <ChevronUp size={18} aria-hidden />}
+        </button>
+        <div id="filter-content" className={filterCollapsed ? "hidden" : "border-t p-3"} style={{ borderColor: "var(--glass-border)" }}>
+          <span className="label mb-1 block text-[11px] uppercase text-[var(--color-text-muted)]">ソート</span>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            {sortLinks.map(({ label, value }) => {
+              const Icon = SORT_ICONS[value];
+              const isActive = sortOption === value;
+              const href = buildQuery({ sort: value });
+              return (
+                <Link
+                  key={value}
+                  href={href}
+                  className={`inline-flex items-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
+                    isActive ? "btn btn-secondary text-white" : "btn btn-ghost text-[var(--color-text-muted)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-text)]"
+                  }`}
+                  style={
+                    isActive
+                      ? { background: "var(--color-accent-blue)", boxShadow: "var(--shadow-btn-secondary)" }
+                      : { border: "1px solid var(--color-border)", background: "transparent" }
+                  }
+                  aria-label={`${label}でソート`}
+                >
+                  {Icon && <Icon size={16} aria-hidden />}
+                  {label}
+                </Link>
+              );
+            })}
+            <Link
+              href={buildQuery({ dir: sortDirParam === "asc" ? "desc" : "asc" })}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
+                sortDirParam === "desc"
+                  ? "border-[var(--color-accent-emerald)] bg-[rgba(16,185,129,0.15)] text-[var(--color-accent-emerald)]"
+                  : "border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-text)]"
+              }`}
+              aria-label={sortDirParam === "asc" ? "昇順（クリックで降順）" : "降順（クリックで昇順）"}
+            >
+              {sortDirParam === "asc" ? <ArrowUp size={16} aria-hidden /> : <ArrowDown size={16} aria-hidden />}
+            </Link>
+          </div>
+          <span className="label mt-3 block text-[11px] uppercase text-[var(--color-text-muted)]">ステータス</span>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {[
+              { label: "全て", value: "all" },
+              { label: "未挑戦", value: "not_attempted" },
+              { label: "未合格", value: "not_passed" },
+              { label: "合格", value: "passed" },
+            ].map(({ label, value }) => {
+              const isActive = statusParam === value;
+              const href = buildQuery({ status: value });
+              return (
+                <Link
+                  key={value}
+                  href={href}
+                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${isActive ? "border-[var(--color-accent-emerald)] bg-[rgba(16,185,129,0.15)] text-[var(--color-accent-emerald)]" : "border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-text)]"}`}
+                  aria-pressed={isActive}
+                  aria-label={`ステータス: ${label}`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
+          <span className="label mt-3 block text-[11px] uppercase text-[var(--color-text-muted)]">難易度</span>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {["all", "初級", "中級", "上級"].map((value) => {
+              const isActive = difficultyParam === value;
+              const href = buildQuery({ difficulty: value });
+              return (
+                <Link
+                  key={value}
+                  href={href}
+                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${isActive ? "border-[var(--color-accent-emerald)] bg-[rgba(16,185,129,0.15)] text-[var(--color-accent-emerald)]" : "border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[var(--color-text)]"}`}
+                  aria-pressed={isActive}
+                  aria-label={`難易度: ${value === "all" ? "全て" : value}`}
+                >
+                  {value === "all" ? "全て" : value}
+                </Link>
+              );
+            })}
+          </div>
+          {uniqueTags.length > 0 && (
+            <>
+              <span className="label mt-3 block text-[11px] uppercase text-[var(--color-text-muted)]">タグ</span>
+              <div className="tag-filter-row mt-2 flex flex-wrap gap-2">
+                {uniqueTags.map((tag) => {
+                  const isActive = currentTags.includes(tag);
+                  const newTags = isActive ? currentTags.filter((t) => t !== tag) : [...currentTags, tag];
+                  const href = buildQuery({ tags: newTags.length ? newTags.join(",") : "" });
+                  return (
+                    <Link
+                      key={tag}
+                      href={href}
+                      className={`tag-pill rounded-full border px-3 py-1.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
+                        isActive ? "active font-medium" : ""
+                      }`}
+                      style={{
+                        borderColor: isActive ? "var(--color-accent-emerald)" : "var(--color-border)",
+                        background: isActive ? "rgba(16,185,129,0.15)" : "transparent",
+                        color: isActive ? "var(--color-accent-emerald)" : "var(--color-text-muted)",
+                      }}
+                      aria-pressed={isActive}
+                      aria-label={`タグ「${tag}」でフィルター`}
+                    >
+                      {tag}
+                    </Link>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
-        {uniqueTags.length > 0 && (
-          <>
-            <span className="label mt-3 block text-[11px] uppercase text-[var(--color-text-muted)]">タグでフィルター</span>
-            <div className="tag-filter-row mt-2 flex flex-wrap gap-2">
-              {uniqueTags.map((tag) => {
-                const isActive = currentTags.includes(tag);
-                const newTags = isActive ? currentTags.filter((t) => t !== tag) : [...currentTags, tag];
-                const href = newTags.length
-                  ? `${baseUrl}?tags=${newTags.join(",")}${sortOption !== "order" ? `&sort=${sortOption}` : ""}`
-                  : sortOption !== "order"
-                    ? `${baseUrl}?sort=${sortOption}`
-                    : baseUrl;
-                return (
-                  <Link
-                    key={tag}
-                    href={href}
-                    className={`tag-pill rounded-full border px-3 py-1.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] ${
-                      isActive ? "active font-medium" : ""
-                    }`}
-                    style={{
-                      borderColor: isActive ? "var(--color-accent-emerald)" : "var(--color-border)",
-                      background: isActive ? "rgba(16,185,129,0.15)" : "transparent",
-                      color: isActive ? "var(--color-accent-emerald)" : "var(--color-text-muted)",
-                    }}
-                    aria-pressed={isActive}
-                    aria-label={`タグ「${tag}」でフィルター`}
-                  >
-                    {tag}
-                  </Link>
-                );
-              })}
-            </div>
-          </>
-        )}
       </div>
 
-      {questions.length === 0 ? (
+      {filteredQuestions.length === 0 ? (
         <p className="mt-6 text-[var(--color-text-muted)]">問題がありません。</p>
       ) : (
-        <ul
-          className="question-tiles mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-          style={{ gap: "var(--space-4)" }}
-          aria-busy={statusLoading || favLoading}
-        >
-          {questions.map((q) => (
-            <QuestionCard
-              key={q.id}
-              workbookId={workbookId}
-              question={q}
-              baseUrl={baseUrl}
-              status={statusByQuestion[q.id] ?? "none"}
-              isFavorited={favoritedSet.has(q.id)}
-              favoriteCount={q.favoriteCount ?? 0}
-              onFavoriteToggle={() => handleFavoriteToggle(q.id)}
-              toggling={togglingId === q.id}
-            />
-          ))}
-        </ul>
+        <>
+          <ul
+            className="question-tiles mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            style={{ gap: "var(--space-4)" }}
+            aria-busy={statusLoading || favLoading}
+          >
+            {visibleQuestions.map((q) => (
+              <QuestionCard
+                key={q.id}
+                workbookId={workbookId}
+                question={q}
+                baseUrl={baseUrl}
+                status={statusByQuestion[q.id] ?? "none"}
+                isFavorited={favoritedSet.has(q.id)}
+                favoriteCount={q.favoriteCount ?? 0}
+                hasDraft={draftSet.has(q.id)}
+                onFavoriteToggle={() => handleFavoriteToggle(q.id)}
+                toggling={togglingId === q.id}
+              />
+            ))}
+          </ul>
+          {hasMore && <div ref={sentinelRef} className="h-4 w-full" aria-hidden />}
+        </>
       )}
     </div>
   );

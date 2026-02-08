@@ -1,5 +1,20 @@
 [
   {
+    "id": "draft-py-value-q3-client-3zzd9idcnrx-1770521265081",
+    "workbookId": "py-value",
+    "questionId": "q3",
+    "clientId": "client-3zzd9idcnrx-1770521265081",
+    "userAnswer": {
+      "cells": [
+        {
+          "id": "1",
+          "content": "a = 100"
+        }
+      ]
+    },
+    "updatedAt": "2026-02-08T06:59:08.066Z"
+  },
+  {
     "id": "draft-py-value-q1-draft-test-client",
     "workbookId": "py-value",
     "questionId": "q1",
@@ -12,6 +27,21 @@
         }
       ]
     },
-    "updatedAt": "2026-02-08T02:51:23.567Z"
+    "updatedAt": "2026-02-08T07:58:39.892Z"
+  },
+  {
+    "id": "draft-py-value-q1770534630317-client-3zzd9idcnrx-1770521265081",
+    "workbookId": "py-value",
+    "questionId": "q1770534630317",
+    "clientId": "client-3zzd9idcnrx-1770521265081",
+    "userAnswer": {
+      "cells": [
+        {
+          "id": "1",
+          "content": "import matplotlib.pyplot as plt\n\n# データの用意\nx = [1, 2, 3, 4, 5]\ny = [2, 3, 5, 7, 11]\n\n# グラフの描画\nplt.plot(x, y, marker='o', color='blue', linestyle='-')\n\n# ラベルとタイトルの追加\nplt.title(\"Simple Line Chart\")\nplt.xlabel(\"X-axis\")\nplt.ylabel(\"Y-axis\")\n\n# 画面に表示\nplt.show()"
+        }
+      ]
+    },
+    "updatedAt": "2026-02-08T08:14:32.576Z"
   }
 ]

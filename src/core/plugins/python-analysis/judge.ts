@@ -7,9 +7,51 @@ import type { Question } from "@/lib/types";
 
 interface PyodideRuntime {
   runPythonAsync(code: string): Promise<void>;
+  runPython?(code: string): unknown;
   globals: { get(name: string): unknown };
+  loadPackage?(names: string[]): Promise<void>;
 }
 import type { JudgeResult } from "@/lib/types";
+
+const PYODIDE_PACKAGES = ["numpy", "matplotlib", "pandas", "scipy", "scikit-learn", "statsmodels"];
+let pyodideInstance: PyodideRuntime | null = null;
+
+/** DD-023: プラグイン mount 時のプリロード用に export */
+export async function getPyodide(): Promise<PyodideRuntime> {
+  if (pyodideInstance) return pyodideInstance;
+  const loadPyodide = (globalThis as typeof window & { loadPyodide?: (opts: { indexURL: string }) => Promise<PyodideRuntime> }).loadPyodide;
+  if (!loadPyodide) {
+    await new Promise<void>((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("Failed to load Pyodide script"));
+      document.head.appendChild(s);
+    });
+  }
+  const loadPyodideFn = (globalThis as typeof window & { loadPyodide: (opts: { indexURL: string }) => Promise<PyodideRuntime> }).loadPyodide;
+  const pyodide = await loadPyodideFn({
+    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
+  });
+  if (pyodide.loadPackage) {
+    try {
+      await pyodide.loadPackage(PYODIDE_PACKAGES);
+    } catch {
+      // continue without some packages
+    }
+  }
+  await pyodide.runPythonAsync(`
+import sys
+if 'matplotlib' in sys.modules or True:
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+    except Exception:
+        pass
+  `.trim());
+  pyodideInstance = pyodide;
+  return pyodide;
+}
 
 /** TC-P04: 複数セルを結合して 1 スクリプトにする。単体テスト用に export。 */
 export function getCombinedCode(userAnswer: Record<string, unknown>): string {
@@ -110,20 +152,7 @@ export async function runJudge(
         details: { kind: "runtime_error" },
       };
     }
-    const loadPyodide = (globalThis as typeof window & { loadPyodide?: (opts: { indexURL: string }) => Promise<PyodideRuntime> }).loadPyodide;
-    if (!loadPyodide) {
-      await new Promise<void>((resolve, reject) => {
-        const s = document.createElement("script");
-        s.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error("Failed to load Pyodide script"));
-        document.head.appendChild(s);
-      });
-    }
-    const loadPyodideFn = (globalThis as typeof window & { loadPyodide: (opts: { indexURL: string }) => Promise<PyodideRuntime> }).loadPyodide;
-    const pyodide = await loadPyodideFn({
-      indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/",
-    });
+    const pyodide = await getPyodide();
     const runResult = await withTimeout(pyodide.runPythonAsync(code), timeoutMs);
     if (runResult === "timeout") {
       return {
@@ -189,4 +218,82 @@ export async function runJudge(
   }
 }
 
-export const judgeAdapter = { runJudge };
+/** セル実行結果（stdout/stderr/plot）。DATA-02 §4.2, FR-P003 */
+export interface CellRunResult {
+  variables: Record<string, unknown>;
+  stdout?: string;
+  stderr?: string;
+  error?: string;
+  plotBase64?: string;
+}
+
+/** DD-010 / プラン: セル単位実行。stdout/stderr 取得、plt.show() 時は plotBase64 返却。 */
+export async function runCodeAndGetVariables(
+  code: string,
+  watchNames: string[],
+  options?: { timeoutMs?: number }
+): Promise<CellRunResult> {
+  const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  try {
+    if (typeof window === "undefined") {
+      return { variables: {}, error: "Pyodide はブラウザでのみ利用できます。" };
+    }
+    const pyodide = await getPyodide();
+    const indented = code.split("\n").map((l) => "  " + l).join("\n");
+    const wrap =
+      `
+import sys, io
+_so, _se = io.StringIO(), io.StringIO()
+_old_stdout, _old_stderr = sys.stdout, sys.stderr
+sys.stdout, sys.stderr = _so, _se
+try:
+` +
+      indented +
+      `
+except Exception as e:
+    import traceback
+    _se.write(traceback.format_exc())
+finally:
+    sys.stdout, sys.stderr = _old_stdout, _old_stderr
+__pyodide_stdout__ = _so.getvalue()
+__pyodide_stderr__ = _se.getvalue()
+`;
+    const runResult = await withTimeout(pyodide.runPythonAsync(wrap), timeoutMs);
+    if (runResult === "timeout") {
+      return { variables: {}, error: "タイムアウトしました。" };
+    }
+    const variables = getWatchVariableValues(pyodide.globals, watchNames.length ? watchNames : ["ans"]);
+    const rawStdout = pyodide.globals.get("__pyodide_stdout__");
+    const rawStderr = pyodide.globals.get("__pyodide_stderr__");
+    const stdout = rawStdout != null ? String(rawStdout) : "";
+    const stderr = rawStderr != null ? String(rawStderr) : "";
+    let plotBase64: string | undefined;
+    try {
+      await pyodide.runPythonAsync(`
+import sys
+__plot_b64__ = None
+if 'matplotlib' in sys.modules:
+    try:
+        import matplotlib.pyplot as plt
+        if plt.get_fignums():
+            import io, base64
+            buf = io.BytesIO()
+            plt.savefig(buf, format='png', bbox_inches='tight')
+            plt.close('all')
+            __plot_b64__ = base64.b64encode(buf.getvalue()).decode('utf-8')
+    except Exception:
+        pass
+  `.trim());
+      const b64 = pyodide.globals.get("__plot_b64__");
+      if (b64 != null) plotBase64 = String(b64);
+    } catch {
+      // ignore plot export errors
+    }
+    return { variables, stdout: stdout || undefined, stderr: stderr || undefined, plotBase64 };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { variables: {}, error: message };
+  }
+}
+
+export const judgeAdapter = { runJudge, runCodeAndGetVariables };

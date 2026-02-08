@@ -90,7 +90,6 @@ export function QuestionEditorClient({
           setSaving(false);
           return;
         }
-        setMessage({ type: "ok", text: "保存しました。" });
         window.location.href = backUrl;
         return;
       } catch {

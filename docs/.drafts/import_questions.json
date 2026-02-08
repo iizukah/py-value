@@ -1,0 +1,80 @@
+[
+  {
+    "id": "import-iris-pandas",
+    "title": "Iris 種別ごとの平均（pandas）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 1,
+    "problem_statement": "sklearn の iris データセットを pandas DataFrame にし、種別（target）ごとの sepal length の平均を求め、変数 `ans` に代入してください。",
+    "initial_code": "import pandas as pd\nfrom sklearn.datasets import load_iris\n\n# データ読み込み\niris = load_iris()\ndf = pd.DataFrame(iris.data, columns=iris.feature_names)\ndf['target'] = iris.target\n",
+    "validation": { "method": "value_match", "expected_value": null },
+    "tags": ["pandas", "iris", "集約"],
+    "difficulty": "中級",
+    "watchVariables": ["ans"]
+  },
+  {
+    "id": "import-matplotlib",
+    "title": "簡単な折れ線グラフ（matplotlib）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 2,
+    "problem_statement": "リスト [1, 4, 2, 5] を matplotlib で折れ線グラフとしてプロットし、plt.show() で表示してください。変数 `ans` に True を代入してください。",
+    "initial_code": "import matplotlib\nmatplotlib.use('module://matplotlib_backend_pyodide')\nimport matplotlib.pyplot as plt\n",
+    "validation": { "method": "value_match", "expected_value": true },
+    "tags": ["matplotlib", "可視化"],
+    "difficulty": "初級",
+    "watchVariables": ["ans"]
+  },
+  {
+    "id": "import-numpy",
+    "title": "配列の合計（numpy）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 3,
+    "problem_statement": "numpy で 1 から 10 までの配列を作成し、その合計を変数 `ans` に代入してください。",
+    "initial_code": "import numpy as np\n",
+    "validation": { "method": "value_match", "expected_value": 55 },
+    "tags": ["numpy", "配列"],
+    "difficulty": "初級",
+    "watchVariables": ["ans"]
+  },
+  {
+    "id": "import-pandas-statsmodels",
+    "title": "簡単な回帰（pandas + statsmodels）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 4,
+    "problem_statement": "pandas で 2 列のデータ（x: [1,2,3,4,5], y: [2,4,5,4,5]）を作成し、statsmodels の OLS で y ~ x の回帰を行い、決定係数 R-squared を変数 `ans` に代入してください。",
+    "initial_code": "import pandas as pd\nimport statsmodels.api as sm\n",
+    "validation": { "method": "value_match", "expected_value": null, "tolerance": { "atol": 0.01 } },
+    "tags": ["pandas", "statsmodels", "回帰"],
+    "difficulty": "中級",
+    "watchVariables": ["ans"]
+  },
+  {
+    "id": "import-sklearn-pandas",
+    "title": "Iris 分類（sklearn + pandas）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 5,
+    "problem_statement": "sklearn の iris データを pandas で用意し、LogisticRegression で学習・予測した正解率（accuracy）を変数 `ans` に代入してください。",
+    "initial_code": "import pandas as pd\nfrom sklearn.datasets import load_iris\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.model_selection import train_test_split\n",
+    "validation": { "method": "value_match", "expected_value": null, "tolerance": { "atol": 0.05 } },
+    "tags": ["sklearn", "pandas", "分類"],
+    "difficulty": "中級",
+    "watchVariables": ["ans"]
+  },
+  {
+    "id": "import-scipy",
+    "title": "相関係数（scipy）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 6,
+    "problem_statement": "scipy.stats の pearsonr を用い、配列 [1,2,3,4,5] と [2,4,5,4,5] のピアソン相関係数を求め、その値を変数 `ans` に代入してください。",
+    "initial_code": "from scipy import stats\n",
+    "validation": { "method": "value_match", "expected_value": null, "tolerance": { "atol": 0.01 } },
+    "tags": ["scipy", "統計"],
+    "difficulty": "初級",
+    "watchVariables": ["ans"]
+  }
+]

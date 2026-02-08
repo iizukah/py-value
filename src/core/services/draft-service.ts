@@ -34,3 +34,12 @@ export async function saveDraft(
   await repo.save(draft);
   return draft;
 }
+
+/** API-021: 下書きがある questionId 一覧（workbook + client 単位） */
+export async function listDraftQuestionIds(
+  workbookId: string,
+  clientId: string
+): Promise<string[]> {
+  const repo = getDraftRepository();
+  return repo.listQuestionIds(workbookId, clientId);
+}

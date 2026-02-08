@@ -18,7 +18,6 @@ export function buildBreadcrumbs(pathname: string, workbookTitle?: string): Brea
     if (i === 0 && workbookTitle) {
       items.push({ label: workbookTitle, href });
     } else if (seg === "questions" && segments[i + 1]) {
-      items.push({ label: "問題", href });
       i++;
       href += "/" + segments[i];
       items.push({ label: segments[i], href });

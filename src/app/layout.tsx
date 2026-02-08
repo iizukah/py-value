@@ -5,7 +5,7 @@ import "@/core/plugins/register-plugins";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Breadcrumb from "./components/layout/Breadcrumb";
-import { LoadingProvider, LoadingOverlay } from "./components/layout/LoadingOverlay";
+import LoadingOverlay, { LoadingProvider } from "./components/layout/LoadingOverlay";
 import HomeBgLayer from "./components/home/HomeBgLayer";
 
 const outfit = Outfit({

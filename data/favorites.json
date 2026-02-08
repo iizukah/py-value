@@ -56,27 +56,19 @@
     "updatedAt": "2026-02-08T03:31:05.339Z"
   },
   {
-    "id": "fav-py-value-q4-client-3zzd9idcnrx-1770521265081",
-    "workbookId": "py-value",
-    "questionId": "q4",
-    "clientId": "client-3zzd9idcnrx-1770521265081",
-    "count": 1,
-    "updatedAt": "2026-02-08T04:38:42.429Z"
-  },
-  {
-    "id": "fav-py-value-q2-client-3zzd9idcnrx-1770521265081",
-    "workbookId": "py-value",
-    "questionId": "q2",
-    "clientId": "client-3zzd9idcnrx-1770521265081",
-    "count": 1,
-    "updatedAt": "2026-02-08T04:39:15.293Z"
-  },
-  {
     "id": "fav-py-value-q5-client-3zzd9idcnrx-1770521265081",
     "workbookId": "py-value",
     "questionId": "q5",
     "clientId": "client-3zzd9idcnrx-1770521265081",
     "count": 1,
     "updatedAt": "2026-02-08T04:39:38.873Z"
+  },
+  {
+    "id": "fav-py-value-q3-client-3zzd9idcnrx-1770521265081",
+    "workbookId": "py-value",
+    "questionId": "q3",
+    "clientId": "client-3zzd9idcnrx-1770521265081",
+    "count": 1,
+    "updatedAt": "2026-02-08T07:12:34.069Z"
   }
 ]

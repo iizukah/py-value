@@ -7,12 +7,19 @@
     "status": "published",
     "order": 1,
     "problem_statement": "変数 `ans` に 1 を代入してください。",
-    "initial_code": "",
+    "initial_code": "a = 1",
     "validation": {
       "method": "value_match",
       "expected_value": 1
     },
-    "tags": ["統計", "基礎"]
+    "tags": [
+      "統計",
+      "基礎"
+    ],
+    "difficulty": "初級",
+    "watchVariables": [
+      "ans"
+    ]
   },
   {
     "id": "q2",
@@ -27,7 +34,9 @@
       "method": "value_match",
       "expected_value": 5
     },
-    "tags": ["統計"]
+    "tags": [
+      "統計"
+    ]
   },
   {
     "id": "q3",
@@ -42,7 +51,9 @@
       "method": "value_match",
       "expected_value": 15
     },
-    "tags": ["回帰"]
+    "tags": [
+      "回帰"
+    ]
   },
   {
     "id": "q4",
@@ -56,7 +67,9 @@
     "validation": {
       "method": "value_match",
       "expected_value": 3.14,
-      "tolerance": { "atol": 0.01 }
+      "tolerance": {
+        "atol": 0.01
+      }
     }
   },
   {
@@ -72,5 +85,460 @@
       "method": "value_match",
       "expected_value": 4
     }
+  },
+  {
+    "id": "q1770534630317",
+    "title": "あいうえお",
+    "type": "python-analysis",
+    "difficulty": "初級",
+    "explanation": "test",
+    "status": "published",
+    "order": 0,
+    "problem_statement": "あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
+    "initial_code": "a = 100",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 100
+    },
+    "watchVariables": [
+      "a"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-iris-pandas",
+    "title": "Iris 種別ごとの平均（pandas）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 1,
+    "problem_statement": "sklearn の iris データセットを pandas DataFrame にし、種別（target）ごとの sepal length の平均を求め、変数 `ans` に代入してください。",
+    "initial_code": "import pandas as pd\nfrom sklearn.datasets import load_iris\n\n# データ読み込み\niris = load_iris()\ndf = pd.DataFrame(iris.data, columns=iris.feature_names)\ndf['target'] = iris.target\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": null
+    },
+    "tags": [
+      "pandas",
+      "iris",
+      "集約"
+    ],
+    "difficulty": "中級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-matplotlib",
+    "title": "簡単な折れ線グラフ（matplotlib）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 2,
+    "problem_statement": "リスト [1, 4, 2, 5] を matplotlib で折れ線グラフとしてプロットし、plt.show() で表示してください。変数 `ans` に True を代入してください。",
+    "initial_code": "import matplotlib\nmatplotlib.use('module://matplotlib_backend_pyodide')\nimport matplotlib.pyplot as plt\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": true
+    },
+    "tags": [
+      "matplotlib",
+      "可視化"
+    ],
+    "difficulty": "初級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-numpy",
+    "title": "配列の合計（numpy）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 3,
+    "problem_statement": "numpy で 1 から 10 までの配列を作成し、その合計を変数 `ans` に代入してください。",
+    "initial_code": "import numpy as np\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 55
+    },
+    "tags": [
+      "numpy",
+      "配列"
+    ],
+    "difficulty": "初級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-pandas-statsmodels",
+    "title": "簡単な回帰（pandas + statsmodels）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 4,
+    "problem_statement": "pandas で 2 列のデータ（x: [1,2,3,4,5], y: [2,4,5,4,5]）を作成し、statsmodels の OLS で y ~ x の回帰を行い、決定係数 R-squared を変数 `ans` に代入してください。",
+    "initial_code": "import pandas as pd\nimport statsmodels.api as sm\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": null,
+      "tolerance": {
+        "atol": 0.01
+      }
+    },
+    "tags": [
+      "pandas",
+      "statsmodels",
+      "回帰"
+    ],
+    "difficulty": "中級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-sklearn-pandas",
+    "title": "Iris 分類（sklearn + pandas）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 5,
+    "problem_statement": "sklearn の iris データを pandas で用意し、LogisticRegression で学習・予測した正解率（accuracy）を変数 `ans` に代入してください。",
+    "initial_code": "import pandas as pd\nfrom sklearn.datasets import load_iris\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.model_selection import train_test_split\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": null,
+      "tolerance": {
+        "atol": 0.05
+      }
+    },
+    "tags": [
+      "sklearn",
+      "pandas",
+      "分類"
+    ],
+    "difficulty": "中級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-scipy",
+    "title": "相関係数（scipy）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 6,
+    "problem_statement": "scipy.stats の pearsonr を用い、配列 [1,2,3,4,5] と [2,4,5,4,5] のピアソン相関係数を求め、その値を変数 `ans` に代入してください。",
+    "initial_code": "from scipy import stats\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": null,
+      "tolerance": {
+        "atol": 0.01
+      }
+    },
+    "tags": [
+      "scipy",
+      "統計"
+    ],
+    "difficulty": "初級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-chukyu-01",
+    "title": "グループごとの最大値（pandas）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 10,
+    "problem_statement": "sklearn の iris データを pandas DataFrame にし、種別（target）ごとの petal length (cm) の**最大値**を求め、その3つの最大値の**合計**を変数 `ans` に代入してください。",
+    "initial_code": "import pandas as pd\nfrom sklearn.datasets import load_iris\n\niris = load_iris()\ndf = pd.DataFrame(iris.data, columns=iris.feature_names)\ndf['target'] = iris.target\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 16.3,
+      "tolerance": {
+        "atol": 0.1
+      }
+    },
+    "tags": [
+      "pandas",
+      "iris",
+      "集約"
+    ],
+    "difficulty": "中級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-chukyu-02",
+    "title": "ヒストグラムの描画（matplotlib）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 11,
+    "problem_statement": "正規乱数 100 個を numpy で生成し、matplotlib でヒストグラム（plt.hist）を描画して plt.show() で表示してください。変数 `ans` に True を代入してください。",
+    "initial_code": "import numpy as np\nimport matplotlib\nmatplotlib.use('module://matplotlib_backend_pyodide')\nimport matplotlib.pyplot as plt\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": true
+    },
+    "tags": [
+      "matplotlib",
+      "numpy",
+      "可視化"
+    ],
+    "difficulty": "中級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-chukyu-03",
+    "title": "配列の平均と標準偏差（numpy）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 12,
+    "problem_statement": "1 から 20 までの整数の配列を作成し、その**平均**を変数 `ans` に代入してください。",
+    "initial_code": "import numpy as np\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 10.5
+    },
+    "tags": [
+      "numpy",
+      "統計"
+    ],
+    "difficulty": "中級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-chukyu-04",
+    "title": "2変量の相関係数（pandas）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 13,
+    "problem_statement": "pandas で 2 列のデータ（x: [1,2,3,4,5,6,7,8,9,10], y: [1,2,3,4,5,6,7,8,9,10]）を持つ DataFrame を作成し、x と y の**ピアソン相関係数**（1 つのスカラー値）を変数 `ans` に代入してください。",
+    "initial_code": "import pandas as pd\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 1
+    },
+    "tags": [
+      "pandas",
+      "相関"
+    ],
+    "difficulty": "中級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-chukyu-05",
+    "title": "線形回帰の傾き（sklearn）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 14,
+    "problem_statement": "sklearn の LinearRegression を用い、説明変数 x = [[1],[2],[3],[4],[5]]、目的変数 y = [2, 4, 6, 8, 10] で回帰し、得られた**傾き**（coef_ の先頭要素）を変数 `ans` に代入してください。",
+    "initial_code": "from sklearn.linear_model import LinearRegression\nimport numpy as np\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 2,
+      "tolerance": {
+        "atol": 0.01
+      }
+    },
+    "tags": [
+      "sklearn",
+      "回帰"
+    ],
+    "difficulty": "中級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-chukyu-06",
+    "title": "正規分布の累積確率（scipy）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 15,
+    "problem_statement": "scipy.stats の norm を用い、平均0・標準偏差1の正規分布で、x ≤ 0 となる**累積確率** P(X ≤ 0) を変数 `ans` に代入してください。",
+    "initial_code": "from scipy import stats\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 0.5,
+      "tolerance": {
+        "atol": 0.01
+      }
+    },
+    "tags": [
+      "scipy",
+      "統計",
+      "正規分布"
+    ],
+    "difficulty": "中級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-joukyu-01",
+    "title": "時系列の移動平均（pandas）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 20,
+    "problem_statement": "pandas で Series([10, 20, 30, 40, 50]) を作成し、**窓幅 3** の移動平均（rolling(3).mean()）を計算し、その**最後の値**（5番目要素に対応する移動平均）を変数 `ans` に代入してください。",
+    "initial_code": "import pandas as pd\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 40,
+      "tolerance": {
+        "atol": 0.01
+      }
+    },
+    "tags": [
+      "pandas",
+      "時系列",
+      "移動平均"
+    ],
+    "difficulty": "上級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-joukyu-02",
+    "title": "複数サブプロット（matplotlib）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 21,
+    "problem_statement": "matplotlib で 2×2 のサブプロットを作成し、4 つの axes にそれぞれ [1,2,3]、[4,5,6]、[7,8,9]、[10,11,12] の折れ線をプロットし、plt.show() で表示してください。変数 `ans` に True を代入してください。",
+    "initial_code": "import matplotlib\nmatplotlib.use('module://matplotlib_backend_pyodide')\nimport matplotlib.pyplot as plt\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": true
+    },
+    "tags": [
+      "matplotlib",
+      "可視化",
+      "サブプロット"
+    ],
+    "difficulty": "上級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-joukyu-03",
+    "title": "行列のトレース（numpy）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 22,
+    "problem_statement": "2×2 の行列 A = [[1, 2], [3, 4]] を numpy で作成し、その**トレース**（対角成分の和）を変数 `ans` に代入してください。",
+    "initial_code": "import numpy as np\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": 5
+    },
+    "tags": [
+      "numpy",
+      "線形代数"
+    ],
+    "difficulty": "上級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-joukyu-04",
+    "title": "ロジスティック回帰の係数（statsmodels）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 23,
+    "problem_statement": "statsmodels の Logit を用い、説明変数 X = [1, 2, 3, 4, 5]、目的変数 y = [0, 0, 1, 1, 1] でロジスティック回帰をフィットし、得られた**定数項（const）の係数**を変数 `ans` に代入してください。",
+    "initial_code": "import numpy as np\nimport statsmodels.api as sm\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": null,
+      "tolerance": {
+        "atol": 0.5
+      }
+    },
+    "tags": [
+      "statsmodels",
+      "ロジスティック回帰"
+    ],
+    "difficulty": "上級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-joukyu-05",
+    "title": "KMeans の inertia（sklearn）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 24,
+    "problem_statement": "sklearn の KMeans を用い、データ X = [[1,2], [1.5,2], [5,8], [8,8], [1,0.5]] を **n_clusters=2**、**random_state=42** でクラスタリングし、**inertia_**（クラスタ内二乗和）を変数 `ans` に代入してください。",
+    "initial_code": "from sklearn.cluster import KMeans\nimport numpy as np\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": null,
+      "tolerance": {
+        "atol": 0.5
+      }
+    },
+    "tags": [
+      "sklearn",
+      "クラスタリング",
+      "KMeans"
+    ],
+    "difficulty": "上級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
+  },
+  {
+    "id": "import-joukyu-06",
+    "title": "対応のない t 検定の p 値（scipy）",
+    "type": "python-analysis",
+    "status": "published",
+    "order": 25,
+    "problem_statement": "scipy.stats の ttest_ind を用い、群 A = [1, 2, 3, 4, 5] と群 B = [2, 3, 4, 5, 6] の**対応のない t 検定**を行い、得られた **p 値**を変数 `ans` に代入してください。",
+    "initial_code": "from scipy import stats\n",
+    "validation": {
+      "method": "value_match",
+      "expected_value": null,
+      "tolerance": {
+        "atol": 0.01
+      }
+    },
+    "tags": [
+      "scipy",
+      "統計",
+      "検定"
+    ],
+    "difficulty": "上級",
+    "watchVariables": [
+      "ans"
+    ],
+    "workbookId": "py-value"
   }
 ]

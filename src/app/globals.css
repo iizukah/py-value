@@ -95,6 +95,25 @@
   background-clip: text;
 }
 
+/* Typography (mock.html L.61-62) */
+.typography-title {
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-size: 18px;
+}
+/* DD-024: ページタイトルを EXER 同スタイルに */
+.typography-page-title {
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-size: 1.5rem;
+}
+.typography-heading {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
 /* CD-016～020: workspace 3-pane, judge result (mock.html) */
 .three-pane {
   display: grid;
@@ -115,6 +134,34 @@
   overflow: auto;
 }
 .three-pane .pane:last-child { border-right: none; }
+
+/* DD-043: セルスクロールバーをサイトトーンに合わせる */
+.cell-input::-webkit-scrollbar,
+.cell-group-ws pre::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.cell-input::-webkit-scrollbar-track,
+.cell-group-ws pre::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+  border-radius: 4px;
+}
+.cell-input::-webkit-scrollbar-thumb,
+.cell-group-ws pre::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+.cell-input::-webkit-scrollbar-thumb:hover,
+.cell-group-ws pre::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-emerald);
+  opacity: 0.6;
+}
+.cell-input,
+.cell-group-ws pre {
+  scrollbar-color: var(--color-border) var(--color-bg-secondary);
+  scrollbar-width: thin;
+}
+
 .workspace-judge-success {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid var(--color-accent-emerald);
@@ -134,8 +181,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 160px;
-  gap: var(--space-4);
+  gap: var(--space-2);
 }
 .result-grading-loading {
   display: flex;
@@ -198,7 +244,6 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: var(--space-3);
-  min-height: 100px;
   max-width: 320px;
   margin-left: auto;
   margin-right: auto;

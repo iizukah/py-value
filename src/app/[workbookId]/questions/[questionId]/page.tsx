@@ -33,8 +33,7 @@ export default async function QuestionPage({
 
   return (
     <div className="mx-auto max-w-6xl p-6">
-      <h1 className="text-xl font-bold text-[var(--color-text)]">{question.title}</h1>
-      <div className="mt-6">
+      <div className="mt-4">
         <PluginComponent
           question={question}
           workbookId={workbookId}

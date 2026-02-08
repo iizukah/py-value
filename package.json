@@ -19,6 +19,7 @@
     "lowdb": "^7.0.1",
     "lucide-react": "^0.563.0",
     "next": "14.2.18",
+    "prismjs": "^1.30.0",
     "pyodide": "^0.26.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
