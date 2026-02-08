@@ -98,19 +98,32 @@ export default function PythonAnalysisPlugin({
   }, [workbookId, displayResult?.isCorrect]);
 
   return (
-    <div className="space-y-4 rounded border border-gray-200 p-4">
+    <div
+      className="space-y-4 rounded-[var(--radius-lg)] border p-4"
+      style={{
+        borderColor: "var(--color-border)",
+        backgroundColor: "var(--color-bg-secondary)",
+      }}
+    >
       {question.problem_statement && (
         <div>
-          <h3 className="text-lg font-medium">問題</h3>
-          <pre className="whitespace-pre-wrap rounded bg-gray-50 p-2 text-sm">
+          <h3 className="text-lg font-medium text-[var(--color-text)]">問題</h3>
+          <pre
+            className="whitespace-pre-wrap rounded-[var(--radius-sm)] p-2 text-sm text-[var(--color-text)]"
+            style={{ backgroundColor: "var(--color-bg-main)" }}
+          >
             {question.problem_statement}
           </pre>
         </div>
       )}
       <div>
-        <label className="block text-sm font-medium text-gray-700">コード</label>
+        <label className="block text-sm font-medium text-[var(--color-text-muted)]">コード</label>
         <textarea
-          className="mt-1 w-full rounded border border-gray-300 p-2 font-mono text-sm"
+          className="mt-1 w-full rounded-[var(--radius-sm)] border p-2 font-mono text-sm text-[var(--color-text)]"
+          style={{
+            borderColor: "var(--color-border)",
+            backgroundColor: "var(--color-bg-main)",
+          }}
           rows={10}
           value={code}
           onChange={(e) => {
@@ -125,41 +138,64 @@ export default function PythonAnalysisPlugin({
           type="button"
           onClick={handleRun}
           disabled={displayJudging}
-          className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+          className="rounded-full px-4 py-2 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] focus:ring-offset-2 focus:ring-offset-[var(--color-bg-main)] disabled:opacity-50 hover:opacity-90"
+          style={{
+            backgroundColor: "var(--color-accent-emerald)",
+            boxShadow: "var(--shadow-btn-primary)",
+          }}
         >
           {displayJudging ? "採点中..." : "実行・採点"}
         </button>
       </div>
       {displayResult && (
         <div
-          className="rounded border border-gray-200 bg-white p-4 shadow-sm"
+          className="rounded-[var(--radius-lg)] border p-4"
+          style={{
+            borderColor: "var(--color-border)",
+            backgroundColor: "var(--color-bg-secondary)",
+          }}
           data-sc="SC-003"
           role="region"
           aria-label="採点結果"
         >
-          <p className="mb-1 text-sm font-medium text-gray-500">採点結果</p>
+          <p className="mb-1 text-sm font-medium text-[var(--color-text-muted)]">採点結果</p>
           <div
-            className={`mb-3 inline-block rounded px-2 py-1 text-sm font-semibold ${
-              displayResult.isCorrect ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            className={`mb-3 inline-block rounded-[var(--radius-pill)] px-3 py-1 text-sm font-bold text-white ${
+              displayResult.isCorrect
+                ? "shadow-[0_0_16px_rgba(16,185,129,0.5)]"
+                : "shadow-[0_0_12px_rgba(248,113,113,0.5)]"
             }`}
+            style={{
+              background: displayResult.isCorrect
+                ? "linear-gradient(135deg, #10b981, #0d9488)"
+                : "linear-gradient(135deg, #f87171, #dc2626)",
+            }}
           >
             {displayResult.isCorrect ? "Passed" : "Fail"}
           </div>
           {displayResult.message && (
-            <p className="mb-4 text-sm text-gray-700">{displayResult.message}</p>
+            <p className="mb-4 text-sm text-[var(--color-text)]">{displayResult.message}</p>
           )}
-          <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleRun}
-              className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm hover:bg-gray-50"
+              className="rounded-[var(--radius-md)] border px-3 py-1.5 text-sm text-[var(--color-text)] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)]"
+              style={{
+                borderColor: "var(--color-border)",
+                backgroundColor: "var(--color-bg-main)",
+              }}
             >
               Retry
             </button>
             {showCompleteLink === true && workbookId && (
               <Link
                 href={`/${workbookId}/complete`}
-                className="rounded bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="rounded-full px-4 py-1.5 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] focus:ring-offset-2 focus:ring-offset-[var(--color-bg-main)] hover:opacity-90"
+                style={{
+                  backgroundColor: "var(--color-accent-emerald)",
+                  boxShadow: "var(--shadow-btn-primary)",
+                }}
                 aria-label="完了画面へ"
               >
                 完了画面へ

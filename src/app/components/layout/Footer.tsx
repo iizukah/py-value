@@ -1,7 +1,17 @@
 export default function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-gray-50 px-4 py-3 text-center text-sm text-gray-500">
-      EXER FRAMEWORK
+    <footer
+      className="border-t px-4 py-3 text-center text-sm"
+      style={{
+        backgroundColor: "var(--color-bg-secondary)",
+        borderColor: "var(--color-border)",
+        color: "var(--color-text-muted)",
+      }}
+      role="contentinfo"
+    >
+      <span aria-hidden="true">SYSTEM ONLINE</span>
+      <span className="mx-2" aria-hidden="true">|</span>
+      <span>EXER FRAMEWORK</span>
     </footer>
   );
 }

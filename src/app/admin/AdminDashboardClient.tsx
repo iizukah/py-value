@@ -83,23 +83,23 @@ export function AdminDashboardClient({
 
   return (
     <div className="mx-auto max-w-4xl p-6" data-sc="SC-007" role="region" aria-label="管理ダッシュボード">
-      <h1 className="text-xl font-bold">管理ダッシュボード</h1>
+      <h1 className="text-xl font-bold text-[var(--color-text)]">管理ダッシュボード</h1>
       <nav className="mt-4 flex flex-wrap gap-4 text-sm" aria-label="管理ナビ">
         <Link
           href={`${base}${keyQuery}`}
-          className="font-medium text-blue-600 hover:underline"
+          className="font-medium text-[var(--color-accent-emerald)] hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] rounded"
         >
           問題一覧
         </Link>
         <Link
           href={`${base}/import${keyQuery}`}
-          className="text-gray-600 hover:text-gray-900"
+          className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] rounded"
         >
           インポート/エクスポート
         </Link>
         <Link
           href={`${base}/datasets${keyQuery}`}
-          className="text-gray-600 hover:text-gray-900"
+          className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] rounded"
         >
           データセットアップロード
         </Link>
@@ -107,13 +107,17 @@ export function AdminDashboardClient({
       <div className="mt-6 flex flex-wrap items-end gap-4">
         <Link
           href={`${base}/questions/new${keyQuery}`}
-          className="inline-block rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+          className="inline-block rounded-full px-4 py-2 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] focus:ring-offset-2 focus:ring-offset-[var(--color-bg-main)]"
+          style={{
+            backgroundColor: "var(--color-accent-emerald)",
+            boxShadow: "var(--shadow-btn-primary)",
+          }}
         >
           新規作成
         </Link>
         {workbook && (
           <div className="flex items-center gap-2" role="group" aria-label="履歴の最大件数">
-            <label htmlFor="history-limit" className="text-sm font-medium text-gray-700">
+            <label htmlFor="history-limit" className="text-sm font-medium text-[var(--color-text-muted)]">
               履歴の最大件数
             </label>
             <input
@@ -123,7 +127,11 @@ export function AdminDashboardClient({
               max={999}
               value={historyLimitInput}
               onChange={(e) => setHistoryLimitInput(e.target.value)}
-              className="w-20 rounded border border-gray-300 px-2 py-1 text-sm"
+              className="w-20 rounded-[var(--radius-sm)] border px-2 py-1 text-sm text-[var(--color-text)]"
+              style={{
+                borderColor: "var(--color-border)",
+                backgroundColor: "var(--color-bg-main)",
+              }}
               aria-describedby="history-limit-desc"
             />
             <button
@@ -147,35 +155,42 @@ export function AdminDashboardClient({
                   setSavingHistoryLimit(false);
                 }
               }}
-              className="rounded border border-gray-300 bg-white px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-[var(--radius-md)] border px-3 py-1 text-sm text-[var(--color-text)] hover:opacity-90 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)]"
+              style={{
+                borderColor: "var(--color-border)",
+                backgroundColor: "var(--color-bg-secondary)",
+              }}
             >
               {savingHistoryLimit ? "保存中..." : "保存"}
             </button>
-            <span id="history-limit-desc" className="text-xs text-gray-500">
+            <span id="history-limit-desc" className="text-xs text-[var(--color-text-muted)]">
               ユーザーごとの履歴保持件数
             </span>
           </div>
         )}
       </div>
-      <p className="mt-4 text-sm text-gray-600">問題一覧（下書き含む）:</p>
-      {loading && <p className="mt-2 text-gray-500">読み込み中...</p>}
+      <p className="mt-4 text-sm text-[var(--color-text-muted)]">問題一覧（下書き含む）:</p>
+      {loading && <p className="mt-2 text-[var(--color-text-muted)]">読み込み中...</p>}
       {error && (
-        <p className="mt-2 text-red-600" role="alert">
+        <p className="mt-2 text-red-400" role="alert">
           {error}
         </p>
       )}
       {!loading && !error && (
         <div className="mt-2 overflow-x-auto">
-          <table className="min-w-full border border-gray-200 text-sm">
+          <table
+            className="min-w-full border text-sm text-[var(--color-text)]"
+            style={{ borderColor: "var(--color-border)" }}
+          >
             <thead>
-              <tr className="bg-gray-50">
-                <th className="border-b border-gray-200 px-3 py-2 text-left font-medium">
+              <tr style={{ backgroundColor: "var(--color-bg-secondary)" }}>
+                <th className="border-b px-3 py-2 text-left font-medium" style={{ borderColor: "var(--color-border)" }}>
                   タイトル
                 </th>
-                <th className="border-b border-gray-200 px-3 py-2 text-left font-medium">
+                <th className="border-b px-3 py-2 text-left font-medium" style={{ borderColor: "var(--color-border)" }}>
                   ステータス
                 </th>
-                <th className="border-b border-gray-200 px-3 py-2 text-left font-medium">
+                <th className="border-b px-3 py-2 text-left font-medium" style={{ borderColor: "var(--color-border)" }}>
                   操作
                 </th>
               </tr>
@@ -183,19 +198,19 @@ export function AdminDashboardClient({
             <tbody>
               {questions.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-3 py-4 text-gray-500">
+                  <td colSpan={3} className="px-3 py-4 text-[var(--color-text-muted)]">
                     問題がありません。
                   </td>
                 </tr>
               ) : (
                 questions.map((q) => (
-                  <tr key={q.id} className="border-b border-gray-100">
+                  <tr key={q.id} className="border-b" style={{ borderColor: "var(--color-border)" }}>
                     <td className="px-3 py-2">{q.title}</td>
                     <td className="px-3 py-2">{q.status === "published" ? "公開" : "下書き"}</td>
                     <td className="px-3 py-2">
                       <Link
                         href={`${base}/questions/${q.id}/edit${keyQuery}`}
-                        className="text-blue-600 hover:underline"
+                        className="text-[var(--color-accent-emerald)] hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-emerald)] rounded"
                       >
                         編集
                       </Link>
@@ -203,7 +218,7 @@ export function AdminDashboardClient({
                       <button
                         type="button"
                         onClick={() => handleDelete(q.id)}
-                        className="text-red-600 hover:underline"
+                        className="text-red-400 hover:underline focus:outline-none focus:ring-2 focus:ring-red-400 rounded"
                         aria-label={`${q.title} を削除`}
                       >
                         削除
