@@ -1,4 +1,4 @@
-// TEST-01 E2E: Playwright 設定（TC-E2E-01〜07 必須範囲）
+// TEST-01, TEST-02 E2E: Playwright 設定（TC-E2E-01〜13 / 本番環境 E2E）
 import { defineConfig, devices } from "@playwright/test";
 import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
@@ -13,6 +13,9 @@ if (existsSync(envPath)) {
   }
 }
 
+const baseURL = process.env.BASE_URL ?? "http://localhost:3000";
+const isProduction = !!process.env.BASE_URL;
+
 export default defineConfig({
   testDir: "src/tests/e2e",
   fullyParallel: true,
@@ -21,19 +24,23 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL,
     trace: "on-first-retry",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
-    env: {
-      ...process.env,
-      ADMIN_API_KEY: process.env.ADMIN_API_KEY ?? process.env.ADMIN_KEY ?? "test-admin-key",
-      ADMIN_KEY: process.env.ADMIN_KEY ?? process.env.ADMIN_API_KEY ?? "test-admin-key",
-    },
-  },
+  ...(isProduction
+    ? {}
+    : {
+        webServer: {
+          command: "npm run dev",
+          url: "http://localhost:3000",
+          reuseExistingServer: !process.env.CI,
+          timeout: 60_000,
+          env: {
+            ...process.env,
+            ADMIN_API_KEY: process.env.ADMIN_API_KEY ?? process.env.ADMIN_KEY ?? "test-admin-key",
+            ADMIN_KEY: process.env.ADMIN_KEY ?? process.env.ADMIN_API_KEY ?? "test-admin-key",
+          },
+        },
+      }),
 });
