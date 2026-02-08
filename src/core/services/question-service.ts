@@ -20,6 +20,9 @@ export async function listQuestions(
       return { ...q, favoriteCount: count };
     })
   );
+  if (sort === "favorites") {
+    withCount.sort((a, b) => (b.favoriteCount ?? 0) - (a.favoriteCount ?? 0));
+  }
   return withCount;
 }
 

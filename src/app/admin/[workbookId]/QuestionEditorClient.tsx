@@ -86,10 +86,8 @@ export function QuestionEditorClient({
           return;
         }
         setMessage({ type: "ok", text: "保存しました。" });
-        if (!question) {
-          window.location.href = backUrl;
-          return;
-        }
+        window.location.href = backUrl;
+        return;
       } catch {
         setMessage({ type: "error", text: "通信エラー" });
       }

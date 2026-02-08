@@ -15,6 +15,8 @@ import { createLowdbHistoryRepository } from "./lowdb/history-repository";
 import { createLowdbFavoriteRepository } from "./lowdb/favorite-repository";
 import { createFirestoreWorkbookRepository } from "./firestore/workbook-repository";
 import { createFirestoreQuestionRepository } from "./firestore/question-repository";
+import { createFirestoreHistoryRepository } from "./firestore/history-repository";
+import { createFirestoreFavoriteRepository } from "./firestore/favorite-repository";
 
 export type { WorkbookRepository } from "./workbook-repository";
 export type { QuestionRepository, ListQuestionsOptions } from "./question-repository";
@@ -63,13 +65,23 @@ export function getDraftRepository(): DraftRepository {
 
 export function getHistoryRepository(): HistoryRepository {
   if (cachedHistoryRepo) return cachedHistoryRepo;
-  cachedHistoryRepo = createLowdbHistoryRepository(getDataDir());
+  const source = process.env.DATA_SOURCE ?? "lowdb";
+  if (source === "firestore") {
+    cachedHistoryRepo = createFirestoreHistoryRepository();
+  } else {
+    cachedHistoryRepo = createLowdbHistoryRepository(getDataDir());
+  }
   return cachedHistoryRepo;
 }
 
 export function getFavoriteRepository(): FavoriteRepository {
   if (cachedFavoriteRepo) return cachedFavoriteRepo;
-  cachedFavoriteRepo = createLowdbFavoriteRepository(getDataDir());
+  const source = process.env.DATA_SOURCE ?? "lowdb";
+  if (source === "firestore") {
+    cachedFavoriteRepo = createFirestoreFavoriteRepository();
+  } else {
+    cachedFavoriteRepo = createLowdbFavoriteRepository(getDataDir());
+  }
   return cachedFavoriteRepo;
 }
 
