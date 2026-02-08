@@ -1,6 +1,6 @@
 "use client";
 
-/* CD-027: 共通 loading-overlay, stats-loader, scanning-line (mock.html) */
+/* CD-027: 共通 loading-overlay, stats-loader (ヒストグラムのみ) */
 
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
@@ -42,27 +42,26 @@ export default function LoadingOverlay() {
       aria-live="polite"
       aria-label="読み込み中"
     >
-      <div className="stats-loader flex h-[60px] w-[120px] items-end gap-1">
-        {[0.2, 0.5, 0.8, 1, 0.8, 0.5, 0.2].map((h, i) => (
+      <div
+        className="stats-loader flex items-end"
+        style={{ height: 100, width: 202, gap: 6 }}
+      >
+        {[0.2, 0.35, 0.5, 0.65, 0.8, 0.9, 1, 0.9, 0.8, 0.65, 0.5, 0.35, 0.2].map((h, i) => (
           <div
             key={i}
             className="stats-bar rounded-t"
             style={{
-              width: 8,
+              width: 10,
               height: `${h * 100}%`,
               background: "linear-gradient(to top, var(--color-accent-blue), var(--color-accent-emerald))",
-              animation: "stats-grow 1.5s ease-in-out infinite",
-              animationDelay: `${0.1 * (i + 1)}s`,
+              animation: "stats-grow 1.6s ease-in-out infinite",
+              animationDelay: `${(i + 1) * 0.12}s`,
+              // 底に近いバーは伸びを抑え、頂上だけ大きく
+              ["--stats-grow-max" as string]: 1 + h * 0.5,
             }}
           />
         ))}
       </div>
-      <div className="scanning-line relative mt-5 h-0.5 w-[200px] overflow-hidden bg-[rgba(16,185,129,0.2)]">
-        <div className="scanning-line-bar" />
-      </div>
-      <p className="loading-text mt-4 font-mono text-[10px] tracking-[0.2em] text-[var(--color-accent-emerald)]">
-        {message}
-      </p>
     </div>
   );
 }

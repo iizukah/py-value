@@ -16,6 +16,8 @@ import type { PythonAnalysisUserAnswer } from "@/lib/types";
 import { runJudge, getCombinedCode, runCodeAndGetVariables, getPyodide } from "./judge";
 import { getOrCreateClientId } from "@/lib/client-id";
 import { CodeInputWithHighlight } from "./CodeInputWithHighlight";
+import { ProblemStatementMarkdown } from "./ProblemStatementMarkdown";
+import { decodeHtmlEntities } from "./decode-html-entities";
 
 export interface PythonAnalysisPluginProps {
   question: Question;
@@ -37,9 +39,14 @@ export default function PythonAnalysisPlugin({
   workbookId,
   questionId,
 }: PythonAnalysisPluginProps) {
-  const initialCells = (initialAnswer as PythonAnalysisUserAnswer)?.cells ?? [
-    { id: "1", content: question.initial_code ?? "" },
-  ];
+  const answerCells = (initialAnswer as PythonAnalysisUserAnswer)?.cells;
+  const initialCells =
+    answerCells && answerCells.length > 0
+      ? answerCells.map((c) => ({
+          id: c.id,
+          content: decodeHtmlEntities(c.content ?? ""),
+        }))
+      : [{ id: "1", content: decodeHtmlEntities(question.initial_code ?? "") }];
   const [cells, setCells] = useState<{ id: string; content: string }[]>(initialCells);
   const [judgeResult, setJudgeResult] = useState<JudgeResult | null>(externalJudgeResult ?? null);
   const [isJudging, setIsJudging] = useState(false);
@@ -74,7 +81,7 @@ export default function PythonAnalysisPlugin({
   useEffect(() => {
     const next = (initialAnswer as PythonAnalysisUserAnswer)?.cells;
     if (next && Array.isArray(next) && next.length > 0) {
-      setCells(next.map((c) => ({ id: c.id, content: c.content ?? "" })));
+      setCells(next.map((c) => ({ id: c.id, content: decodeHtmlEntities(c.content ?? "") })));
     }
   }, [initialAnswer]);
 
@@ -135,7 +142,7 @@ export default function PythonAnalysisPlugin({
 
   /** DD-024: リセット — セル・採点・変数・プロットを初期状態に戻す */
   const handleReset = useCallback(() => {
-    const initial = [{ id: "1", content: question.initial_code ?? "" }];
+    const initial = [{ id: "1", content: decodeHtmlEntities(question.initial_code ?? "") }];
     setCells(initial);
     notifyAnswer(initial);
     setJudgeResult(null);
@@ -296,33 +303,37 @@ export default function PythonAnalysisPlugin({
 
   return (
     <>
-      {/* DD-023: Pyodide 準備完了まで全画面ローディング */}
+      {/* DD-023: Pyodide 準備完了まで全画面ローディング（コードペインは表示しない） */}
       {!pyodideReady && (
         <div
-          className="fixed inset-0 z-[200] flex flex-col items-center justify-center gap-6"
-          style={{ background: "var(--color-bg-main)" }}
+          className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
+          style={{ background: "var(--color-bg-main)", opacity: 1 }}
           role="status"
           aria-live="polite"
           aria-busy="true"
         >
-          <div className="stats-loader flex h-[60px] w-[120px] items-end gap-1" style={{ gap: 4 }}>
-            {[0.2, 0.5, 0.8, 1, 0.8, 0.5, 0.2].map((h, i) => (
+          <div
+            className="stats-loader flex items-end"
+            style={{ height: 100, width: 202, gap: 6 }}
+          >
+            {[0.2, 0.35, 0.5, 0.65, 0.8, 0.9, 1, 0.9, 0.8, 0.65, 0.5, 0.35, 0.2].map((h, i) => (
               <div
                 key={i}
                 className="stats-bar rounded-t"
                 style={{
-                  width: 8,
+                  width: 10,
                   height: `${h * 100}%`,
                   background: "linear-gradient(to top, var(--color-accent-blue), var(--color-accent-emerald))",
-                  animation: "stats-grow 1.5s ease-in-out infinite",
-                  animationDelay: `${i * 0.1}s`,
+                  animation: "stats-grow 1.6s ease-in-out infinite",
+                  animationDelay: `${(i + 1) * 0.12}s`,
+                  ["--stats-grow-max" as string]: 1 + h * 0.5,
                 }}
               />
             ))}
           </div>
-          <p className="text-sm font-medium text-[var(--color-text-muted)]">準備中...</p>
         </div>
       )}
+      {pyodideReady && (
       <div className="three-pane mt-6" style={{ minHeight: "420px" }}>
       {/* CD-016: 左ペイン = 問題 */}
       <div className="pane workspace-problem-pane">
@@ -360,19 +371,8 @@ export default function PythonAnalysisPlugin({
               </div>
             )}
           </div>
-          <div
-            className="workspace-problem-readability rounded-[var(--radius-md)] border p-3 text-[14px] leading-relaxed"
-            style={{
-              backgroundColor: "rgba(255,255,255,0.03)",
-              borderColor: "var(--color-border)",
-              color: "var(--color-text)",
-            }}
-          >
-            {question.problem_statement || "（問題文なし）"}
-          </div>
-        </div>
 
-        {/* CD-018, CD-019, CD-020: 採点結果ブロック（ワークスペース内） */}
+        {/* CD-018, CD-019, CD-020: 採点結果ブロック（問題タイトルと問題文の間） */}
         {(displayJudging || displayResult) && (
         <div
           className={`mt-4 rounded-[var(--radius-md)] border p-3 ${
@@ -441,10 +441,24 @@ export default function PythonAnalysisPlugin({
           </div>
         </div>
         )}
+          <div
+            className="workspace-problem-readability rounded-[var(--radius-md)] border p-3 text-[14px] leading-relaxed"
+            style={{
+              backgroundColor: "rgba(255,255,255,0.03)",
+              borderColor: "var(--color-border)",
+              color: "var(--color-text)",
+            }}
+          >
+            <ProblemStatementMarkdown
+              source={question.problem_statement ?? ""}
+              style={{ color: "var(--color-text)" }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* CD-016: 中央ペイン = セル編集 or 問題一覧（採点結果時）+ CD-017 ツールバー */}
-      <div className="pane flex flex-col">
+      <div className="pane workspace-code-pane flex flex-col">
         <div
           className="workspace-toolbar mb-4 flex flex-wrap items-center justify-between gap-2"
         >
@@ -516,7 +530,7 @@ export default function PythonAnalysisPlugin({
           /* DD-021: 採点結果時は中央ペインに問題一覧（CHALLENGE・難易度・タグ・問題文省略） */
           <div className="flex flex-1 flex-col gap-3 overflow-auto">
             <span className="label mb-1 block text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
-              問題一覧
+              次の問題に挑戦！
             </span>
             <ul className="flex flex-col gap-3">
               {resultQuestionList.map((q) => (
@@ -569,31 +583,29 @@ export default function PythonAnalysisPlugin({
           {(isCellRunning || displayJudging) && (
             <div
               className="absolute inset-0 z-[100] flex flex-col items-center justify-center rounded-[var(--radius-sm)]"
-              style={{ background: "var(--color-bg-main)" }}
+              style={{ background: "var(--color-bg-main)", opacity: 1 }}
               aria-live="polite"
               aria-busy="true"
             >
-              <div className="stats-loader flex h-[60px] w-[120px] items-end gap-1" style={{ gap: 4 }}>
-                {[0.2, 0.5, 0.8, 1, 0.8, 0.5, 0.2].map((h, i) => (
+              <div
+                className="stats-loader flex items-end"
+                style={{ height: 100, width: 202, gap: 6 }}
+              >
+                {[0.2, 0.35, 0.5, 0.65, 0.8, 0.9, 1, 0.9, 0.8, 0.65, 0.5, 0.35, 0.2].map((h, i) => (
                   <div
                     key={i}
                     className="stats-bar rounded-t"
                     style={{
-                      width: 8,
+                      width: 10,
                       height: `${h * 100}%`,
                       background: "linear-gradient(to top, var(--color-accent-blue), var(--color-accent-emerald))",
-                      animation: "stats-grow 1.5s ease-in-out infinite",
-                      animationDelay: `${i * 0.1}s`,
+                      animation: "stats-grow 1.6s ease-in-out infinite",
+                      animationDelay: `${(i + 1) * 0.12}s`,
+                      ["--stats-grow-max" as string]: 1 + h * 0.5,
                     }}
                   />
                 ))}
               </div>
-              <div className="relative mt-5 h-0.5 w-[200px] overflow-hidden bg-[rgba(16,185,129,0.2)]">
-                <div className="scanning-line-bar" />
-              </div>
-              <p className="mt-6 text-[10px] font-mono tracking-widest text-[var(--color-accent-emerald)]">
-                {displayJudging ? "採点中..." : "実行中..."}
-              </p>
             </div>
           )}
         <div className="cell-group-ws flex flex-1 flex-col gap-4">
@@ -610,7 +622,7 @@ export default function PythonAnalysisPlugin({
                 className="cell-box min-h-[80px] rounded-[var(--radius-sm)] border p-3 font-mono text-[13px]"
                 style={{
                   borderColor: "var(--color-border)",
-                  backgroundColor: "var(--color-bg-main)",
+                  backgroundColor: "var(--color-bg-secondary)",
                   color: "var(--color-text)",
                 }}
               >
@@ -625,7 +637,7 @@ export default function PythonAnalysisPlugin({
                   placeholder="コードを入力..."
                   aria-label={`セル ${index + 1}`}
                   rows={4}
-                  style={{ backgroundColor: "var(--color-bg-main)" }}
+                  style={{ backgroundColor: "var(--color-bg-secondary)" }}
                 />
               </div>
               <div
@@ -751,6 +763,7 @@ export default function PythonAnalysisPlugin({
         </div>
       </div>
     </div>
+      )}
     </>
   );
 }

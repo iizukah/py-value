@@ -47,24 +47,11 @@
   }
 }
 
-/* CD-027: loading overlay keyframes (mock.html) */
+/* CD-027: loading overlay keyframes。底(短いバー)は伸びを抑え、中央だけ強く (--stats-grow-max でバーごとに指定) */
 @keyframes stats-grow {
-  0%, 100% { transform: scaleY(1); opacity: 0.5; }
-  50% { transform: scaleY(1.3); opacity: 1; }
+  0%, 100% { transform: scaleY(1); opacity: 0.4; }
+  50% { transform: scaleY(var(--stats-grow-max, 1.5)); opacity: 1; }
 }
-@keyframes scan {
-  from { left: -40px; }
-  to { left: 200px; }
-}
-.scanning-line-bar {
-  position: absolute;
-  width: 40px;
-  height: 100%;
-  background: var(--color-accent-emerald);
-  box-shadow: 0 0 15px var(--color-accent-emerald);
-  animation: scan 2s linear infinite;
-}
-
 /* CD-005: home bg layer keyframes (mock.html) */
 @keyframes fvGridMove {
   0% { background-position: 0 0, 0 0; }
@@ -158,6 +145,28 @@
 }
 .cell-input,
 .cell-group-ws pre {
+  scrollbar-color: var(--color-border) var(--color-bg-secondary);
+  scrollbar-width: thin;
+}
+
+/* ワークスペース中央ペイン（セル一覧スクロール）を DD-043 と同トーンに */
+.workspace-code-pane::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.workspace-code-pane::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+  border-radius: 4px;
+}
+.workspace-code-pane::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+.workspace-code-pane::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-emerald);
+  opacity: 0.6;
+}
+.workspace-code-pane {
   scrollbar-color: var(--color-border) var(--color-bg-secondary);
   scrollbar-width: thin;
 }
