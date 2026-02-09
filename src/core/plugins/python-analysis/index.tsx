@@ -49,6 +49,8 @@ export default function PythonAnalysisPlugin({
         }))
       : [{ id: "1", content: stripHtmlToPlainText(question.initial_code ?? "") }];
   const [cells, setCells] = useState<{ id: string; content: string }[]>(initialCells);
+  /** 下書き読み込み等でセルを差し替えたときにインクリメント。Monaco を再マウントしてカーソル飛びを防ぐ。 */
+  const [cellsRevision, setCellsRevision] = useState(0);
   const [judgeResult, setJudgeResult] = useState<JudgeResult | null>(externalJudgeResult ?? null);
   const [isJudging, setIsJudging] = useState(false);
   const [showCompleteLink, setShowCompleteLink] = useState<boolean | null>(null);
@@ -85,6 +87,7 @@ export default function PythonAnalysisPlugin({
     const next = (initialAnswer as PythonAnalysisUserAnswer)?.cells;
     if (next && Array.isArray(next) && next.length > 0) {
       setCells(next.map((c) => ({ id: c.id, content: stripHtmlToPlainText(c.content ?? "") })));
+      setCellsRevision((r) => r + 1);
     }
   }, [initialAnswer]);
 
@@ -152,6 +155,7 @@ export default function PythonAnalysisPlugin({
   const handleReset = useCallback(() => {
     const initial = [{ id: "1", content: stripHtmlToPlainText(question.initial_code ?? "") }];
     setCells(initial);
+    setCellsRevision((r) => r + 1);
     notifyAnswer(initial);
     setJudgeResult(null);
     setResultTileVisible(false);
@@ -642,6 +646,7 @@ export default function PythonAnalysisPlugin({
               >
                 <CodeInputWithHighlight
                   value={cell.content}
+                  contentKey={cellsRevision}
                   onChange={(value) => {
                     const next = cells.map((c, i) =>
                       i === index ? { ...c, content: value } : c

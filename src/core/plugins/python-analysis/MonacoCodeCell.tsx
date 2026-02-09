@@ -2,7 +2,8 @@
 
 /**
  * DD-022: Python セル用 Monaco Editor。
- * value/onChange で親と同期。言語は python、テーマは vs-dark。
+ * 非制御: 初期値は defaultValue、入力中は value で上書きしないためカーソルが飛ばない。
+ * 外部リセット（下書き読み込み等）時は contentKey を変えて再マウントする。
  */
 
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -18,6 +19,8 @@ function toPlain(s: string): string {
 export interface MonacoCodeCellProps {
   value: string;
   onChange: (value: string) => void;
+  /** 外部から内容を差し替えたときに変えるキー。変わるとエディタを再マウントして defaultValue を反映する。 */
+  contentKey?: string | number;
   placeholder?: string;
   "aria-label"?: string;
   className?: string;
@@ -32,6 +35,7 @@ const HEIGHT_PADDING = 4;
 export function MonacoCodeCell({
   value,
   onChange,
+  contentKey,
   "aria-label": ariaLabel,
   className = "",
   style = {},
@@ -39,7 +43,7 @@ export function MonacoCodeCell({
 }: MonacoCodeCellProps) {
   const [height, setHeight] = useState(Math.max(MIN_HEIGHT_PX, rows * LINE_HEIGHT));
 
-  // value に HTML 等が含まれる場合は正規化して親を更新
+  // value に HTML 等が含まれる場合は正規化して親を更新（初回・外部更新時）
   useEffect(() => {
     const normalized = toPlain(value ?? "");
     if (normalized !== value) onChange(normalized);
@@ -97,7 +101,12 @@ export function MonacoCodeCell({
       verticalScrollbarSize: 8,
       horizontalScrollbarSize: 8,
     },
+    quickSuggestions: false,
+    suggestOnTriggerCharacters: false,
   };
+
+  // contentKey が変わったときだけ再マウントして defaultValue を反映（下書き読み込み等）
+  const editorKey = contentKey ?? "default";
 
   return (
     <div
@@ -107,10 +116,11 @@ export function MonacoCodeCell({
       aria-label={ariaLabel}
     >
       <Editor
+        key={editorKey}
         height={height}
         language="python"
         theme="vs-dark"
-        value={displayValue}
+        defaultValue={displayValue}
         onChange={handleEditorChange}
         onMount={handleEditorMount}
         options={options}
