@@ -78,5 +78,13 @@
     "clientId": "client-3zzd9idcnrx-1770521265081",
     "count": 1,
     "updatedAt": "2026-02-08T11:56:49.839Z"
+  },
+  {
+    "id": "fav-py-value-q1-client-1epjo0ap0j5h-1770563303814",
+    "workbookId": "py-value",
+    "questionId": "q1",
+    "clientId": "client-1epjo0ap0j5h-1770563303814",
+    "count": 1,
+    "updatedAt": "2026-02-08T15:08:46.162Z"
   }
 ]

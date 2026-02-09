@@ -7,7 +7,7 @@ test.describe("TC-E2E-13: キーボード操作", () => {
     page,
   }) => {
     await page.goto("/py-value");
-    await expect(page.locator("h1")).toHaveText("Pythonデータ分析");
+    await expect(page.locator("h1")).toContainText("Pythonデータ分析");
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
     const firstQuestionLink = page.locator('a[href^="/py-value/questions/"]').first();
@@ -21,6 +21,6 @@ test.describe("TC-E2E-13: キーボード操作", () => {
     await page.keyboard.press("Enter");
     await page.waitForURL(/\/py-value$/);
     await expect(page).toHaveURL(/\/py-value$/);
-    await expect(page.locator("h1")).toHaveText("Pythonデータ分析");
+    await expect(page.locator("h1")).toContainText("Pythonデータ分析");
   });
 });

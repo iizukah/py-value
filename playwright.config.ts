@@ -28,6 +28,10 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  timeout: isProduction ? 60_000 : undefined,
+  ...(isProduction
+    ? { workers: 1 }
+    : {}),
   ...(isProduction
     ? {}
     : {

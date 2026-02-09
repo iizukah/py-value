@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:prod": "cross-env BASE_URL=https://exir-27624.web.app playwright test"
+    "test:e2e:prod": "cross-env BASE_URL=https://exir-27624.web.app playwright test",
+    "sync-admin-key": "node scripts/sync-admin-key-to-cloudrun.mjs"
   },
 "dependencies": {
   "@monaco-editor/react": "^4.6.0",

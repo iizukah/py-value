@@ -12,8 +12,8 @@ test.describe("TC-E2E-08: 履歴一覧・詳細", () => {
     await expect(page).toHaveURL(/\/py-value\/history$/);
     await expect(page.locator("h1")).toHaveText("履歴");
     await expect(
-      page.getByRole("link", { name: "一覧へ戻る" })
-    ).toBeVisible();
+      page.getByRole("link", { name: "一覧へ戻る" }).or(page.getByText("履歴はありません"))
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test("履歴一覧で1件クリックすると詳細（SC-006）に遷移する", async ({

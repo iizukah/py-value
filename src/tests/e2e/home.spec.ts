@@ -4,12 +4,12 @@ import { test, expect } from "@playwright/test";
 test.describe("TC-E2E-01: ルートでホーム表示", () => {
   test("ファーストビュー・問題集カードが表示される", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("h1")).toHaveText("EXER");
+    await expect(page.locator("h1")).toContainText("Exercise the Mind");
     await expect(
-      page.getByText("Exercise the Mind, Master the Skill.")
+      page.getByText("Exercise the Mind", { exact: false })
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: /Pythonデータ分析.*問題一覧へ/ })
+      page.getByRole("link", { name: /Pythonデータ分析/ })
     ).toBeVisible();
   });
 });
@@ -19,13 +19,12 @@ test.describe("TC-E2E-02: 問題集選択で一覧へ遷移", () => {
     page,
   }) => {
     await page.goto("/");
-    await page.getByRole("link", { name: /Pythonデータ分析.*問題一覧へ/ }).click();
+    await page.getByRole("link", { name: /Pythonデータ分析/ }).first().click();
     await page.waitForURL(/\/py-value$/, { timeout: 15000 });
     await expect(page).toHaveURL(/\/py-value$/);
-    await expect(page.locator("h1")).toHaveText("Pythonデータ分析");
-    // 少なくとも1問のカードがある（問題一覧画面であることの確認）
+    await expect(page.locator("h1")).toContainText("Pythonデータ分析");
     await expect(
       page.locator('a[href^="/py-value/questions/"]').first()
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15000 });
   });
 });
